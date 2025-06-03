@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebaseConfig';
+import { auth, db } from '../firebase';
 
 export default function SignupScreen() {
   const [form, setForm] = useState({
