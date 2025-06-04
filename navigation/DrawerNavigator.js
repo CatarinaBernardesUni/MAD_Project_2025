@@ -7,14 +7,17 @@ import ManageStudents from '../screens/admin/ManageStudents';
 import EnrollStudents from '../screens/admin/EnrollStudents';
 import Dashboard from '../screens/admin/Dashboard';
 import Settings from '../screens/Settings';
+import HomeScreen from '../screens/HomeScreen'; 
+import LearnMoreScreen from '../screens/LearnMoreScreen'; // Assuming this is the screen you want to add
 
 
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
-    <Drawer.Navigator initialRouteName="AdminHome">
-      <Drawer.Screen name="AdminHome" component={AdminHome} />
+    <Drawer.Navigator initialRouteName="HomeScreen">
+      <Drawer.Screen name="HomeScreen" component={HomeScreen} />
+      <Drawer.Screen name="LearnMoreScreen" component={LearnMoreScreen} />
       <Drawer.Screen name="ManageClasses" component={ManageClasses} />
       <Drawer.Screen name="ManageTeachers" component={ManageTeachers} />
       <Drawer.Screen name="ManageStudents" component={ManageStudents} />
