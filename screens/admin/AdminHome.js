@@ -1,6 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase';
+
 const AdminHome = ({ navigation }) => {
 
     // top part of the screen
@@ -42,7 +45,14 @@ const AdminHome = ({ navigation }) => {
         <Text style={styles.subtext}>Overview of attendance and records</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={() => {/* Add logout logic */}}>
+      <TouchableOpacity style={styles.logoutButton} onPress={async () => {
+    try {
+      await signOut(auth);
+      navigation.navigate('HomeScreen'); /*see how to navigate on nested*/
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  }}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>

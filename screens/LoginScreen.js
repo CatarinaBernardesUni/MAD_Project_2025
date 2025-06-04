@@ -1,17 +1,44 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
 
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+
+import { useNavigation } from '@react-navigation/native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const navigation = useNavigation();
+
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
       console.log('Login successful');
+
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+      const userData = userDoc.data();
+
+      if (userData.roles && userData.roles.includes('admin')) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'AdminHome' }], 
+        });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'DEFINE LATER' }], 
+        });
+      }
+    } else {
+      Alert.alert('User not found in Firestore');
+    }
+
     } catch (err) {
       Alert.alert('Login Failed', err.message);
     }

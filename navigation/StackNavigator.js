@@ -6,8 +6,6 @@ import ManageTeachers from '../screens/ManageTeachers';
 import ManageStudents from '../screens/ManageStudents';
 import EnrollStudents from '../screens/EnrollStudents';
 import Dashboard from '../screens/Dashboard';
-import HomeScreen from '../screens/HomeScreen'; 
-import LearnMoreScreen from '../screens/LearnMoreScreen'; 
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 
@@ -15,11 +13,9 @@ const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="HomeScreen">
-      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+    <Stack.Navigator>
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="SignupScreen" component={SignupScreen} />
-      <Stack.Screen name="LearnMoreScreen" component={LearnMoreScreen} />
       <Stack.Screen name="AdminHome" component={AdminHome} options={{ headerShown: false }} />
       <Stack.Screen name="ManageClasses" component={ManageClasses} />
       <Stack.Screen name="ManageTeachers" component={ManageTeachers} />
