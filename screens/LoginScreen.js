@@ -24,14 +24,16 @@ export default function LoginScreen() {
         style={styles.input}
         placeholder="Email"
         autoCapitalize="none"
-        keyboardType="email-address"
+        // keyboardType="email-address"
         onChangeText={setEmail}
         value={email}
+        onFocus={() => console.log('Email focused')}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         secureTextEntry
+        autoCapitalize="none"
         onChangeText={setPassword}
         value={password}
       />

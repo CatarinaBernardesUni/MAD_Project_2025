@@ -10,7 +10,7 @@ import Settings from '../screens/Settings';
 import HomeScreen from '../screens/HomeScreen'; 
 import LearnMoreScreen from '../screens/LearnMoreScreen'; // Assuming this is the screen you want to add
 import LoginScreen from '../screens/LoginScreen';
-
+import SignupScreen from '../screens/SignupScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -19,6 +19,7 @@ const DrawerNavigator = () => {
     <Drawer.Navigator initialRouteName="HomeScreen">
       <Drawer.Screen name="HomeScreen" component={HomeScreen} />
       <Drawer.Screen name="LoginScreen" component={LoginScreen} />
+      <Drawer.Screen name="SignupScreen" component={SignupScreen} />
       <Drawer.Screen name="LearnMoreScreen" component={LearnMoreScreen} />
       <Drawer.Screen name="ManageClasses" component={ManageClasses} />
       <Drawer.Screen name="ManageTeachers" component={ManageTeachers} />

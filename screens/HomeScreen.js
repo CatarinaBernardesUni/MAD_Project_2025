@@ -9,7 +9,7 @@ export default function HomepageScreen({ navigation }) {
 
       <View style={styles.buttonGroup}>
         <Button title="Log In" onPress={() => navigation.navigate('LoginScreen')} />
-        <Button title="Sign Up" onPress={() => navigation.navigate('Signup')} />
+        <Button title="Sign Up" onPress={() => navigation.navigate('SignupScreen')} />
         <Button title="Learn more about app" onPress={() => navigation.navigate('LearnMoreScreen')} />
       </View>
     </View>
