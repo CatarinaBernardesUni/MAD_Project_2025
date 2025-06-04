@@ -8,7 +8,7 @@ export default function HomepageScreen({ navigation }) {
       <Text style={styles.subtitle}>“Where every class finds its time.”</Text>
 
       <View style={styles.buttonGroup}>
-        <Button title="Log In" onPress={() => navigation.navigate('Login')} />
+        <Button title="Log In" onPress={() => navigation.navigate('LoginScreen')} />
         <Button title="Sign Up" onPress={() => navigation.navigate('Signup')} />
         <Button title="Learn more about app" onPress={() => navigation.navigate('LearnMoreScreen')} />
       </View>

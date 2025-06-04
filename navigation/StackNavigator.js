@@ -6,14 +6,17 @@ import ManageTeachers from '../screens/ManageTeachers';
 import ManageStudents from '../screens/ManageStudents';
 import EnrollStudents from '../screens/EnrollStudents';
 import Dashboard from '../screens/Dashboard';
-import HomeScreen from '../screens/HomeScreen'; // Assuming this is the screen you want to add
+import HomeScreen from '../screens/HomeScreen'; 
+import LearnMoreScreen from '../screens/LearnMoreScreen'; 
+import LoginScreen from '../screens/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="HomeScreen">
-      <Stack.Screen name="HomeScreen" component={HomepageScreen} />
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="LearnMoreScreen" component={LearnMoreScreen} />
       <Stack.Screen name="AdminHome" component={AdminHome} options={{ headerShown: false }} />
       <Stack.Screen name="ManageClasses" component={ManageClasses} />

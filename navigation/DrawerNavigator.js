@@ -1,6 +1,6 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import AdminHome from '../screens/admin/AdminHome';
+//import AdminHome from '../screens/admin/AdminHome';
 import ManageClasses from '../screens/admin/ManageClasses';
 import ManageTeachers from '../screens/admin/ManageTeachers';
 import ManageStudents from '../screens/admin/ManageStudents';
@@ -9,6 +9,7 @@ import Dashboard from '../screens/admin/Dashboard';
 import Settings from '../screens/Settings';
 import HomeScreen from '../screens/HomeScreen'; 
 import LearnMoreScreen from '../screens/LearnMoreScreen'; // Assuming this is the screen you want to add
+import LoginScreen from '../screens/LoginScreen';
 
 
 const Drawer = createDrawerNavigator();
@@ -17,6 +18,7 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator initialRouteName="HomeScreen">
       <Drawer.Screen name="HomeScreen" component={HomeScreen} />
+      <Drawer.Screen name="LoginScreen" component={LoginScreen} />
       <Drawer.Screen name="LearnMoreScreen" component={LearnMoreScreen} />
       <Drawer.Screen name="ManageClasses" component={ManageClasses} />
       <Drawer.Screen name="ManageTeachers" component={ManageTeachers} />
