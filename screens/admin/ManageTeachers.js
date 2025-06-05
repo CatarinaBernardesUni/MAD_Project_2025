@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import TeacherCard from '../../components/TeacherCard';
 
 export default function AdminManageTeachers({ navigation }) {
   const [teachers, setTeachers] = useState([]);
@@ -35,25 +36,19 @@ export default function AdminManageTeachers({ navigation }) {
   const deleteTeacher = async (teacherId) => {
     try {
       await deleteDoc(doc(db, 'users', teacherId));
-      fetchTeachers(); // refresh list
+      fetchTeachers(); 
     } catch (err) {
       console.error('Failed to delete:', err);
     }
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.teacherCard}>
-      <Text>ID: {item.id}</Text>
-      <Text>Name: {item.name}</Text>
-      <Text>Email: {item.email}</Text>
-      <Text>Subjects: Programming</Text> {/* CHANGE THIS TO ACCTUALLY FETCH THE TEACHER'S SUBJECTS */}
-
-      <View style={styles.buttonRow}>
-        <Button title="Edit" onPress={() => navigation.navigate('EditTeacher', { teacher: item })} />
-        <Button title="Delete" color="red" onPress={() => deleteTeacher(item.id)} />
-      </View>
-    </View>
-  );
+  <TeacherCard
+    teacher={item}
+    onEdit={(teacher) => navigation.navigate('EditTeacher', { teacher })}
+    onDelete={(teacher) => deleteTeacher(teacher.id)}
+  />
+);
 
   return (
     <View style={styles.container}>

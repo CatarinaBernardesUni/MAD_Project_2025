@@ -25,7 +25,7 @@ export default function SignupScreen() {
   const pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ImagePicker.MediaType,
         allowsEditing: true,
         quality: 0.5,
       });
