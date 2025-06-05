@@ -7,12 +7,13 @@ import ManageStudents from '../screens/admin/ManageStudents';
 import EnrollStudents from '../screens/admin/EnrollStudents';
 import Dashboard from '../screens/admin/Dashboard';
 import Settings from '../screens/Settings';
+import CustomDrawerContent from './CustomDrawerContent';
 
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
       <Drawer.Screen name="AdminHome" component={AdminHome} />
       <Drawer.Screen name="ManageClasses" component={ManageClasses} />
       <Drawer.Screen name="ManageTeachers" component={ManageTeachers} />

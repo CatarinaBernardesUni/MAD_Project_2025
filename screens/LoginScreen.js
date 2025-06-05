@@ -1,43 +1,18 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
 
-import { auth, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-
-import { useNavigation } from '@react-navigation/native';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const navigation = useNavigation();
-
   const handleLogin = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful');
-
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists()) {
-      const userData = userDoc.data();
-
-      if (userData.roles && userData.roles.includes('admin')) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'AdminHome' }], 
-        });
-      } else {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'DEFINE LATER' }], 
-        });
-      }
-    } else {
-      Alert.alert('User not found in Firestore');
-    }
+      Alert.alert('Login Successful', 'You have successfully logged in.');
 
     } catch (err) {
       Alert.alert('Login Failed', err.message);
@@ -51,10 +26,9 @@ export default function LoginScreen() {
         style={styles.input}
         placeholder="Email"
         autoCapitalize="none"
-        // keyboardType="email-address"
+        keyboardType="email-address"
         onChangeText={setEmail}
         value={email}
-        onFocus={() => console.log('Email focused')}
       />
       <TextInput
         style={styles.input}

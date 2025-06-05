@@ -6,8 +6,8 @@ import { auth } from '../../firebase';
 
 const AdminHome = ({ navigation }) => {
 
-    // top part of the screen
-    React.useLayoutEffect(() => {
+  // top part of the screen
+  React.useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: '#4A90E2' },
       headerTintColor: '#fff',
@@ -46,13 +46,14 @@ const AdminHome = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.logoutButton} onPress={async () => {
-    try {
-      await signOut(auth);
-      navigation.navigate('HomeScreen'); /*see how to navigate on nested*/
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  }}>
+        try {
+          console.log('Logged in UID:', auth.currentUser.uid);
+          await signOut(auth);
+          console.log('Signed out successfully');
+        } catch (error) {
+          console.error('Error signing out:', error);
+        }
+      }}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>

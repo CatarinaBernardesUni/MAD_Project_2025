@@ -13,13 +13,17 @@ export default function App() {
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator, View } from 'react-native';
+
 import useFirebaseUser from './useFirebaseUser';
 
-import DrawerNavigator from './navigation/DrawerNavigator'; 
-import AuthStack from './navigation/AuthStack';                               
+import AuthStack from './navigation/AuthStack';
+import AdminNavigator from './navigation/AdminNavigator';
+import TeacherNavigator from './navigation/TeacherNavigator';
+import StudentNavigator from './navigation/StudentNavigator';
+
 
 export default function App() {
-  const { user, loading } = useFirebaseUser();
+  const { user, role, loading } = useFirebaseUser();
 
   if (loading) {
     return (
@@ -28,10 +32,26 @@ export default function App() {
       </View>
     );
   }
+  console.log("user:", user);
+  console.log("role:", role);
+
+  let Navigator;
+
+  if (!user) {
+    Navigator = AuthStack;
+  } else if (role === 'admin') {
+    Navigator = AdminNavigator;
+  } else if (role === 'teacher') {
+    Navigator = TeacherNavigator;
+  } else if (role === 'student') {
+    Navigator = StudentNavigator;
+  } else {
+    Navigator = AuthStack; // fallback if role is missing or unrecognized
+  }
 
   return (
     <NavigationContainer>
-      {user ? <DrawerNavigator /> : <AuthStack />}
+      <Navigator />
     </NavigationContainer>
   );
 }
