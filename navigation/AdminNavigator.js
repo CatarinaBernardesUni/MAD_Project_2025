@@ -7,7 +7,7 @@ import ManageStudents from '../screens/admin/ManageStudents';
 import EnrollStudents from '../screens/admin/EnrollStudents';
 import Dashboard from '../screens/admin/Dashboard';
 import Settings from '../screens/Settings';
-import CustomDrawerContent from './CustomDrawerContent';
+import CustomDrawerContent from '../components/CustomDrawerContent';
 
 const Drawer = createDrawerNavigator();
 

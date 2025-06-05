@@ -5,7 +5,7 @@ import TeacherCalendar from '../screens/teacher/TeacherCalendar';
 import TeacherDashboard from '../screens/teacher/TeacherDashboard';
 import TeacherSubjects from '../screens/teacher/TeacherSubjects';
 import Settings from '../screens/Settings';
-import CustomDrawerContent from './CustomDrawerContent';
+import CustomDrawerContent from '../components/CustomDrawerContent';
 
 const Drawer = createDrawerNavigator();
 

@@ -5,7 +5,7 @@ import StudentAttendance from '../screens/student/StudentAttendance';
 import StudentCalendar from '../screens/student/StudentCalendar';
 import StudentEnroll from '../screens/student/StudentEnroll';
 import Settings from '../screens/Settings';
-import CustomDrawerContent from './CustomDrawerContent';
+import CustomDrawerContent from '../components/CustomDrawerContent';
 
 const Drawer = createDrawerNavigator();
 
