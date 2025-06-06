@@ -7,6 +7,7 @@ import TeacherSubjects from '../screens/teacher/TeacherSubjects';
 import Settings from '../screens/Settings';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 
+
 const Drawer = createDrawerNavigator();
 
 export default function TeacherNavigator() {
