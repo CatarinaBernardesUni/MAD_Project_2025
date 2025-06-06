@@ -18,6 +18,7 @@ export default function SignupScreen() {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission needed', 'Please allow access to your gallery.');
+        /* How to add an actual request of permission? */
       }
     })();
   }, []);

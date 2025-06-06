@@ -14,6 +14,10 @@ export default function AdminManageTeachers({ navigation }) {
     fetchTeachers();
   }, []);
 
+  useEffect(() => {
+  applyFilters();
+}, [sortAlphabetically]);
+
   const fetchTeachers = async () => {
     const q = query(collection(db, 'users'), where('roles', 'array-contains', 'teacher'));
     const snapshot = await getDocs(q);
@@ -27,36 +31,39 @@ export default function AdminManageTeachers({ navigation }) {
     if (teacherIdFilter.trim()) {
       filtered = filtered.filter(t => t.id.includes(teacherIdFilter.trim()));
     }
-    if (sortAlphabetically) {
-      filtered = filtered.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    filtered.sort((a, b) => {
+    if (!a.name || !b.name) return 0; // safety check
+    return sortAlphabetically
+      ? a.name.localeCompare(b.name)
+      : b.name.localeCompare(a.name);
+  });
     setFilteredTeachers(filtered);
   };
 
   const deleteTeacher = async (teacherId) => {
     try {
       await deleteDoc(doc(db, 'users', teacherId));
-      fetchTeachers(); 
+      /*it is deleting from the users but not from the authentication*/
+      fetchTeachers();
     } catch (err) {
       console.error('Failed to delete:', err);
     }
   };
 
   const renderItem = ({ item }) => (
-  <TeacherCard
-    teacher={item}
-    onEdit={(teacher) => navigation.navigate('EditTeacher', { teacher })}
-    onDelete={(teacher) => deleteTeacher(teacher.id)}
-  />
-);
+    <TeacherCard
+      teacher={item}
+      onEdit={(teacher) => navigation.navigate('EditTeacher', { teacher })}
+      onDelete={(teacher) => deleteTeacher(teacher.id)}
+    />
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Manage Teachers</Text>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('AddTeacher')}
-      >
+        onPress={() => navigation.navigate('AddTeacher')}>
         <Text>Add Teacher</Text>
       </TouchableOpacity>
 
@@ -68,11 +75,11 @@ export default function AdminManageTeachers({ navigation }) {
         onChangeText={setTeacherIdFilter}
       />
       <View style={styles.filtersRow}>
-        <Text>Alphabetical Order</Text>
-        <TouchableOpacity onPress={() => setSortAlphabetically(!sortAlphabetically)}>
+        <TouchableOpacity style={styles.filterButton} onPress={() => setSortAlphabetically(!sortAlphabetically)}>
+          <Text>Alphabetical Order</Text>
           <Text>{sortAlphabetically ? '▼' : '▲'}</Text>
         </TouchableOpacity>
-        <Button title="Apply Filters" onPress={applyFilters} />
+        <Button title="Search" onPress={applyFilters} />
       </View>
 
       <FlatList
@@ -88,7 +95,8 @@ const styles = StyleSheet.create({
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
   addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
   input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12 },
-  filtersRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 },
+  filtersRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, justifyContent: 'space-between' },
   teacherCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },
-  buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }
+  buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
+  filterButton: { flexDirection: 'row', marginLeft: 8, alignItems: 'center', gap: 4 },
 });
