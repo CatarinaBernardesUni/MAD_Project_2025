@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../firebaseConfig';
 import TeacherCard from '../../components/TeacherCard';
-import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
 
 export default function AdminManageTeachers({ navigation }) {
   const [teachers, setTeachers] = useState([]);

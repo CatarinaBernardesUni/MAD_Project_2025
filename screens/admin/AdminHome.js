@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { auth } from '../../firebaseConfig';
 
 const AdminHome = ({ navigation }) => {
 

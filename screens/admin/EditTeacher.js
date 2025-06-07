@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../firebaseConfig';
 
 export default function EditTeacherScreen({ route, navigation }) {
   const { teacherId } = route.params;
@@ -90,6 +90,7 @@ useEffect(() => {
     }
   };
 
+    /*not sure this is working*/
   if (loading || !form) {
   return <Text style={{ padding: 20 }}>Loading...</Text>;
 }
@@ -100,7 +101,7 @@ useEffect(() => {
 
       <TextInput style={styles.input} placeholder="Name" value={form.name} onChangeText={name => setForm({ ...form, name })} />
       <TextInput style={styles.input} placeholder="Age" keyboardType="numeric" value={form.age} onChangeText={age => setForm({ ...form, age })} />
-      <TextInput style={styles.input} placeholder="Email" value={form.email} onChangeText={email => setForm({ ...form, email })} autoCapitalize="none" editable={false} />
+      <TextInput style={styles.input} placeholder="Email" value={form.email} onChangeText={email => setForm({ ...form, email })} autoCapitalize="none" />
 
       <Text style={styles.label}>Subjects:</Text>
       <View style={styles.subjectContainer}>

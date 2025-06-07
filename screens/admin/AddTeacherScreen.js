@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollVi
 import * as ImagePicker from 'expo-image-picker';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { auth, db } from '../../firebaseConfig';
 
 export default function AddTeacherScreen({ navigation }) {
     const [form, setForm] = useState({

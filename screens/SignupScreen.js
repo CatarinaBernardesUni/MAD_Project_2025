@@ -6,7 +6,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db } from '../firebaseConfig';
 
 export default function SignupScreen() {
   const [form, setForm] = useState({
