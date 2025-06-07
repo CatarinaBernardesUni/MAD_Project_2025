@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 
 const formatTimeRange = (start, end) => {
   try {
@@ -62,7 +56,7 @@ const ClassCard = ({ item, onEdit, onDelete }) => {
         <View style={styles.buttons}>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => onEdit(item)}
+            onPress={() => onEdit(item)} 
           >
             <Text>Edit</Text>
           </TouchableOpacity>

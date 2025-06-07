@@ -231,8 +231,12 @@ const ManageClasses = ({ navigation }) => {
                   c.start.toISOString().slice(0, 10).includes(dateFilter))
             )}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ClassCard item={item} onDelete={handleDelete} onEdit={() => {}} />
+              renderItem={({ item }) => (
+                <ClassCard
+                  item={item}
+                  onEdit={(classItem) => navigation.navigate('EditClass', { classData: classItem })}
+                  onDelete={handleDelete}
+                />
             )}
           />
         )}

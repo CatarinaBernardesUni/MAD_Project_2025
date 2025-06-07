@@ -11,6 +11,7 @@ import CustomDrawerContent from '../components/CustomDrawerContent';
 import AddTeacherScreen from '../screens/admin/AddTeacherScreen';
 import AddClass from '../screens/admin/AddClass';
 import EditTeacher from '../screens/admin/EditTeacher';
+import EditClass from '../screens/admin/EditClass';
 
 const Drawer = createDrawerNavigator();
 
@@ -26,7 +27,8 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Settings" component={Settings}/>
       <Drawer.Screen name="AddTeacher" component={AddTeacherScreen} options={{ drawerItemStyle: { display: 'none' } }} />
       <Drawer.Screen name="AddClass" component={AddClass} options={{ drawerItemStyle: { display: 'none' } }} />
-      <Drawer.Screen name="EditTeacher" component={EditTeacher} options={{ drawerItemStyle: { display: 'none' } }}/>      
+      <Drawer.Screen name="EditTeacher" component={EditTeacher} options={{ drawerItemStyle: { display: 'none' } }}/>
+      <Drawer.Screen name="EditClass" component={EditClass} options={{ drawerItemStyle: { display: 'none' } }}/>      
     </Drawer.Navigator>
   );
 };
