@@ -7,6 +7,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 
 export default function SignupScreen() {
   const [form, setForm] = useState({
@@ -39,15 +41,30 @@ export default function SignupScreen() {
     }
   };
 
+  const uploadImageAsync = async (uri, userId) => {
+  const blob = await (await fetch(uri)).blob();
+
+  const storage = getStorage();
+  const fileRef = ref(storage, `profilePictures/${userId}.jpg`);
+
+  await uploadBytes(fileRef, blob);
+  const downloadURL = await getDownloadURL(fileRef);
+  return downloadURL;
+};
+
   const handleSignUp = async () => {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
+      let downloadURL = null;
+    if (form.profilePicture) {
+      downloadURL = await uploadImageAsync(form.profilePicture, user.uid);
+    }
       await setDoc(doc(db, 'users', user.uid), {
         name: form.name,
         age: parseInt(form.age),
         email: form.email,
         roles: [form.role],
-        profilePicture: form.profilePicture || null,
+        profilePicture: downloadURL,
       });
       Alert.alert('Account created!');
     } catch (err) {

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
 
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../firebase';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -10,14 +11,31 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('Login successful');
-      Alert.alert('Login Successful', 'You have successfully logged in.');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    } catch (err) {
-      Alert.alert('Login Failed', err.message);
+    // Now check if user exists in Firestore
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      // Sign out and show alert
+      await signOut(auth);
+      Alert.alert(
+        'Account Deleted',
+        'Your account has been removed from the system. Please contact an administrator.'
+      );
+      return;
     }
-  };
+
+    // If Firestore user document exists
+    console.log('Login successful');
+    Alert.alert('Login Successful', 'You have successfully logged in.');
+
+  } catch (err) {
+    Alert.alert('Login Failed', err.message);
+  }
+};
 
   return (
     <View style={styles.container}>
