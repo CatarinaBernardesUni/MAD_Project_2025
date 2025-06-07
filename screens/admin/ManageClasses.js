@@ -1,34 +1,206 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View, Text, TouchableOpacity, FlatList, StyleSheet,
+  ActivityIndicator, TextInput,
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // Add this import
+import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
+import ClassCard from '../../components/ClassCard'; // <- Make sure path is correct
 
-const ManageClasses = () => {
+const fetchRefName = async (refPath, field = 'name') => {
+  try {
+    if (!refPath || typeof refPath !== 'string') return 'Unknown';
+    const ref = doc(db, refPath);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const data = snap.data();
+      return data[field] || data.name || data.fullName || 'Unnamed';
+    } else {
+      return 'Not Found';
+    }
+  } catch (err) {
+    console.error('Error resolving reference path:', refPath, err);
+    return 'Error';
+  }
+};
+
+const ManageClasses = ({ navigation }) => {
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('');
+  const [teacherFilter, setTeacherFilter] = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+
+  // New state for dropdown options
+  const [teacherOptions, setTeacherOptions] = useState([]);
+  const [subjectOptions, setSubjectOptions] = useState([]);
+
+  const fetchClasses = async () => {
+    setLoading(true);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'classes'));
+
+      const fetched = await Promise.all(
+        querySnapshot.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+
+          // Extract professorId from the reference string (e.g., "users/teacherId")
+          const professorRef = data.professor || '';
+          const professorId = professorRef.split('/')[1] || '';
+
+          const subjectRef = data.subject || '';
+          const subjectId = subjectRef.split('/')[1] || '';
+
+          const subjectName = await fetchRefName(data.subject, 'name');
+          const professorName = await fetchRefName(data.professor, 'name');
+
+          return {
+            id: docSnap.id,
+            subject: subjectName,
+            subjectId, // add this
+            professor: professorName,
+            professorId, // add this
+            additionalNotes: data.additionalNotes || '',
+            start: data.start?.toDate?.() || new Date(),
+            end: data.end?.toDate?.() || new Date(),
+          };
+        })
+      );
+
+      setClasses(fetched);
+    } catch (err) {
+      console.error('Error fetching classes:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'classes', id));
+      fetchClasses();
+    } catch (err) {
+      console.error('Error deleting class:', err);
+    }
+  };
+
+  // Fetch teachers and subjects for dropdowns
+  useEffect(() => {
+    const fetchDropdowns = async () => {
+      // Fetch teachers from users collection
+      const usersSnap = await getDocs(collection(db, 'users'));
+      const teachers = usersSnap.docs
+        .filter(doc => {
+          const roles = doc.data().roles || [];
+          return Array.isArray(roles) && roles.includes('teacher');
+        })
+        .map(doc => ({
+          id: doc.id,
+          name: doc.data().name || doc.data().fullName || doc.id,
+        }));
+      setTeacherOptions(teachers);
+
+      // Fetch subjects
+      const subjectsSnap = await getDocs(collection(db, 'subjects'));
+      const subjects = subjectsSnap.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name || doc.id,
+      }));
+      setSubjectOptions(subjects);
+    };
+    fetchDropdowns();
+  }, []);
+
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Manage Classes</Text>
-      <Text style={styles.text}>This is where you will add, edit, or delete class sessions.</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Manage Classes</Text>
+        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddClass')}>
+          <Text>Add Class</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={{ marginBottom: 8 }}>Filters:</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Class ID"
+        value={filter}
+        onChangeText={setFilter}
+      />
+
+<View style={styles.pickerWrapper}>
+  <Picker
+    selectedValue={teacherFilter}
+    style={styles.picker}
+    onValueChange={(itemValue) => setTeacherFilter(itemValue)}
+    dropdownIconColor="#333"
+  >
+    <Picker.Item label="All Teachers" value="" />
+    {teacherOptions.map((teacher) => (
+      <Picker.Item key={teacher.id} label={teacher.name} value={teacher.id} />
+    ))}
+  </Picker>
+</View>
+
+<View style={styles.pickerWrapper}>
+  <Picker
+    selectedValue={subjectFilter}
+    style={styles.picker}
+    onValueChange={(itemValue) => setSubjectFilter(itemValue)}
+    dropdownIconColor="#333"
+  >
+    <Picker.Item label="All Subjects" value="" />
+    {subjectOptions.map((subject) => (
+      <Picker.Item key={subject.id} label={subject.name} value={subject.id} />
+    ))}
+  </Picker>
+</View>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Filter by Date (YYYY-MM-DD)"
+        value={dateFilter}
+        onChangeText={setDateFilter}
+      />
+
+      {loading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <FlatList
+          data={classes.filter(
+            (c) =>
+              c.id.includes(filter) &&
+              (teacherFilter === '' || c.professorId === teacherFilter) &&
+              (subjectFilter === '' || c.subjectId === subjectFilter) &&
+              (!dateFilter ||
+                c.start.toISOString().slice(0, 10).includes(dateFilter))
+          )}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ClassCard item={item} onDelete={handleDelete} onEdit={() => {}} />
+          )}
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F6FC',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    color: '#4A90E2',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  text: {
-    fontSize: 16,
-    color: '#444',
-    textAlign: 'center',
-  },
+  container: {padding: 16, flex: 1 },
+  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12},
+  title: { fontSize: 22, fontWeight: 'bold' },
+  addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
+  input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
+  filtersRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, justifyContent: 'space-between' },
+  ClassCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },
+  pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
+  overflow: 'hidden', height: 40, justifyContent: 'center',},
 });
 
 export default ManageClasses;

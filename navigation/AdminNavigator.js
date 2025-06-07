@@ -9,6 +9,7 @@ import Dashboard from '../screens/admin/Dashboard';
 import Settings from '../screens/Settings';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import AddTeacherScreen from '../screens/admin/AddTeacherScreen';
+import AddClass from '../screens/admin/AddClass';
 
 const Drawer = createDrawerNavigator();
 
@@ -22,8 +23,8 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="EnrollStudents" component={EnrollStudents} />
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Settings" component={Settings}/>
-      <Drawer.Screen name="AddTeacher" component={AddTeacherScreen} options={{ drawerItemStyle: { display: 'none' } }}
-      />
+      <Drawer.Screen name="AddTeacher" component={AddTeacherScreen} options={{ drawerItemStyle: { display: 'none' } }} />
+      <Drawer.Screen name="AddClass" component={AddClass} options={{ drawerItemStyle: { display: 'none' } }} />
     </Drawer.Navigator>
   );
 };
