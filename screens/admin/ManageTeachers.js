@@ -3,6 +3,9 @@ import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet }
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import TeacherCard from '../../components/TeacherCard';
+import { Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 export default function AdminManageTeachers({ navigation }) {
   const [teachers, setTeachers] = useState([]);
@@ -10,13 +13,15 @@ export default function AdminManageTeachers({ navigation }) {
   const [teacherIdFilter, setTeacherIdFilter] = useState('');
   const [sortAlphabetically, setSortAlphabetically] = useState(true);
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     fetchTeachers();
-  }, []);
+  }, [])
+);
 
   useEffect(() => {
-  applyFilters();
-}, [sortAlphabetically]);
+    applyFilters();
+  }, [sortAlphabetically]);
 
   const fetchTeachers = async () => {
     const q = query(collection(db, 'users'), where('roles', 'array-contains', 'teacher'));
@@ -32,11 +37,11 @@ export default function AdminManageTeachers({ navigation }) {
       filtered = filtered.filter(t => t.id.includes(teacherIdFilter.trim()));
     }
     filtered.sort((a, b) => {
-    if (!a.name || !b.name) return 0; // safety check
-    return sortAlphabetically
-      ? a.name.localeCompare(b.name)
-      : b.name.localeCompare(a.name);
-  });
+      if (!a.name || !b.name) return 0; 
+      return sortAlphabetically
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    });
     setFilteredTeachers(filtered);
   };
 
@@ -53,8 +58,17 @@ export default function AdminManageTeachers({ navigation }) {
   const renderItem = ({ item }) => (
     <TeacherCard
       teacher={item}
-      onEdit={(teacher) => navigation.navigate('EditTeacher', { teacher })}
-      onDelete={(teacher) => deleteTeacher(teacher.id)}
+      onEdit={(teacher) => navigation.navigate('EditTeacher', { teacherId: teacher.id })}
+      onDelete={(teacher) =>
+        Alert.alert(
+          'Confirm Deletion',
+          `Are you sure you want to delete ${teacher.name || 'this teacher'}?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Delete', style: 'destructive', onPress: () => deleteTeacher(teacher.id) },
+          ]
+        )
+      }
     />
   );
 
