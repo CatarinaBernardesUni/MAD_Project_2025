@@ -30,7 +30,8 @@ const ClassCard = ({ item, onEdit, onDelete }) => {
       <Text style={styles.subject}>{String(item.subject)}</Text>
       <Text style={styles.date}>Date: {formatDate(item.start)}</Text>
       <Text style={styles.time}>{formatTimeRange(item.start, item.end)}</Text>
-      <Text style={styles.professor}>Prof. {String(item.professor)}</Text>
+      <Text style={styles.professor}>Teacher: {String(item.professor)}</Text>
+      <Text>Class Type: {item.classType}</Text> {/* <-- Add this line */}
       <Text style={styles.notes}>Notes: {item.additionalNotes ? String(item.additionalNotes) : 'N/A'}</Text>
       <View style={styles.buttons}>
         <TouchableOpacity style={styles.editButton} onPress={() => onEdit(item)}>

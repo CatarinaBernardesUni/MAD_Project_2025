@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, FlatList, StyleSheet,
   ActivityIndicator, TextInput,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Add this import
+import { Picker } from '@react-native-picker/picker'; 
 import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import ClassCard from '../../components/ClassCard'; // <- Make sure path is correct
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fetchRefName = async (refPath, field = 'name') => {
   try {
@@ -26,16 +27,20 @@ const fetchRefName = async (refPath, field = 'name') => {
 };
 
 const ManageClasses = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [teacherFilter, setTeacherFilter] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
+  const [filtersVisible, setFiltersVisible] = useState(true);
 
   // New state for dropdown options
   const [teacherOptions, setTeacherOptions] = useState([]);
   const [subjectOptions, setSubjectOptions] = useState([]);
+  const [classTypeFilter, setClassTypeFilter] = useState('');
+  const [classTypeOptions, setClassTypeOptions] = useState([]);
 
   const fetchClasses = async () => {
     setLoading(true);
@@ -46,7 +51,6 @@ const ManageClasses = ({ navigation }) => {
         querySnapshot.docs.map(async (docSnap) => {
           const data = docSnap.data();
 
-          // Extract professorId from the reference string (e.g., "users/teacherId")
           const professorRef = data.professor || '';
           const professorId = professorRef.split('/')[1] || '';
 
@@ -59,9 +63,10 @@ const ManageClasses = ({ navigation }) => {
           return {
             id: docSnap.id,
             subject: subjectName,
-            subjectId, // add this
+            subjectId,
             professor: professorName,
-            professorId, // add this
+            professorId,
+            classType: data.classType || '', 
             additionalNotes: data.additionalNotes || '',
             start: data.start?.toDate?.() || new Date(),
             end: data.end?.toDate?.() || new Date(),
@@ -109,6 +114,14 @@ const ManageClasses = ({ navigation }) => {
         name: doc.data().name || doc.id,
       }));
       setSubjectOptions(subjects);
+
+      // Fetch class types (assuming class types are stored in the same collection, otherwise adjust the path)
+      const classTypesSnap = await getDocs(collection(db, 'classType'));
+      const classTypes = classTypesSnap.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name || doc.id,
+      }));
+      setClassTypeOptions(classTypes);
     };
     fetchDropdowns();
   }, []);
@@ -118,89 +131,136 @@ const ManageClasses = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Manage Classes</Text>
-        <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddClass')}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.title}>Manage Classes</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('AddClass')}
+        >
           <Text>Add Class</Text>
         </TouchableOpacity>
+
+        {filtersVisible && (
+          <>
+            <Text style={{ marginBottom: 8 }}>Filters:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Class ID"
+              value={filter}
+              onChangeText={setFilter}
+            />
+
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={teacherFilter}
+                style={styles.picker}
+                onValueChange={(itemValue) => setTeacherFilter(itemValue)}
+                dropdownIconColor="#333"
+              >
+                <Picker.Item label="All Teachers" value="" />
+                {teacherOptions.map((teacher) => (
+                  <Picker.Item key={teacher.id} label={teacher.name} value={teacher.id} />
+                ))}
+              </Picker>
+            </View>
+
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={subjectFilter}
+                style={styles.picker}
+                onValueChange={(itemValue) => setSubjectFilter(itemValue)}
+                dropdownIconColor="#333"
+              >
+                <Picker.Item label="All Subjects" value="" />
+                {subjectOptions.map((subject) => (
+                  <Picker.Item key={subject.id} label={subject.name} value={subject.id} />
+                ))}
+              </Picker>
+            </View>
+
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={classTypeFilter}
+                style={styles.picker}
+                onValueChange={(itemValue) => setClassTypeFilter(itemValue)}
+                dropdownIconColor="#333"
+              >
+                <Picker.Item label="All Class Types" value="" />
+                {classTypeOptions.map((type) => (
+                  <Picker.Item key={type.id} label={type.name} value={type.name} />
+                ))}
+              </Picker>
+            </View>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Filter by Date (YYYY-MM-DD)"
+              value={dateFilter}
+              onChangeText={setDateFilter}
+            />
+
+            <TouchableOpacity
+              style={[styles.addButton2, { alignSelf: 'flex-end', marginBottom: 16 }]}
+              onPress={() => setFiltersVisible(false)}
+            >
+              <Text>Hide Filters</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {!filtersVisible && (
+          <TouchableOpacity
+            style={[styles.addButton2, { alignSelf: 'flex-end', marginBottom: 16 }]}
+            onPress={() => setFiltersVisible(true)}
+          >
+            <Text>Show Filters</Text>
+          </TouchableOpacity>
+        )}
+
+        {loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <FlatList
+            data={classes.filter(
+              (c) =>
+                c.id.includes(filter) &&
+                (teacherFilter === '' || c.professorId === teacherFilter) &&
+                (subjectFilter === '' || c.subjectId === subjectFilter) &&
+                (classTypeFilter === '' || c.classType === classTypeFilter) &&
+                (!dateFilter ||
+                  c.start.toISOString().slice(0, 10).includes(dateFilter))
+            )}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <ClassCard item={item} onDelete={handleDelete} onEdit={() => {}} />
+            )}
+          />
+        )}
       </View>
-      <Text style={{ marginBottom: 8 }}>Filters:</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Class ID"
-        value={filter}
-        onChangeText={setFilter}
-      />
-
-<View style={styles.pickerWrapper}>
-  <Picker
-    selectedValue={teacherFilter}
-    style={styles.picker}
-    onValueChange={(itemValue) => setTeacherFilter(itemValue)}
-    dropdownIconColor="#333"
-  >
-    <Picker.Item label="All Teachers" value="" />
-    {teacherOptions.map((teacher) => (
-      <Picker.Item key={teacher.id} label={teacher.name} value={teacher.id} />
-    ))}
-  </Picker>
-</View>
-
-<View style={styles.pickerWrapper}>
-  <Picker
-    selectedValue={subjectFilter}
-    style={styles.picker}
-    onValueChange={(itemValue) => setSubjectFilter(itemValue)}
-    dropdownIconColor="#333"
-  >
-    <Picker.Item label="All Subjects" value="" />
-    {subjectOptions.map((subject) => (
-      <Picker.Item key={subject.id} label={subject.name} value={subject.id} />
-    ))}
-  </Picker>
-</View>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Filter by Date (YYYY-MM-DD)"
-        value={dateFilter}
-        onChangeText={setDateFilter}
-      />
-
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <FlatList
-          data={classes.filter(
-            (c) =>
-              c.id.includes(filter) &&
-              (teacherFilter === '' || c.professorId === teacherFilter) &&
-              (subjectFilter === '' || c.subjectId === subjectFilter) &&
-              (!dateFilter ||
-                c.start.toISOString().slice(0, 10).includes(dateFilter))
-          )}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ClassCard item={item} onDelete={handleDelete} onEdit={() => {}} />
-          )}
-        />
-      )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {padding: 16, flex: 1 },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12},
+  headerContainer: {
+  marginBottom: 12,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+},
   title: { fontSize: 22, fontWeight: 'bold' },
   addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
   input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
-  filtersRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, justifyContent: 'space-between' },
   ClassCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },
   pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
   overflow: 'hidden', height: 40, justifyContent: 'center',},
+  addButton2: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
+
 });
 
 export default ManageClasses;
