@@ -3,36 +3,48 @@ import {
   View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { httpsCallable } from 'firebase/functions';
 import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { db, auth, functions } from '../../firebaseConfig';
 
 export default function EditTeacherScreen({ route, navigation }) {
   const { teacherId } = route.params;
-const [form, setForm] = useState(null);
-const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [originalEmail, setOriginalEmail] = useState('');
 
-useEffect(() => {
-  const fetchTeacher = async () => {
-    try {
-      const docSnap = await getDoc(doc(db, 'users', teacherId));
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setForm({
-          name: data.name || '',
-          age: data.age?.toString() || '',
-          email: data.email || '',
-          profilePicture: data.profilePicture || null,
-          subjects: data.subjects || [],
-        });
+  useEffect(() => {
+  const user = auth.currentUser;
+  if (user) {
+    console.log('🔥 Logged-in User UID (caller):', user.uid);
+  } else {
+    console.log('⚠️ No user is currently logged in');
+  }
+}, []);
+
+  useEffect(() => {
+    const fetchTeacher = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, 'users', teacherId));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setForm({
+            name: data.name || '',
+            age: data.age?.toString() || '',
+            email: data.email || '',
+            profilePicture: data.profilePicture || null,
+            subjects: data.subjects || [],
+          });
+          setOriginalEmail(data.email || '');
+        }
+        setLoading(false);
+      } catch (err) {
+        Alert.alert('Error loading teacher');
       }
-      setLoading(false);
-    } catch (err) {
-      Alert.alert('Error loading teacher');
-    }
-  };
+    };
 
-  fetchTeacher();
-}, [teacherId]);
+    fetchTeacher();
+  }, [teacherId]);
 
   const [availableSubjects, setAvailableSubjects] = useState([]);
 
@@ -75,6 +87,10 @@ useEffect(() => {
     }
 
     try {
+      if (form.email !== originalEmail) {
+        const success = await callUpdateEmailFunction(teacherId, form.email);
+        if (!success) return;
+      }
       const teacherRef = doc(db, 'users', teacherId);
       await updateDoc(teacherRef, {
         name: form.name,
@@ -90,10 +106,23 @@ useEffect(() => {
     }
   };
 
-    /*not sure this is working*/
+  const callUpdateEmailFunction = async (uid, newEmail) => {
+    try {
+      const updateUserEmail = httpsCallable(functions, 'updateUserEmail');
+      const result = await updateUserEmail({ uid, newEmail });
+      console.log('Function result:', result.data);
+      return true;
+    } catch (err) {
+      console.error('Cloud Function Error:', err);
+      Alert.alert('Error updating email', err.message);
+      return false;
+    }
+  };
+
+  /*not sure this is working*/
   if (loading || !form) {
-  return <Text style={{ padding: 20 }}>Loading...</Text>;
-}
+    return <Text style={{ padding: 20 }}>Loading...</Text>;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

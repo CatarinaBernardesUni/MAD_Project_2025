@@ -1,19 +1,41 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+admin.initializeApp();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+exports.updateUserEmail = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'You must be logged in');
+  }
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+  const callerUid = context.auth.uid;
+  const { uid, newEmail } = data;
+  console.log('👤 Caller UID:', callerUid);
+
+  try {
+    // Fetch caller's user document from Firestore
+    const callerDoc = await admin.firestore().collection('users').doc(callerUid).get();
+    
+
+    if (!callerDoc.exists) {
+      throw new functions.https.HttpsError('not-found', 'Caller user document not found');
+    }
+
+    const callerData = callerDoc.data();
+    const roles = callerData.roles || [];
+
+    // Only allow if the first role is 'admin'
+    if (roles[0] !== 'admin') {
+      throw new functions.https.HttpsError('permission-denied', 'Only admins can update emails');
+    }
+
+    // Update the user's email in Firebase Authentication
+    await admin.auth().updateUser(uid, { email: newEmail });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating email:',error);
+    
+    throw new functions.https.HttpsError('internal', error.message);
+  }
+});
