@@ -35,8 +35,6 @@ const ManageClasses = ({ navigation }) => {
   const [subjectFilter, setSubjectFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [filtersVisible, setFiltersVisible] = useState(true);
-
-  // New state for dropdown options
   const [teacherOptions, setTeacherOptions] = useState([]);
   const [subjectOptions, setSubjectOptions] = useState([]);
   const [classTypeFilter, setClassTypeFilter] = useState('');
@@ -133,9 +131,7 @@ const ManageClasses = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.title}>Manage Classes</Text>
-        </View>
+        <Text style={styles.header}>Manage Classes</Text>
 
         <TouchableOpacity
           style={styles.addButton}
@@ -247,13 +243,8 @@ const ManageClasses = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {padding: 16, flex: 1 },
-  headerContainer: {
-  marginBottom: 12,
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-},
-  title: { fontSize: 22, fontWeight: 'bold' },
+  header: {fontSize: 24, fontWeight: 'bold', marginBottom: 12},
+  title: { fontSize: 24, fontWeight: 'bold', marginTop: 16, marginBottom: 12 },
   addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
   input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
   ClassCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },

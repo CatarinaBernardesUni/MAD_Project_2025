@@ -140,7 +140,7 @@ const AddClass = ({ navigation }) => {
             </TouchableOpacity>
           ))}
 
-          <Text style={styles.label}>Professor:</Text>
+          <Text style={styles.label}>Teacher:</Text>
           {filteredProfessors.length > 0 ? (
             filteredProfessors.map(prof => (
               <TouchableOpacity
@@ -155,7 +155,7 @@ const AddClass = ({ navigation }) => {
               </TouchableOpacity>
             ))
           ) : selectedSubject ? (
-            <Text style={{ fontStyle: 'italic' }}>No professors for this subject</Text>
+            <Text style={{ fontStyle: 'italic' }}>No teachers for this subject</Text>
           ) : null}
           <Text style={styles.label}>Class Type:</Text>
           <View style={styles.pickerWrapper}>Class Type:

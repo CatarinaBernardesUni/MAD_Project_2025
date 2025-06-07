@@ -1,5 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 
 const formatTimeRange = (start, end) => {
   try {
@@ -25,23 +31,50 @@ const formatDate = (date) => {
 };
 
 const ClassCard = ({ item, onEdit, onDelete }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this class?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => onDelete(item.id) },
+      ]
+    );
+  };
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+      onPress={() => setExpanded(prev => !prev)}
+      style={styles.card}
+    >
       <Text style={styles.subject}>{String(item.subject)}</Text>
       <Text style={styles.date}>Date: {formatDate(item.start)}</Text>
       <Text style={styles.time}>{formatTimeRange(item.start, item.end)}</Text>
       <Text style={styles.professor}>Teacher: {String(item.professor)}</Text>
-      <Text>Class Type: {item.classType}</Text> {/* <-- Add this line */}
-      <Text style={styles.notes}>Notes: {item.additionalNotes ? String(item.additionalNotes) : 'N/A'}</Text>
-      <View style={styles.buttons}>
-        <TouchableOpacity style={styles.editButton} onPress={() => onEdit(item)}>
-          <Text>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(item.id)}>
-          <Text>Delete</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      <Text>Class Type: {item.classType}</Text>
+      <Text style={styles.notes}>
+        Notes: {item.additionalNotes ? String(item.additionalNotes) : 'N/A'}
+      </Text>
+
+      {expanded && (
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => onEdit(item)}
+          >
+            <Text>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDelete}
+          >
+            <Text>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 };
 
