@@ -62,10 +62,10 @@ export default function AdminManageTeachers({ navigation }) {
       onDelete={(teacher) =>
         Alert.alert(
           'Confirm Deletion',
-          `Are you sure you want to delete ${teacher.name || 'this teacher'}?`,
+          `Are you sure you want to block ${teacher.name || 'this teacher'}?`,
           [
             { text: 'Cancel', style: 'cancel' },
-            { text: 'Delete', style: 'destructive', onPress: () => deleteTeacher(teacher.id) },
+            { text: 'Block', style: 'destructive', onPress: () => deleteTeacher(teacher.id) },
           ]
         )
       }
