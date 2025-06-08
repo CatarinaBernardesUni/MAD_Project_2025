@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
-import { auth, db, secondaryAuth } from '../../firebase';
+import { auth, db, secondaryAuth } from '../../firebaseConfig';
 import { uploadImage, pickImage } from '../../utils/uploadImage';
 
 export default function AddTeacherScreen({ navigation }) {

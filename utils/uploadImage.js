@@ -1,5 +1,5 @@
 import * as ImagePicker from 'expo-image-picker';
-import { storage } from '../firebase';
+import { storage } from '../firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Alert } from 'react-native';
 

@@ -6,7 +6,7 @@ import {
 
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db } from '../firebaseConfig';
 
 import { uploadImage, pickImage } from '../utils/uploadImage';
 

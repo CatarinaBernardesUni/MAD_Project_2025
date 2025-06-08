@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../firebaseConfig';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function EditClass({ route, navigation }) {

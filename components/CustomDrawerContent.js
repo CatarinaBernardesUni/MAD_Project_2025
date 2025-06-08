@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
-import { auth, db } from '../firebase';
+import { auth, db } from '../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function CustomDrawerContent(props) {

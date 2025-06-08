@@ -5,8 +5,8 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
 import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
-import ClassCard from '../../components/ClassCard'; // <- Make sure path is correct
+import { db } from '../../firebaseConfig';
+import ClassCard from '../../components/ClassCard'; 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fetchRefName = async (refPath, field = 'name') => {

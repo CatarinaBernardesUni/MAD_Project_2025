@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
 import { collection, getDocs, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../firebaseConfig';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const AddClass = ({ navigation }) => {

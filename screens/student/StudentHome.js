@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { auth } from '../../firebaseConfig';
 
 const StudentHome = () => {
   return (

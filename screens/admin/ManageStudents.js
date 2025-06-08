@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../firebaseConfig';
 import StudentCard from '../../components/StudentCard';
 import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
