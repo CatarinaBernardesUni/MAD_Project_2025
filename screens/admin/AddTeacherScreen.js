@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { auth, db, secondaryAuth } from '../../firebase';
+import { uploadImage, pickImage } from '../../utils/uploadImage';
 
 export default function AddTeacherScreen({ navigation }) {
     const [form, setForm] = useState({
@@ -32,16 +32,6 @@ export default function AddTeacherScreen({ navigation }) {
         fetchSubjects();
     }, []);
 
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 0.5,
-        });
-        if (!result.canceled) {
-            setForm({ ...form, profilePicture: result.assets[0].uri });
-        }
-    };
-
     const toggleSubject = (subject) => {
         const newSubjects = form.subjects.includes(subject)
             ? form.subjects.filter(s => s !== subject)
@@ -56,21 +46,28 @@ export default function AddTeacherScreen({ navigation }) {
         }
 
         try {
-            const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
+            const { user } = await createUserWithEmailAndPassword(secondaryAuth, form.email, form.password);
+
+            let downloadURL = null;
+            if (form.profilePicture) {
+                downloadURL = await uploadImage(form.profilePicture, user.uid);
+            }
+
             await setDoc(doc(db, 'users', user.uid), {
                 name: form.name,
                 age: parseInt(form.age),
                 email: form.email,
                 roles: ['teacher'],
                 subjects: form.subjects,
-                profilePicture: form.profilePicture || null,
+                profilePicture: downloadURL || null,
             });
             Alert.alert('Teacher added!');
             navigation.goBack();
         } catch (err) {
             Alert.alert('Error:', err.message);
-        }
-    };
+        } finally {
+            await secondaryAuth.signOut();
+    }};
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -97,7 +94,12 @@ export default function AddTeacherScreen({ navigation }) {
                 ))}
             </View>
 
-            <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+            <TouchableOpacity style={styles.imagePicker} onPress={async () => {
+                const uri = await pickImage();
+                if (uri) {
+                    setForm(prev => ({ ...prev, profilePicture: uri }));
+                }
+            }}>
                 <Text>{form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}</Text>
             </TouchableOpacity>
 

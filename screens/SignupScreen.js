@@ -1,53 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View, Text, TextInput, Alert, Pressable, StyleSheet,
   TouchableOpacity, ScrollView, Image
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+
+import { uploadImage, pickImage } from '../utils/uploadImage';
 
 export default function SignupScreen() {
   const [form, setForm] = useState({
     name: '', age: '', email: '', password: '', role: '', profilePicture: null
   });
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Please allow access to your gallery.');
-        /* How to add an actual request of permission? */
-      }
-    })();
-  }, []);
-
-  const pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaType,
-        allowsEditing: true,
-        quality: 0.5,
-      });
-
-      if (!result.canceled) {
-        setForm({ ...form, profilePicture: result.assets[0].uri });
-      }
-    } catch (error) {
-      Alert.alert('Image selection failed', error.message);
-    }
-  };
-
   const handleSignUp = async () => {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
+      let downloadURL = null;
+
+      if (form.profilePicture) {
+        downloadURL = await uploadImage(form.profilePicture, user.uid);
+      }
+
+      await updateProfile(user, {
+        displayName: form.name,
+        photoURL: downloadURL,
+      });
+
       await setDoc(doc(db, 'users', user.uid), {
         name: form.name,
         age: parseInt(form.age),
         email: form.email,
         roles: [form.role],
-        profilePicture: form.profilePicture || null,
+        profilePicture: downloadURL || null,
       });
       Alert.alert('Account created!');
     } catch (err) {
@@ -112,7 +99,12 @@ export default function SignupScreen() {
         value={form.password}
       />
 
-      <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+      <TouchableOpacity style={styles.imagePicker} onPress={async () => {
+        const uri = await pickImage();
+        if (uri) {
+          setForm(prev => ({ ...prev, profilePicture: uri }));
+        }
+      }}>
         <Text style={styles.imagePickerText}>
           {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}
         </Text>
