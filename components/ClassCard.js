@@ -24,8 +24,11 @@ const formatDate = (date) => {
   }
 };
 
-const ClassCard = ({ item, onEdit, onDelete }) => {
+const ClassCard = ({ item, onEdit, onDelete, classTypeOptions = [] }) => {
   const [expanded, setExpanded] = useState(false);
+
+  // Find the class type name by ID
+  const classTypeName = classTypeOptions.find(opt => opt.id === item.classType)?.name || item.classType;
 
   const handleDelete = () => {
     Alert.alert(
@@ -38,6 +41,8 @@ const ClassCard = ({ item, onEdit, onDelete }) => {
     );
   };
 
+  console.log('ClassCard peopleLimit:', item.peopleLimit, typeof item.peopleLimit);
+
   return (
     <TouchableOpacity
       onPress={() => setExpanded(prev => !prev)}
@@ -46,10 +51,13 @@ const ClassCard = ({ item, onEdit, onDelete }) => {
       <Text style={styles.subject}>{String(item.subject)}</Text>
       <Text style={styles.date}>Date: {formatDate(item.start)}</Text>
       <Text style={styles.time}>{formatTimeRange(item.start, item.end)}</Text>
-      <Text style={styles.professor}>Teacher: {String(item.professor)}</Text>
-      <Text>Class Type: {item.classType}</Text>
+      <Text style={styles.teacher}>Teacher: {String(item.professor)}</Text>
+      <Text>Class Type: {classTypeName}</Text>
       <Text style={styles.notes}>
         Notes: {item.additionalNotes ? String(item.additionalNotes) : 'N/A'}
+      </Text>
+      <Text style={styles.notes}>
+        People Limit: {item.peopleLimit ? String(item.peopleLimit) : 'No limit'}
       </Text>
 
       {expanded && (
@@ -73,54 +81,15 @@ const ClassCard = ({ item, onEdit, onDelete }) => {
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#F2F6FC',
-    padding: 16,
-    marginVertical: 8,
-    borderRadius: 10,
-    elevation: 2,
-  },
-  subject: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#4A90E2',
-    marginBottom: 4,
-  },
-  date: {
-    fontSize: 14,
-    color: '#777',
-    marginBottom: 2,
-  },
-  time: {
-    fontSize: 14,
-    color: '#555',
-  },
-  professor: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#333',
-  },
-  notes: {
-    fontSize: 13,
-    fontStyle: 'italic',
-    marginTop: 6,
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 10,
-  },
-  editButton: {
-    backgroundColor: '#D0E6FF',
-    padding: 8,
-    borderRadius: 6,
-    marginRight: 8,
-  },
-  deleteButton: {
-    backgroundColor: '#FFD0D0',
-    padding: 8,
-    borderRadius: 6,
-  },
-});
+  card: {backgroundColor: '#F2F6FC', padding: 16, marginVertical: 8, borderRadius: 10, elevation: 2,},
+  subject: { fontSize: 18, fontWeight: 'bold', color: '#4A90E2', marginBottom: 4,},
+  date: {fontSize: 14, color: '#777', marginBottom: 2,},
+  time: {fontSize: 14, color: '#555',},
+  teacher: {marginTop: 4, fontSize: 14, color: '#333',},
+  notes: {fontSize: 13, fontStyle: 'italic', marginTop: 6,},
+  limit: {fontSize: 14, color: '#333', marginTop: 4,},
+  buttons: {flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10,},
+  editButton: {backgroundColor: '#D0E6FF', padding: 8, borderRadius: 6, marginRight: 8,},
+  deleteButton: {backgroundColor: '#FFD0D0', padding: 8, borderRadius: 6,},});
 
 export default ClassCard;

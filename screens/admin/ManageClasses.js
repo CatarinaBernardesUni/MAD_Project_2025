@@ -51,12 +51,16 @@ const ManageClasses = ({ navigation }) => {
 
           const professorRef = data.professor || '';
           const professorId = professorRef.split('/')[1] || '';
+          const professorName = professorRef && professorId
+            ? await fetchRefName(data.professor, 'name')
+            : 'Unknown';
 
           const subjectRef = data.subject || '';
           const subjectId = subjectRef.split('/')[1] || '';
 
-          const subjectName = await fetchRefName(data.subject, 'name');
-          const professorName = await fetchRefName(data.professor, 'name');
+          const subjectName = subjectRef && subjectId
+            ? await fetchRefName(data.subject, 'name')
+            : 'Unknown';
 
           return {
             id: docSnap.id,
@@ -68,6 +72,7 @@ const ManageClasses = ({ navigation }) => {
             additionalNotes: data.additionalNotes || '',
             start: data.start?.toDate?.() || new Date(),
             end: data.end?.toDate?.() || new Date(),
+            peopleLimit: data.peopleLimit !== undefined && data.peopleLimit !== null ? data.peopleLimit : null,
           };
         })
       );
@@ -231,12 +236,13 @@ const ManageClasses = ({ navigation }) => {
                   c.start.toISOString().slice(0, 10).includes(dateFilter))
             )}
             keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <ClassCard
-                  item={item}
-                  onEdit={(classItem) => navigation.navigate('EditClass', { classData: classItem })}
-                  onDelete={handleDelete}
-                />
+            renderItem={({ item }) => (
+              <ClassCard
+                item={item}
+                onEdit={(classItem) => navigation.navigate('EditClass', { classData: classItem })}
+                onDelete={handleDelete}
+                classTypeOptions={classTypeOptions}
+              />
             )}
           />
         )}

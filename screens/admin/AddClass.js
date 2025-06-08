@@ -14,8 +14,10 @@ const AddClass = ({ navigation }) => {
   const [filteredProfessors, setFilteredProfessors] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedProfessor, setSelectedProfessor] = useState('');
-  const [startDateString, setStartDateString] = useState('');
-  const [endDateString, setEndDateString] = useState('');
+  const [date, setDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [peopleLimit, setPeopleLimit] = useState('');
   const [loading, setLoading] = useState(false);
@@ -66,11 +68,26 @@ const AddClass = ({ navigation }) => {
   };
 
   const handleAddClass = async () => {
-    const startDate = parseDate(startDateString);
-    const endDate = parseDate(endDateString);
+    const startDateTime = new Date(`${date}T${startTime}:00`);
+    const endDateTime = new Date(`${date}T${endTime}:00`);
 
-    if (!selectedSubject || !selectedProfessor || !startDate || !endDate) {
+    if (
+      !selectedSubject ||
+      !selectedProfessor ||
+      !selectedClassType ||
+      !date ||
+      !startTime ||
+      !endTime ||
+      isNaN(startDateTime.getTime()) ||
+      isNaN(endDateTime.getTime())
+    ) {
       alert('Please fill in all required fields with valid data');
+      return;
+    }
+
+    // Validation: End time must be after start time (on the same date)
+    if (endDateTime <= startDateTime) {
+      alert('End time must be after start time.');
       return;
     }
 
@@ -79,11 +96,11 @@ const AddClass = ({ navigation }) => {
       await addDoc(collection(db, 'classes'), {
         subject: `subjects/${selectedSubject}`,
         professor: `users/${selectedProfessor}`,
-        classType: selectedClassType, // <-- add this line
-        start: Timestamp.fromDate(startDate),
-        end: Timestamp.fromDate(endDate),
-        additionalNotes,
-        peopleLimit: Number(peopleLimit) || 0,
+        classType: selectedClassType,
+        start: Timestamp.fromDate(startDateTime),
+        end: Timestamp.fromDate(endDateTime),
+        additionalNotes: additionalNotes || '', // Optional
+        peopleLimit: peopleLimit === '' ? null : Number(peopleLimit), // Optional
         description: '',
       });
       alert('Class added successfully');
@@ -170,20 +187,27 @@ const AddClass = ({ navigation }) => {
             ))}
           </Picker></View>
 
-          <Text style={styles.label}>Start Date & Time:</Text>
+          <Text style={styles.label}>Date:</Text>
           <TextInput
-            value={startDateString}
-            onChangeText={setStartDateString}
+            value={date}
+            onChangeText={setDate}
             style={styles.input}
-            placeholder="e.g. 2025-06-12 14:30"
+            placeholder="e.g. 2025-06-12"
+          />
+          <Text style={styles.label}>Start Time:</Text>
+          <TextInput
+            value={startTime}
+            onChangeText={setStartTime}
+            style={styles.input}
+            placeholder="e.g. 14:30"
           />
 
-          <Text style={styles.label}>End Date & Time:</Text>
+          <Text style={styles.label}>End Time:</Text>
           <TextInput
-            value={endDateString}
-            onChangeText={setEndDateString}
+            value={endTime}
+            onChangeText={setEndTime}
             style={styles.input}
-            placeholder="e.g. 2025-06-12 16:00"
+            placeholder="e.g. 16:00"
           />
 
           <Text style={styles.label}>Additional Notes:</Text>
