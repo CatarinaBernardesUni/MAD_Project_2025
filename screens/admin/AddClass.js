@@ -17,7 +17,6 @@ const AddClass = ({ navigation }) => {
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [peopleLimit, setPeopleLimit] = useState('');
   const [loading, setLoading] = useState(false);
