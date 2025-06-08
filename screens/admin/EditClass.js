@@ -171,7 +171,7 @@ const EditClass = ({ route, navigation }) => {
         </View>
 
         <Text style={styles.label}>Class Type</Text>
-        <View style={styles.optionList}>
+        <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={selectedClassType}
             onValueChange={(itemValue) => setSelectedClassType(itemValue)}
@@ -247,8 +247,8 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, color: '#4A90E2', fontWeight: 'bold', marginBottom: 20 },
   label: { fontSize: 16, marginVertical: 10, fontWeight: '600' },
   input: { borderColor: '#ccc', borderWidth: 1, borderRadius: 6, backgroundColor: '#fff', padding: 10, marginBottom: 10 },
-  pickerWrapper: { borderColor: '#ccc', borderWidth: 1, borderRadius: 6, overflow: 'hidden', marginBottom: 10 },
-  picker: { height: 50, width: '100%' },
+  pickerWrapper: { borderColor: '#ccc', borderWidth: 1, borderRadius: 6, marginBottom: 10 },
+  picker: { height: 56, width: '100%' },
   optionList: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   optionButton: { backgroundColor: '#eee', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, marginBottom: 6 },
   optionButtonSelected: { backgroundColor: '#4A90E2' },

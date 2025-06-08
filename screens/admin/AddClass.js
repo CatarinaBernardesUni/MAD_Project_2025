@@ -176,7 +176,6 @@ const AddClass = ({ navigation }) => {
           ) : null}
           <Text style={styles.label}>Class Type:</Text>
           <View style={styles.pickerWrapper}>
-            <Text>Class Type:</Text>
             <Picker
               selectedValue={selectedClassType}
               onValueChange={(itemValue) => setSelectedClassType(itemValue)}
@@ -257,7 +256,8 @@ const styles = StyleSheet.create({
   selected: {backgroundColor: '#D0E6FF',},
   addButton2: {backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20},
   pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
-  overflow: 'hidden', height: 40, justifyContent: 'center',},
+   height: 50, justifyContent: 'center',marginTop: 12},
+  
 });
 
 export default AddClass;
