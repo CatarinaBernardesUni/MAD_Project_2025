@@ -4,9 +4,11 @@ import {
   TouchableOpacity, ScrollView, Image
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { auth, db, storage } from '../firebase';
+
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function SignupScreen() {
   const [form, setForm] = useState({
@@ -18,7 +20,6 @@ export default function SignupScreen() {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Permission needed', 'Please allow access to your gallery.');
-        /* How to add an actual request of permission? */
       }
     })();
   }, []);
@@ -39,15 +40,46 @@ export default function SignupScreen() {
     }
   };
 
+  const uploadImage = async (uri, uid) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const timestamp = Date.now();
+      const imageRef = ref(storage, `profilePictures/${uid}-${timestamp}.jpg`);
+
+      await uploadBytes(imageRef, blob);
+      const downloadURL = await getDownloadURL(imageRef);
+
+      return downloadURL;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      throw error;
+    }
+  };
+
   const handleSignUp = async () => {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
+      let downloadURL = null;
+
+      if (form.profilePicture) {
+        downloadURL = await uploadImage(form.profilePicture, user.uid);
+      }
+
+      // Update Firebase Auth profile
+      await updateProfile(user, {
+        displayName: form.name,
+        photoURL: downloadURL,
+      });
+
+
       await setDoc(doc(db, 'users', user.uid), {
         name: form.name,
         age: parseInt(form.age),
         email: form.email,
         roles: [form.role],
-        profilePicture: form.profilePicture || null,
+        profilePicture: downloadURL || null,
       });
       Alert.alert('Account created!');
     } catch (err) {
