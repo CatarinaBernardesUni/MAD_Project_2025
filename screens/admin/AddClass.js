@@ -12,17 +12,20 @@ const AddClass = ({ navigation }) => {
   const [subjects, setSubjects] = useState([]);
   const [professors, setProfessors] = useState([]);
   const [filteredProfessors, setFilteredProfessors] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedProfessor, setSelectedProfessor] = useState('');
-  const [date, setDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [additionalNotes, setAdditionalNotes] = useState('');
-  const [peopleLimit, setPeopleLimit] = useState('');
-  const [loading, setLoading] = useState(false);
   const [classType, setClassType] = useState([]);
-  const [selectedClassType, setSelectedClassType] = useState('');
+  const [form, setForm] = useState({
+    subjectId: '',
+    professorId: '',
+    classType: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+    additionalNotes: '',
+    peopleLimit: '',
+  });
+  const [loading, setLoading] = useState(false);
 
+  // Fetch dropdown data
   const fetchDropdownData = async () => {
     try {
       const subjSnap = await getDocs(collection(db, 'subjects'));
@@ -51,32 +54,51 @@ const AddClass = ({ navigation }) => {
     }
   };
 
-  const handleSubjectSelect = subjectId => {
-    setSelectedSubject(subjectId);
-    const selectedSubj = subjects.find(s => s.id === subjectId)?.name;
+  // Fetch class types
+  useEffect(() => {
+    const fetchClassType = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'classType'));
+        const types = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setClassType(types);
+      } catch (error) {
+        console.error('Error fetching class types:', error);
+      }
+    };
+    fetchClassType();
+  }, []);
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, []);
+
+  // Filter professors by subject
+  useEffect(() => {
+    if (!form.subjectId) {
+      setFilteredProfessors([]);
+      return;
+    }
+    const selectedSubj = subjects.find(s => s.id === form.subjectId)?.name;
     const filtered = professors.filter(p =>
       p.subjects.includes(selectedSubj)
     );
     setFilteredProfessors(filtered);
-    setSelectedProfessor('');
-  };
+    setForm(f => ({ ...f, professorId: '' }));
+  }, [form.subjectId, subjects, professors]);
 
-  const parseDate = str => {
-    const parsed = new Date(str);
-    return isNaN(parsed.getTime()) ? null : parsed;
-  };
+  const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }));
 
   const handleAddClass = async () => {
-    const startDateTime = new Date(`${date}T${startTime}:00`);
-    const endDateTime = new Date(`${date}T${endTime}:00`);
+    const startDateTime = new Date(`${form.date}T${form.startTime}:00`);
+    const endDateTime = new Date(`${form.date}T${form.endTime}:00`);
 
     if (
-      !selectedSubject ||
-      !selectedProfessor ||
-      !selectedClassType ||
-      !date ||
-      !startTime ||
-      !endTime ||
+      !form.subjectId ||
+      !form.professorId ||
+      !form.classType ||
+      !form.date ||
+      !form.startTime ||
+      !form.endTime ||
       isNaN(startDateTime.getTime()) ||
       isNaN(endDateTime.getTime())
     ) {
@@ -84,7 +106,6 @@ const AddClass = ({ navigation }) => {
       return;
     }
 
-    // Validation: End time must be after start time (on the same date)
     if (endDateTime <= startDateTime) {
       alert('End time must be after start time.');
       return;
@@ -93,13 +114,13 @@ const AddClass = ({ navigation }) => {
     try {
       setLoading(true);
       await addDoc(collection(db, 'classes'), {
-        subject: `subjects/${selectedSubject}`,
-        professor: `users/${selectedProfessor}`,
-        classType: selectedClassType,
+        subject: `subjects/${form.subjectId}`,
+        professor: `users/${form.professorId}`,
+        classType: form.classType,
         start: Timestamp.fromDate(startDateTime),
         end: Timestamp.fromDate(endDateTime),
-        additionalNotes: additionalNotes || '', // Optional
-        peopleLimit: peopleLimit === '' ? null : Number(peopleLimit), // Optional
+        additionalNotes: form.additionalNotes || '',
+        peopleLimit: form.peopleLimit === '' ? null : Number(form.peopleLimit),
         description: '',
       });
       alert('Class added successfully');
@@ -111,23 +132,6 @@ const AddClass = ({ navigation }) => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const fetchClassType = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, 'classType'));
-        const types = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log('Fetched class types:', types); // <-- Add this line
-        setClassType(types);
-      } catch (error) {
-        console.error('Error fetching class types:', error);
-      }
-    };
-    fetchClassType();
-  }, []);
-  useEffect(() => {
-    fetchDropdownData();
-  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -146,10 +150,10 @@ const AddClass = ({ navigation }) => {
           {subjects.map(subj => (
             <TouchableOpacity
               key={subj.id}
-              onPress={() => handleSubjectSelect(subj.id)}
+              onPress={() => handleChange('subjectId', subj.id)}
               style={[
                 styles.option,
-                selectedSubject === subj.id && styles.selected,
+                form.subjectId === subj.id && styles.selected,
               ]}
             >
               <Text>{subj.name}</Text>
@@ -161,23 +165,24 @@ const AddClass = ({ navigation }) => {
             filteredProfessors.map(prof => (
               <TouchableOpacity
                 key={prof.id}
-                onPress={() => setSelectedProfessor(prof.id)}
+                onPress={() => handleChange('professorId', prof.id)}
                 style={[
                   styles.option,
-                  selectedProfessor === prof.id && styles.selected,
+                  form.professorId === prof.id && styles.selected,
                 ]}
               >
                 <Text>{prof.name}</Text>
               </TouchableOpacity>
             ))
-          ) : selectedSubject ? (
+          ) : form.subjectId ? (
             <Text style={{ fontStyle: 'italic' }}>No teachers for this subject</Text>
           ) : null}
+
           <Text style={styles.label}>Class Type:</Text>
           <View style={styles.pickerWrapper}>
             <Picker
-              selectedValue={selectedClassType}
-              onValueChange={(itemValue) => setSelectedClassType(itemValue)}
+              selectedValue={form.classType}
+              onValueChange={v => handleChange('classType', v)}
               style={styles.picker}
             >
               <Picker.Item label="Select Class Type" value="" />
@@ -189,39 +194,39 @@ const AddClass = ({ navigation }) => {
 
           <Text style={styles.label}>Date:</Text>
           <TextInput
-            value={date}
-            onChangeText={setDate}
+            value={form.date}
+            onChangeText={v => handleChange('date', v)}
             style={styles.input}
             placeholder="e.g. 2025-06-12"
           />
           <Text style={styles.label}>Start Time:</Text>
           <TextInput
-            value={startTime}
-            onChangeText={setStartTime}
+            value={form.startTime}
+            onChangeText={v => handleChange('startTime', v)}
             style={styles.input}
             placeholder="e.g. 14:30"
           />
 
           <Text style={styles.label}>End Time:</Text>
           <TextInput
-            value={endTime}
-            onChangeText={setEndTime}
+            value={form.endTime}
+            onChangeText={v => handleChange('endTime', v)}
             style={styles.input}
             placeholder="e.g. 16:00"
           />
 
           <Text style={styles.label}>Additional Notes:</Text>
           <TextInput
-            value={additionalNotes}
-            onChangeText={setAdditionalNotes}
+            value={form.additionalNotes}
+            onChangeText={v => handleChange('additionalNotes', v)}
             style={styles.input}
             placeholder="Optional notes..."
           />
 
           <Text style={styles.label}>People Limit (optional):</Text>
           <TextInput
-            value={peopleLimit}
-            onChangeText={setPeopleLimit}
+            value={form.peopleLimit}
+            onChangeText={v => handleChange('peopleLimit', v)}
             keyboardType="numeric"
             style={styles.input}
             placeholder="e.g. 20"
@@ -256,7 +261,7 @@ const styles = StyleSheet.create({
   addButton2: {backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20},
   pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
    height: 50, justifyContent: 'center',marginTop: 12},
-  
+  picker: { height: 50, width: '100%' },
 });
 
 export default AddClass;

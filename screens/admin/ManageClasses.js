@@ -30,14 +30,16 @@ const ManageClasses = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('');
-  const [teacherFilter, setTeacherFilter] = useState('');
-  const [subjectFilter, setSubjectFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [filterForm, setFilterForm] = useState({
+    classId: '',
+    teacher: '',
+    subject: '',
+    date: '',
+    classType: '',
+  });
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [teacherOptions, setTeacherOptions] = useState([]);
   const [subjectOptions, setSubjectOptions] = useState([]);
-  const [classTypeFilter, setClassTypeFilter] = useState('');
   const [classTypeOptions, setClassTypeOptions] = useState([]);
 
   const fetchClasses = async () => {
@@ -151,15 +153,14 @@ const ManageClasses = ({ navigation }) => {
             <TextInput
               style={styles.input}
               placeholder="Class ID"
-              value={filter}
-              onChangeText={setFilter}
+              value={filterForm.classId}
+              onChangeText={v => setFilterForm(f => ({ ...f, classId: v }))}
             />
 
             <View style={styles.pickerWrapper}>
               <Picker
-                selectedValue={teacherFilter}
-                style={styles.picker}
-                onValueChange={(itemValue) => setTeacherFilter(itemValue)}
+                selectedValue={filterForm.teacher}
+                onValueChange={v => setFilterForm(f => ({ ...f, teacher: v }))}
                 dropdownIconColor="#333"
               >
                 <Picker.Item label="All Teachers" value="" />
@@ -171,9 +172,8 @@ const ManageClasses = ({ navigation }) => {
 
             <View style={styles.pickerWrapper}>
               <Picker
-                selectedValue={subjectFilter}
-                style={styles.picker}
-                onValueChange={(itemValue) => setSubjectFilter(itemValue)}
+                selectedValue={filterForm.subject}
+                onValueChange={v => setFilterForm(f => ({ ...f, subject: v }))}
                 dropdownIconColor="#333"
               >
                 <Picker.Item label="All Subjects" value="" />
@@ -185,9 +185,8 @@ const ManageClasses = ({ navigation }) => {
 
             <View style={styles.pickerWrapper}>
               <Picker
-                selectedValue={classTypeFilter}
-                style={styles.picker}
-                onValueChange={(itemValue) => setClassTypeFilter(itemValue)}
+                selectedValue={filterForm.classType}
+                onValueChange={v => setFilterForm(f => ({ ...f, classType: v }))}
                 dropdownIconColor="#333"
               >
                 <Picker.Item label="All Class Types" value="" />
@@ -200,8 +199,8 @@ const ManageClasses = ({ navigation }) => {
             <TextInput
               style={styles.input}
               placeholder="Filter by Date (YYYY-MM-DD)"
-              value={dateFilter}
-              onChangeText={setDateFilter}
+              value={filterForm.date}
+              onChangeText={v => setFilterForm(f => ({ ...f, date: v }))}
             />
 
             <TouchableOpacity
@@ -228,12 +227,12 @@ const ManageClasses = ({ navigation }) => {
           <FlatList
             data={classes.filter(
               (c) =>
-                c.id.includes(filter) &&
-                (teacherFilter === '' || c.professorId === teacherFilter) &&
-                (subjectFilter === '' || c.subjectId === subjectFilter) &&
-                (classTypeFilter === '' || c.classType === classTypeFilter) &&
-                (!dateFilter ||
-                  c.start.toISOString().slice(0, 10).includes(dateFilter))
+                c.id.includes(filterForm.classId) &&
+                (filterForm.teacher === '' || c.professorId === filterForm.teacher) &&
+                (filterForm.subject === '' || c.subjectId === filterForm.subject) &&
+                (filterForm.classType === '' || c.classType === filterForm.classType) &&
+                (!filterForm.date ||
+                  c.start.toISOString().slice(0, 10).includes(filterForm.date))
             )}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (

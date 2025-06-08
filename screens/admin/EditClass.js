@@ -1,46 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, FlatList, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const EditClass = ({ route, navigation }) => {
+export default function EditClass({ route, navigation }) {
   const { classData } = route.params;
-
+  const [form, setForm] = useState(null);
   const [subjectOptions, setSubjectOptions] = useState([]);
   const [professorOptions, setProfessorOptions] = useState([]);
   const [classTypeOptions, setClassTypeOptions] = useState([]);
   const [allProfessors, setAllProfessors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [selectedSubject, setSelectedSubject] = useState(classData.subjectId || '');
-  const [selectedProfessor, setSelectedProfessor] = useState(classData.professorId || '');
-  const [selectedClassType, setSelectedClassType] = useState(classData.classType || '');
-  const [date, setDate] = useState(() => {
-    if (classData.start instanceof Date) return classData.start.toISOString().slice(0, 10);
-    if (typeof classData.start === 'string') return new Date(classData.start).toISOString().slice(0, 10);
-    return '';
-  });
-  const [notes, setNotes] = useState(classData.additionalNotes || '');
-  const [peopleLimit, setPeopleLimit] = useState(
-    classData.peopleLimit !== undefined && classData.peopleLimit !== null ? String(classData.peopleLimit) : ''
-  );
-  const [startTime, setStartTime] = useState(
-    classData.start ? new Date(classData.start).toISOString().slice(11, 16) : ''
-  );
-  const [endTime, setEndTime] = useState(
-    classData.end ? new Date(classData.end).toISOString().slice(11, 16) : ''
-  );
-
-  const [loading, setLoading] = useState(false);
-
+  // Fetch class data and dropdown options
   useEffect(() => {
-    const fetchOptions = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch dropdowns
         const subjectsSnap = await getDocs(collection(db, 'subjects'));
-        setSubjectOptions(
-          subjectsSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }))
-        );
+        const subjectOpts = subjectsSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
+        setSubjectOptions(subjectOpts);
 
         const usersSnap = await getDocs(collection(db, 'users'));
         const teachers = usersSnap.docs
@@ -53,48 +34,78 @@ const EditClass = ({ route, navigation }) => {
         setAllProfessors(teachers);
 
         const typesSnap = await getDocs(collection(db, 'classType'));
-        setClassTypeOptions(
-          typesSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }))
-        );
+        const typeOpts = typesSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
+        setClassTypeOptions(typeOpts);
+
+        // Set form state from classData
+        setForm({
+          subjectId: classData.subjectId || '',
+          professorId: classData.professorId || '',
+          classType: classData.classType || '',
+          date: classData.start
+            ? (classData.start instanceof Date
+                ? classData.start.toISOString().slice(0, 10)
+                : new Date(classData.start).toISOString().slice(0, 10))
+            : '',
+          startTime: classData.start
+            ? (classData.start instanceof Date
+                ? classData.start.toISOString().slice(11, 16)
+                : new Date(classData.start).toISOString().slice(11, 16))
+            : '',
+          endTime: classData.end
+            ? (classData.end instanceof Date
+                ? classData.end.toISOString().slice(11, 16)
+                : new Date(classData.end).toISOString().slice(11, 16))
+            : '',
+          peopleLimit: classData.peopleLimit !== undefined && classData.peopleLimit !== null ? String(classData.peopleLimit) : '',
+          additionalNotes: classData.additionalNotes || '',
+        });
+
+        setLoading(false);
       } catch (err) {
-        console.log(err);
+        Alert.alert('Error loading class');
+        setLoading(false);
       }
     };
+    fetchData();
+  }, [classData]);
 
-    fetchOptions();
-  }, []);
-
+  // Update professor options when subject changes
   useEffect(() => {
-    const selectedSubjectName = subjectOptions.find(s => s.id === selectedSubject)?.name;
-    if (selectedSubject && selectedSubjectName) {
+    if (!form) return;
+    const selectedSubjectName = subjectOptions.find(s => s.id === form.subjectId)?.name;
+    if (form.subjectId && selectedSubjectName) {
       setProfessorOptions(
         allProfessors.filter(prof =>
           Array.isArray(prof.subjects) && prof.subjects.includes(selectedSubjectName)
         )
       );
       // If current professor doesn't teach this subject, clear selection
-      if (!allProfessors.find(p => p.id === selectedProfessor && Array.isArray(p.subjects) && p.subjects.includes(selectedSubjectName))) {
-        setSelectedProfessor('');
+      if (!allProfessors.find(p => p.id === form.professorId && Array.isArray(p.subjects) && p.subjects.includes(selectedSubjectName))) {
+        setForm(f => ({ ...f, professorId: '' }));
       }
     } else {
       setProfessorOptions(allProfessors);
     }
-  }, [selectedSubject, allProfessors, subjectOptions]);
+  }, [form?.subjectId, allProfessors, subjectOptions]);
+
+  const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }));
 
   const handleSave = async () => {
+    if (!form) return;
     setLoading(true);
     try {
-      const startDateTime = new Date(`${date}T${startTime}:00`);
-      const endDateTime = new Date(`${date}T${endTime}:00`);
+      const startDateTime = new Date(`${form.date}T${form.startTime}:00`);
+      const endDateTime = new Date(`${form.date}T${form.endTime}:00`);
 
       // Validation: Required fields
       if (
-        !selectedSubject ||
-        !selectedProfessor ||
-        !selectedClassType ||
-        !date ||
-        !startTime ||
-        !endTime ||
+        !form.subjectId ||
+        !form.professorId ||
+        !form.classType ||
+        !form.date ||
+        !form.startTime ||
+        !form.endTime ||
         isNaN(startDateTime.getTime()) ||
         isNaN(endDateTime.getTime())
       ) {
@@ -103,7 +114,6 @@ const EditClass = ({ route, navigation }) => {
         return;
       }
 
-      // Validation: End time must be after start time
       if (endDateTime <= startDateTime) {
         setLoading(false);
         Alert.alert('Invalid Time', 'End time must be after start time.');
@@ -111,13 +121,13 @@ const EditClass = ({ route, navigation }) => {
       }
 
       await updateDoc(doc(db, 'classes', classData.id), {
-        subject: `subjects/${selectedSubject}`,
-        professor: `users/${selectedProfessor}`,
-        classType: selectedClassType,
+        subject: `subjects/${form.subjectId}`,
+        professor: `users/${form.professorId}`,
+        classType: form.classType,
         start: startDateTime,
         end: endDateTime,
-        peopleLimit: peopleLimit === '' ? null : Number(peopleLimit),
-        additionalNotes: notes,
+        peopleLimit: form.peopleLimit === '' ? null : Number(form.peopleLimit),
+        additionalNotes: form.additionalNotes || '',
       });
       Alert.alert('Success', 'Class updated!');
       navigation.goBack();
@@ -128,22 +138,13 @@ const EditClass = ({ route, navigation }) => {
     }
   };
 
-  const renderOptionButton = (item, selectedId, setSelectedId) => (
-    <TouchableOpacity
-      key={item.id}
-      style={[
-        styles.optionButton,
-        selectedId === item.id && styles.optionButtonSelected,
-      ]}
-      onPress={() => setSelectedId(item.id)}
-    >
-      <Text style={selectedId === item.id ? styles.optionTextSelected : styles.optionText}>
-        {item.name}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const selectedSubjectName = subjectOptions.find(s => s.id === selectedSubject)?.name;
+  if (loading || !form) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F6FC', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#4A90E2" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
@@ -153,8 +154,8 @@ const EditClass = ({ route, navigation }) => {
         <Text style={styles.label}>Subject</Text>
         <View style={styles.pickerWrapper}>
           <Picker
-            selectedValue={selectedSubject}
-            onValueChange={setSelectedSubject}
+            selectedValue={form.subjectId}
+            onValueChange={v => handleChange('subjectId', v)}
             style={styles.picker}
           >
             {subjectOptions.map(item => (
@@ -165,16 +166,27 @@ const EditClass = ({ route, navigation }) => {
 
         <Text style={styles.label}>Teacher</Text>
         <View style={styles.optionList}>
-          {professorOptions.map(item =>
-            renderOptionButton(item, selectedProfessor, setSelectedProfessor)
-          )}
+          {professorOptions.map(item => (
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.optionButton,
+                form.professorId === item.id && styles.optionButtonSelected,
+              ]}
+              onPress={() => handleChange('professorId', item.id)}
+            >
+              <Text style={form.professorId === item.id ? styles.optionTextSelected : styles.optionText}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <Text style={styles.label}>Class Type</Text>
         <View style={styles.pickerWrapper}>
           <Picker
-            selectedValue={selectedClassType}
-            onValueChange={(itemValue) => setSelectedClassType(itemValue)}
+            selectedValue={form.classType}
+            onValueChange={v => handleChange('classType', v)}
             style={styles.picker}
           >
             <Picker.Item label="Select Class Type" value="" />
@@ -187,32 +199,32 @@ const EditClass = ({ route, navigation }) => {
         <Text style={styles.label}>Date</Text>
         <TextInput
           style={styles.input}
-          value={date}
-          onChangeText={setDate}
+          value={form.date}
+          onChangeText={v => handleChange('date', v)}
           placeholder="YYYY-MM-DD"
         />
 
         <Text style={styles.label}>Start Time</Text>
         <TextInput
           style={styles.input}
-          value={startTime}
-          onChangeText={setStartTime}
+          value={form.startTime}
+          onChangeText={v => handleChange('startTime', v)}
           placeholder="HH:MM"
         />
 
         <Text style={styles.label}>End Time</Text>
         <TextInput
           style={styles.input}
-          value={endTime}
-          onChangeText={setEndTime}
+          value={form.endTime}
+          onChangeText={v => handleChange('endTime', v)}
           placeholder="HH:MM"
         />
 
         <Text style={styles.label}>People Limit</Text>
         <TextInput
           style={styles.input}
-          value={peopleLimit}
-          onChangeText={setPeopleLimit}
+          value={form.peopleLimit}
+          onChangeText={v => handleChange('peopleLimit', v)}
           placeholder="Leave empty for no limit"
           keyboardType="numeric"
         />
@@ -220,8 +232,8 @@ const EditClass = ({ route, navigation }) => {
         <Text style={styles.label}>Notes</Text>
         <TextInput
           style={[styles.input, { minHeight: 60 }]}
-          value={notes}
-          onChangeText={setNotes}
+          value={form.additionalNotes}
+          onChangeText={v => handleChange('additionalNotes', v)}
           placeholder="Additional notes"
           multiline
         />
@@ -240,7 +252,7 @@ const EditClass = ({ route, navigation }) => {
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: { padding: 20 },
@@ -257,15 +269,3 @@ const styles = StyleSheet.create({
   saveButton: { backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, marginTop: 20, alignItems: 'center' },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });
-
-export default EditClass;
-
-// When displaying class type in your card/component:
-// const classTypeName = classTypeOptions.find(opt => opt.id === item.classType)?.name || item.classType;
-
-// For teacher
-// const professorId = item.professor?.split('/')[1];
-// const professorName = allProfessors.find(p => p.id === professorId)?.name || 'Unknown';
-
-// For class type
-// const classTypeName = classTypeOptions.find(opt => opt.id === item.classType)?.name || item.classType;
