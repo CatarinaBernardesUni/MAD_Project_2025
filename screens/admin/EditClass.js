@@ -172,9 +172,16 @@ const EditClass = ({ route, navigation }) => {
 
         <Text style={styles.label}>Class Type</Text>
         <View style={styles.optionList}>
-          {classTypeOptions.map(item =>
-            renderOptionButton(item, selectedClassType, setSelectedClassType)
-          )}
+          <Picker
+            selectedValue={selectedClassType}
+            onValueChange={(itemValue) => setSelectedClassType(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Class Type" value="" />
+            {classTypeOptions.map(type => (
+              <Picker.Item key={type.id} label={type.name} value={type.name} />
+            ))}
+          </Picker>
         </View>
 
         <Text style={styles.label}>Date</Text>

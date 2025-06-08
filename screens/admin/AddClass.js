@@ -175,17 +175,19 @@ const AddClass = ({ navigation }) => {
             <Text style={{ fontStyle: 'italic' }}>No teachers for this subject</Text>
           ) : null}
           <Text style={styles.label}>Class Type:</Text>
-          <View style={styles.pickerWrapper}>Class Type:
-          <Picker
-            selectedValue={selectedClassType}
-            onValueChange={(itemValue) => setSelectedClassType(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select Class Type" value="" />
-            {classType.map(type => (
-              <Picker.Item key={type.id} label={type.name} value={type.name} />
-            ))}
-          </Picker></View>
+          <View style={styles.pickerWrapper}>
+            <Text>Class Type:</Text>
+            <Picker
+              selectedValue={selectedClassType}
+              onValueChange={(itemValue) => setSelectedClassType(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Class Type" value="" />
+              {classType.map(type => (
+                <Picker.Item key={type.id} label={type.name} value={type.name} />
+              ))}
+            </Picker>
+          </View>
 
           <Text style={styles.label}>Date:</Text>
           <TextInput
