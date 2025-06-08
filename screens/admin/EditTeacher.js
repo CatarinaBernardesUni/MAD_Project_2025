@@ -2,37 +2,38 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { uploadImage, pickImage } from '../../utils/uploadImage';
 
 export default function EditTeacherScreen({ route, navigation }) {
   const { teacherId } = route.params;
-const [form, setForm] = useState(null);
-const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [pictureChanged, setPictureChanged] = useState(false);
 
-useEffect(() => {
-  const fetchTeacher = async () => {
-    try {
-      const docSnap = await getDoc(doc(db, 'users', teacherId));
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setForm({
-          name: data.name || '',
-          age: data.age?.toString() || '',
-          email: data.email || '',
-          profilePicture: data.profilePicture || null,
-          subjects: data.subjects || [],
-        });
+  useEffect(() => {
+    const fetchTeacher = async () => {
+      try {
+        const docSnap = await getDoc(doc(db, 'users', teacherId));
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setForm({
+            name: data.name || '',
+            age: data.age?.toString() || '',
+            email: data.email || '',
+            profilePicture: data.profilePicture || null,
+            subjects: data.subjects || [],
+          });
+        }
+        setLoading(false);
+      } catch (err) {
+        Alert.alert('Error loading teacher');
       }
-      setLoading(false);
-    } catch (err) {
-      Alert.alert('Error loading teacher');
-    }
-  };
+    };
 
-  fetchTeacher();
-}, [teacherId]);
+    fetchTeacher();
+  }, [teacherId]);
 
   const [availableSubjects, setAvailableSubjects] = useState([]);
 
@@ -51,16 +52,6 @@ useEffect(() => {
     fetchSubjects();
   }, []);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      quality: 0.5,
-    });
-    if (!result.canceled) {
-      setForm({ ...form, profilePicture: result.assets[0].uri });
-    }
-  };
-
   const toggleSubject = (subject) => {
     const newSubjects = form.subjects.includes(subject)
       ? form.subjects.filter(s => s !== subject)
@@ -76,12 +67,18 @@ useEffect(() => {
 
     try {
       const teacherRef = doc(db, 'users', teacherId);
+      let finalImageUrl = form.profilePicture;
+
+      if (pictureChanged && form.profilePicture) {
+      finalImageUrl = await uploadImage(form.profilePicture, teacherId);
+    }
+
       await updateDoc(teacherRef, {
         name: form.name,
         age: parseInt(form.age),
         email: form.email,
         subjects: form.subjects,
-        profilePicture: form.profilePicture || null,
+        profilePicture: finalImageUrl  || null,
       });
       Alert.alert('Teacher updated!');
       navigation.goBack();
@@ -91,8 +88,8 @@ useEffect(() => {
   };
 
   if (loading || !form) {
-  return <Text style={{ padding: 20 }}>Loading...</Text>;
-}
+    return <Text style={{ padding: 20 }}>Loading...</Text>;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -118,7 +115,13 @@ useEffect(() => {
         ))}
       </View>
 
-      <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+      <TouchableOpacity style={styles.imagePicker} onPress={async () => {
+        const uri = await pickImage();
+        if (uri) {
+          setForm(prev => ({ ...prev, profilePicture: uri }));
+          setPictureChanged(true);
+        }
+      }}>
         <Text>{form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}</Text>
       </TouchableOpacity>
 

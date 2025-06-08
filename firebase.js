@@ -22,8 +22,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app); 
 console.log('📚 Firestore DB initialized:', db);
+
+// Main auth instance
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
 const storage = getStorage(app);
 export { storage };
+
+// secondary auth instance for admin
+const secondaryApp = initializeApp(firebaseConfig, 'Secondary');
+
+export const secondaryAuth = initializeAuth(secondaryApp, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+});

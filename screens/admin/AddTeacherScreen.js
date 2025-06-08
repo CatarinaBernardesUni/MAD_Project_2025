@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { auth, db, secondaryAuth } from '../../firebase';
 import { uploadImage, pickImage } from '../../utils/uploadImage';
 
 export default function AddTeacherScreen({ navigation }) {
@@ -46,7 +46,7 @@ export default function AddTeacherScreen({ navigation }) {
         }
 
         try {
-            const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
+            const { user } = await createUserWithEmailAndPassword(secondaryAuth, form.email, form.password);
 
             let downloadURL = null;
             if (form.profilePicture) {
@@ -65,8 +65,9 @@ export default function AddTeacherScreen({ navigation }) {
             navigation.goBack();
         } catch (err) {
             Alert.alert('Error:', err.message);
-        }
-    };
+        } finally {
+            await secondaryAuth.signOut();
+    }};
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
