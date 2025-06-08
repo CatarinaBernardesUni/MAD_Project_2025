@@ -1,62 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View, Text, TextInput, Alert, Pressable, StyleSheet,
   TouchableOpacity, ScrollView, Image
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db, storage } from '../firebase';
+import { auth, db } from '../firebase';
 
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { uploadImage, pickImage } from '../utils/uploadImage';
 
 export default function SignupScreen() {
   const [form, setForm] = useState({
     name: '', age: '', email: '', password: '', role: '', profilePicture: null
   });
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Please allow access to your gallery.');
-      }
-    })();
-  }, []);
-
-  const pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaType,
-        allowsEditing: true,
-        quality: 0.5,
-      });
-
-      if (!result.canceled) {
-        setForm({ ...form, profilePicture: result.assets[0].uri });
-      }
-    } catch (error) {
-      Alert.alert('Image selection failed', error.message);
-    }
-  };
-
-  const uploadImage = async (uri, uid) => {
-    try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-
-      const timestamp = Date.now();
-      const imageRef = ref(storage, `profilePictures/${uid}-${timestamp}.jpg`);
-
-      await uploadBytes(imageRef, blob);
-      const downloadURL = await getDownloadURL(imageRef);
-
-      return downloadURL;
-    } catch (error) {
-      console.error("Image upload failed:", error);
-      throw error;
-    }
-  };
 
   const handleSignUp = async () => {
     try {
@@ -67,12 +24,10 @@ export default function SignupScreen() {
         downloadURL = await uploadImage(form.profilePicture, user.uid);
       }
 
-      // Update Firebase Auth profile
       await updateProfile(user, {
         displayName: form.name,
         photoURL: downloadURL,
       });
-
 
       await setDoc(doc(db, 'users', user.uid), {
         name: form.name,
@@ -144,7 +99,12 @@ export default function SignupScreen() {
         value={form.password}
       />
 
-      <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+      <TouchableOpacity style={styles.imagePicker} onPress={async () => {
+        const uri = await pickImage();
+        if (uri) {
+          setForm(prev => ({ ...prev, profilePicture: uri }));
+        }
+      }}>
         <Text style={styles.imagePickerText}>
           {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}
         </Text>
