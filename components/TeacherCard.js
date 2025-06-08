@@ -30,7 +30,7 @@ export default function TeacherCard({ teacher, onEdit, onDelete }) {
             <Text style={styles.actionText}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(teacher)}>
-            <Text style={styles.actionText}>Delete</Text>
+            <Text style={styles.actionText}>Block Teacher</Text>
           </TouchableOpacity>
         </View>
       )}
