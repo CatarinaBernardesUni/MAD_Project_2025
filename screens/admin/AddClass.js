@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   addButton2: {backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20},
   pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
    height: 50, justifyContent: 'center',marginTop: 12},
-  picker: { height: 50, width: '100%' },
+  picker: { height: 56, width: '100%' },
 });
 
 export default AddClass;
