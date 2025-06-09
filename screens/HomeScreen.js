@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import StatusBar from 'expo-status-bar';
 
 const { width, height } = Dimensions.get('window');
 
@@ -27,7 +28,6 @@ export default function HomepageScreen({ navigation }) {
       }),
     ]).start();
 
-    // Background blinking animation (infinite loop)
     Animated.loop(
       Animated.sequence([
         Animated.timing(blinkAnim1, { toValue: 0.3, duration: 2000, useNativeDriver: true }),
@@ -45,7 +45,6 @@ export default function HomepageScreen({ navigation }) {
 
   return (
     <LinearGradient colors={['#1f3a93', '#0f2027']} style={styles.container}>
-
       <Animated.View
         style={[
           styles.floatingCircle,

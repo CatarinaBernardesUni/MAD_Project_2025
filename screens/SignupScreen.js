@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, Alert, Pressable, StyleSheet,
-  TouchableOpacity, ScrollView, Image
+  TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -45,148 +47,184 @@ export default function SignupScreen() {
   const roles = ['student', 'teacher'];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <LinearGradient colors={['#1f3a93', '#0f2027']} style={styles.container}>
+      <KeyboardAvoidingView keyboardVerticalOffset={60} style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Sign Up</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        onChangeText={name => setForm({ ...form, name })}
-        value={form.name}
-      />
+          <View style={styles.inputContainer}>
+            <Icon name="account-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor="#aaa"
+              onChangeText={(name) => setForm({ ...form, name })}
+              value={form.name}
+              autoCapitalize="words"
+            />
+          </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Age"
-        keyboardType="numeric"
-        onChangeText={age => setForm({ ...form, age })}
-        value={form.age}
-      />
+          <View style={styles.inputContainer}>
+            <Icon name="calendar" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Age"
+              placeholderTextColor="#aaa"
+              keyboardType="numeric"
+              onChangeText={(age) => setForm({ ...form, age })}
+              value={form.age}
+            />
+          </View>
 
-      <Text style={styles.label}>Role:</Text>
-      <View style={styles.radioGroup}>
-        {roles.map(role => (
-          <Pressable
-            key={role}
-            style={[
-              styles.radioButton,
-              form.role === role && styles.radioButtonSelected
-            ]}
-            onPress={() => setForm({ ...form, role })}
+          <Text style={styles.label}>Role:</Text>
+          <View style={styles.radioGroup}>
+            {roles.map((role) => (
+              <Pressable
+                key={role}
+                style={[styles.radioButton, form.role === role && styles.radioButtonSelected]}
+                onPress={() => setForm({ ...form, role })}
+              >
+                <Text style={styles.radioText}>{role.charAt(0).toUpperCase() + role.slice(1)}</Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Icon name="email-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="#aaa"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onChangeText={(email) => setForm({ ...form, email })}
+              value={form.email}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Icon name="lock-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="#aaa"
+              secureTextEntry
+              autoCapitalize="none"
+              onChangeText={(password) => setForm({ ...form, password })}
+              value={form.password}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.imagePicker, { backgroundColor: 'rgba(255, 255, 255, 0.1)' }]}
+            onPress={async () => {
+              const uri = await pickImage();
+              if (uri) {
+                setForm((prev) => ({ ...prev, profilePicture: uri }));
+              }
+            }}
           >
-            <Text style={styles.radioText}>
-              {role.charAt(0).toUpperCase() + role.slice(1)}
+            <Text style={{ color: '#fff' }}>
+              {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}
             </Text>
-          </Pressable>
-        ))}
-      </View>
+          </TouchableOpacity>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        onChangeText={email => setForm({ ...form, email })}
-        value={form.email}
-      />
+          {form.profilePicture && <Image source={{ uri: form.profilePicture }} style={styles.previewImage} />}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        autoCapitalize="none"
-        onChangeText={password => setForm({ ...form, password })}
-        value={form.password}
-      />
-
-      <TouchableOpacity style={styles.imagePicker} onPress={async () => {
-        const uri = await pickImage();
-        if (uri) {
-          setForm(prev => ({ ...prev, profilePicture: uri }));
-        }
-      }}>
-        <Text style={styles.imagePickerText}>
-          {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}
-        </Text>
-      </TouchableOpacity>
-
-      {form.profilePicture && (
-        <Image
-          source={{ uri: form.profilePicture }}
-          style={styles.previewImage}
-        />
-      )}
-
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#fff',
-    flexGrow: 1,
+    flex: 1,
+  },
+  innerContainer: {
+    flex: 1,
+    padding: 24,
     justifyContent: 'center',
   },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    paddingTop: 150,
+  },
   title: {
-    fontSize: 28,
-    fontWeight: '600',
-    marginBottom: 20,
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 40,
     textAlign: 'center',
-    color: '#333',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    width: '100%',
+  },
+  inputIcon: {
+    marginRight: 10,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    flex: 1,
+    paddingVertical: 12,
+    color: '#fff',
     fontSize: 16,
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9',
   },
   label: {
+    color: '#fff',
     fontSize: 16,
     marginBottom: 6,
     fontWeight: '500',
-    color: '#444',
+    alignSelf: 'flex-start',
+    marginLeft: 10,
   },
   radioGroup: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 20,
+    width: '100%',
   },
   radioButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#999',
-    backgroundColor: '#eee',
+    borderColor: '#aaa',
+    backgroundColor: 'rgba(255,255,255,0.3)',
   },
   radioButtonSelected: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#4CAF50',
+    backgroundColor: '#2979FF', 
+  borderColor: '#2979FF',
+  shadowColor: '#2979FF',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.8,
+  shadowRadius: 4,
+  elevation: 6,
   },
   radioText: {
-    color: '#333',
+    color: '#fff',
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '700',
   },
   imagePicker: {
-    backgroundColor: '#ddd',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 25,
     marginBottom: 10,
-  },
-  imagePickerText: {
-    fontSize: 16,
-    color: '#555',
+    alignItems: 'center',
+    width: '100%',
   },
   previewImage: {
     width: 100,
@@ -196,15 +234,22 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
+    backgroundColor: '#3b5998',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 25,
     marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    width: '100%',
   },
   buttonText: {
     color: '#fff',
+    fontWeight: 'bold',
     fontSize: 18,
-    fontWeight: '600',
+    textAlign: 'center',
   },
 });
