@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet
 } from 'react-native';
-import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore'; // removed collection, getDocs
 import { db } from '../../firebase';
 import { uploadImage, pickImage } from '../../utils/uploadImage';
 

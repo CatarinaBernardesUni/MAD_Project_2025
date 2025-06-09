@@ -204,7 +204,7 @@ const ManageClasses = ({ navigation }) => {
             />
 
             <TouchableOpacity
-              style={[styles.addButton2, { alignSelf: 'flex-end', marginBottom: 16 }]}
+              style={[styles.addButton, { alignSelf: 'flex-end', marginBottom: 16 }]}
               onPress={() => setFiltersVisible(false)}
             >
               <Text>Hide Filters</Text>
@@ -214,7 +214,7 @@ const ManageClasses = ({ navigation }) => {
 
         {!filtersVisible && (
           <TouchableOpacity
-            style={[styles.addButton2, { alignSelf: 'flex-end', marginBottom: 16 }]}
+            style={[styles.addButton, { alignSelf: 'flex-end', marginBottom: 16 }]}
             onPress={() => setFiltersVisible(true)}
           >
             <Text>Show Filters</Text>
@@ -256,10 +256,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginTop: 16, marginBottom: 12 },
   addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
   input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
-  ClassCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },
   pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12, overflow: 'hidden', height: 40, justifyContent: 'center',},
-  addButton2: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
-
 });
 
 export default ManageClasses;

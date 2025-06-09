@@ -58,7 +58,22 @@ export default function EnrollStudents({ navigation }) {
 
     // Fetch all classes
     const classSnap = await getDocs(collection(db, 'classes'));
-    const classList = classSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Midnight today
+
+    // Filter out classes before today and sort by start date
+    const classList = classSnap.docs
+      .map(doc => ({ id: doc.id, ...doc.data() }))
+      .filter(cls => {
+        const start = cls.start ? new Date(cls.start.seconds ? cls.start.seconds * 1000 : cls.start) : null;
+        return start && start >= today;
+      })
+      .sort((a, b) => {
+        const aDate = a.start ? new Date(a.start.seconds ? a.start.seconds * 1000 : a.start) : 0;
+        const bDate = b.start ? new Date(b.start.seconds ? b.start.seconds * 1000 : b.start) : 0;
+        return aDate - bDate;
+      });
+
     setClasses(classList);
 
     // Fetch all enrollments and count per class

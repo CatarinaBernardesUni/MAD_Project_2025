@@ -6,6 +6,8 @@ import StudentCalendar from '../screens/student/StudentCalendar';
 import StudentEnroll from '../screens/student/StudentEnroll';
 import Settings from '../screens/Settings';
 import CustomDrawerContent from '../components/CustomDrawerContent';
+import StudentEnrollEdit from '../screens/student/StudentEnrollEdit';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -17,6 +19,7 @@ export default function StudentNavigator() {
             <Drawer.Screen name="StudentCalendar" component={StudentCalendar} />
             <Drawer.Screen name="StudentEnroll" component={StudentEnroll} />
             <Drawer.Screen name="Settings" component={Settings} />
+            <Drawer.Screen name="StudentEnrollEdit" component={StudentEnrollEdit} options={{ drawerItemStyle: { display: 'none' } }} /> 
         </Drawer.Navigator>
     );
 }

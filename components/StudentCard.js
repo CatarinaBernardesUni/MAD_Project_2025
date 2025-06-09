@@ -25,10 +25,10 @@ export default function StudentCard({ student, onEdit, onDelete }) {
 
       {expanded && (
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.editBtn} onPress={() => onEdit(student)}>
+          <TouchableOpacity style={styles.editButton} onPress={() => onEdit(student)}>
             <Text style={styles.actionText}>Edit</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(student)}>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(student)}>
             <Text style={styles.actionText}>Block Student</Text>
           </TouchableOpacity>
         </View>
@@ -72,13 +72,13 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'flex-end',
   },
-  editBtn: {
+  editButton: {
     backgroundColor: '#4A90E2',
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 6,
   },
-  deleteBtn: {
+  deleteButton: {
     backgroundColor: '#E24A4A',
     marginLeft: 10,
     paddingVertical: 6,
