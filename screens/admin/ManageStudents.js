@@ -6,6 +6,7 @@ import StudentCard from '../../components/StudentCard';
 import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AdminManageStudents({ navigation }) {
   const [students, setStudents] = useState([]);
@@ -73,35 +74,37 @@ export default function AdminManageStudents({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Manage Students</Text>
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate('AddStudent')}>
-        <Text>Add Student</Text>
-      </TouchableOpacity>
-
-      <Text>Filters</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Student ID"
-        value={studentIdFilter}
-        onChangeText={setStudentIdFilter}
-      />
-      <View style={styles.filtersRow}>
-        <TouchableOpacity style={styles.filterButton} onPress={() => setSortAlphabetically(!sortAlphabetically)}>
-          <Text>Alphabetical Order</Text>
-          <Text>{sortAlphabetically ? '▼' : '▲'}</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <View style={styles.container}>
+        <Text style={styles.header}>Manage Students</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => navigation.navigate('AddStudent')}>
+          <Text>Add Student</Text>
         </TouchableOpacity>
-        <Button title="Search" onPress={applyFilters} />
-      </View>
 
-      <FlatList
-        data={filteredStudents}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-      />
-    </View>
+        <Text>Filters</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Student ID"
+          value={studentIdFilter}
+          onChangeText={setStudentIdFilter}
+        />
+        <View style={styles.filtersRow}>
+          <TouchableOpacity style={styles.filterButton} onPress={() => setSortAlphabetically(!sortAlphabetically)}>
+            <Text>Alphabetical Order</Text>
+            <Text>{sortAlphabetically ? '▼' : '▲'}</Text>
+          </TouchableOpacity>
+          <Button title="Search" onPress={applyFilters} />
+        </View>
+
+        <FlatList
+          data={filteredStudents}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
