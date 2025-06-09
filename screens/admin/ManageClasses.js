@@ -51,17 +51,32 @@ const ManageClasses = ({ navigation }) => {
         querySnapshot.docs.map(async (docSnap) => {
           const data = docSnap.data();
 
-          const professorRef = data.professor || '';
-          const professorId = professorRef.split('/')[1] || '';
+          // Handle professor field (string or reference)
+          let professorRef = data.professor || '';
+          let professorId = '';
+          if (typeof professorRef === 'string') {
+            professorId = professorRef.split('/')[1] || '';
+          } else if (professorRef && professorRef.id) {
+            professorId = professorRef.id;
+            professorRef = `users/${professorId}`;
+          }
+
           const professorName = professorRef && professorId
-            ? await fetchRefName(data.professor, 'name')
+            ? await fetchRefName(professorRef, 'name')
             : 'Unknown';
 
-          const subjectRef = data.subject || '';
-          const subjectId = subjectRef.split('/')[1] || '';
+          // Handle subject field (string or reference)
+          let subjectRef = data.subject || '';
+          let subjectId = '';
+          if (typeof subjectRef === 'string') {
+            subjectId = subjectRef.split('/')[1] || '';
+          } else if (subjectRef && subjectRef.id) {
+            subjectId = subjectRef.id;
+            subjectRef = `subjects/${subjectId}`;
+          }
 
           const subjectName = subjectRef && subjectId
-            ? await fetchRefName(data.subject, 'name')
+            ? await fetchRefName(subjectRef, 'name')
             : 'Unknown';
 
           return {
