@@ -77,6 +77,11 @@ export default function StudentEnrollEdit({ navigation }) {
             });
           }
         }
+        studentEnrollments.sort((a, b) => {
+          const aDate = a.classData?.start ? new Date(a.classData.start.seconds ? a.classData.start.seconds * 1000 : a.classData.start) : 0;
+          const bDate = b.classData?.start ? new Date(b.classData.start.seconds ? b.classData.start.seconds * 1000 : b.classData.start) : 0;
+          return aDate - bDate;
+        });
         setEnrollments(studentEnrollments);
       } catch (err) {
         Alert.alert('Error loading enrollments');
