@@ -100,7 +100,7 @@ export default function StudentClasses({ navigation }) {
     });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
         <Text style={styles.title}>Available Classes 📝</Text>
         <View style={{ alignItems: 'flex-end', marginBottom: 12 }}>
@@ -181,7 +181,7 @@ export default function StudentClasses({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: '#fff', flex: 1 },
+  container: { padding: 15, backgroundColor: '#fff', flex: 1 },
   title: { fontSize: 22, fontWeight: 'bold', marginVertical: 16 },
   enrollmentCard: { backgroundColor: '#f2f6fc', borderRadius: 10, padding: 16, marginBottom: 16 },
   classTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 4 },

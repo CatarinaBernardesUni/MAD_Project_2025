@@ -108,10 +108,10 @@ export default function TeacherHome({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Teacher Home</Text>
+          <Text style={styles.title}>Home</Text>
           <Text style={styles.welcomeText}>
             Welcome, Teacher{teacherName ? ` ${teacherName}` : ''}! {'\n'}Here's what's coming up next:
           </Text>

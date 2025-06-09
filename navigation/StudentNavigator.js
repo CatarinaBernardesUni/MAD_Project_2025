@@ -14,10 +14,10 @@ const Drawer = createDrawerNavigator();
 export default function StudentNavigator() {
     return (
         <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
-            <Drawer.Screen name="StudentHome" component={StudentHome} />
-            <Drawer.Screen name="StudentAttendance" component={StudentAttendance} />
-            <Drawer.Screen name="StudentCalendar" component={StudentCalendar} />
-            <Drawer.Screen name="StudentEnroll" component={StudentEnroll} />
+            <Drawer.Screen name="StudentHome" component={StudentHome} options={{title: "Home"}}/>
+            <Drawer.Screen name="StudentAttendance" component={StudentAttendance} options={{title: "My Attendance"}}/>
+            <Drawer.Screen name="StudentCalendar" component={StudentCalendar} options={{title: "Calendar"}}/>
+            <Drawer.Screen name="StudentEnroll" component={StudentEnroll} options={{title: "Enroll in Classes"}}/>
             <Drawer.Screen name="Settings" component={Settings} />
             <Drawer.Screen name="StudentEnrollEdit" component={StudentEnrollEdit} options={{ drawerItemStyle: { display: 'none' } }} /> 
         </Drawer.Navigator>
