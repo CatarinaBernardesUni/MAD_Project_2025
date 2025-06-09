@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 
-const StudentHome = () => {
+const StudentHome = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [todaysClasses, setTodaysClasses] = useState([]);
   const [upcomingClasses, setUpcomingClasses] = useState([]);
@@ -124,68 +124,74 @@ const StudentHome = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Student Home</Text>
-        <Text style={styles.welcomeText}>
-          Welcome, Student! 😊{'\n'}Here's what's coming up next:
-        </Text>
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.title}>Student Home</Text>
+          <Text style={styles.welcomeText}>
+            Welcome, Student! 😊{'\n'}Here's what's coming up next:
+          </Text>
 
-        {loading ? (
-          <ActivityIndicator style={{ marginTop: 20 }} />
-        ) : (
-          <>
-            <Text style={styles.sectionTitle}>Today</Text>
-            {todaysClasses.length === 0 ? (
-              <Text style={styles.text}>No classes today.</Text>
-            ) : (
-              <FlatList
-                data={todaysClasses}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => renderClass(item)}
-              />
-            )}
+          {loading ? (
+            <ActivityIndicator style={{ marginTop: 20 }} />
+          ) : (
+            <>
+              <Text style={styles.sectionTitle}>Today</Text>
+              {todaysClasses.length === 0 ? (
+                <Text style={styles.text}>No classes today.</Text>
+              ) : (
+                <FlatList
+                  data={todaysClasses}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => renderClass(item)}
+                  scrollEnabled={false}
+                />
+              )}
 
-            <Text style={styles.sectionTitle}>Upcoming Classes</Text>
-            {upcomingClasses.length === 0 ? (
-              <Text style={styles.text}>No upcoming classes.</Text>
-            ) : (
-              <FlatList
-                data={upcomingClasses}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => renderClass(item)}
-              />
-            )}
-          </>
-        )}
-
-        <TouchableOpacity
-          style={styles.calendarButton}
-          onPress={() => {
-            // Replace 'StudentCalendar' with your actual calendar screen route
-            if (typeof navigation !== 'undefined') {
-              navigation.navigate('StudentCalendar');
-            }
-          }}
-        >
-          <Text style={styles.calendarButtonText}>View Full Calendar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={async () => {
-          try {
-            await signOut(auth);
-          } catch (error) {
-            // Handle error
-          }
-        }}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+              <Text style={styles.sectionTitle}>Upcoming Classes</Text>
+              {upcomingClasses.length === 0 ? (
+                <Text style={styles.text}>No upcoming classes.</Text>
+              ) : (
+                <FlatList
+                  data={upcomingClasses}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => renderClass(item)}
+                  scrollEnabled={false}
+                />
+              )}
+            </>
+          )}
+        </ScrollView>
+        <View style={styles.bottomButtonsRow}>
+          <TouchableOpacity
+            style={styles.calendarButton}
+            onPress={() => {
+              if (typeof navigation !== 'undefined') {
+                navigation.navigate('StudentCalendar');
+              }
+            }}
+          >
+            <Text style={styles.calendarButtonText}>View Full Calendar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={async () => {
+              try {
+                await signOut(auth);
+              } catch (error) {
+                // Handle error
+              }
+            }}
+          >
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2F6FC', justifyContent: 'flex-start', alignItems: 'flex-start', padding: 20 },
+  container: { padding: 20, backgroundColor: '#F2F6FC', alignItems: 'flex-start' },
   title: { fontSize: 24, color: '#000', fontWeight: 'bold', marginBottom: 10, alignSelf: 'flex-start' },
   welcomeText: { fontSize: 16, color: '#444', textAlign: 'left', marginBottom: 18, alignSelf: 'flex-start' },
   sectionTitle: { fontSize: 20, color: '#4A90E2', fontWeight: 'bold', marginTop: 24, marginBottom: 8, alignSelf: 'flex-start' },
@@ -193,10 +199,11 @@ const styles = StyleSheet.create({
   classCard: { backgroundColor: '#fff', borderRadius: 10, padding: 14, marginBottom: 10, width: 320, alignSelf: 'center', elevation: 2 },
   classTitle: { fontWeight: 'bold', fontSize: 16, marginBottom: 4, color: '#000' },
   classInfo: { fontSize: 14, color: '#555', marginBottom: 2 },
-  logoutButton: { marginTop: 30, alignSelf: 'center', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 25, backgroundColor: '#FF6B6B' },
-  logoutText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  calendarButton: { marginTop: 24, alignSelf: 'center', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 25, backgroundColor: '#3a9dde' },
+  bottomButtonsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 16, marginBottom: 20, marginTop: 10 },
+  calendarButton: { alignSelf: 'center', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 25, backgroundColor: '#3a9dde', marginRight: 8 },
   calendarButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  logoutButton: { alignSelf: 'center', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 25, backgroundColor: '#FF6B6B', marginLeft: 8 },
+  logoutText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });
 
 export default StudentHome;
