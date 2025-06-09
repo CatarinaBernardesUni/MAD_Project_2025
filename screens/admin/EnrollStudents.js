@@ -16,9 +16,9 @@ export default function EnrollStudents({ navigation }) {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [classes, setClasses] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(false);
-  const [classTeachers, setClassTeachers] = useState({}); // { [classId]: teacherName }
-  const [classSubjects, setClassSubjects] = useState({}); // { [classId]: subjectName }
-  const [classCounts, setClassCounts] = useState({}); // { [classId]: number }
+  const [classTeachers, setClassTeachers] = useState({}); 
+  const [classSubjects, setClassSubjects] = useState({}); 
+  const [classCounts, setClassCounts] = useState({}); 
 
   useFocusEffect(
     useCallback(() => {
@@ -56,12 +56,11 @@ export default function EnrollStudents({ navigation }) {
     setSelectedStudent(student);
     setLoadingClasses(true);
 
-    // Fetch all classes
     const classSnap = await getDocs(collection(db, 'classes'));
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Midnight today
+    today.setHours(0, 0, 0, 0); // midnight today
 
-    // Filter out classes before today and sort by start date
+    // filter out classes before today and sort by date
     const classList = classSnap.docs
       .map(doc => ({ id: doc.id, ...doc.data() }))
       .filter(cls => {
@@ -76,7 +75,7 @@ export default function EnrollStudents({ navigation }) {
 
     setClasses(classList);
 
-    // Fetch all enrollments and count per class
+    // all enrollments and count per class
     const enrollmentSnap = await getDocs(collection(db, 'enrolment'));
     const counts = {};
     enrollmentSnap.docs.forEach(docSnap => {
@@ -88,7 +87,6 @@ export default function EnrollStudents({ navigation }) {
     });
     setClassCounts(counts);
 
-    // Fetch teacher and subject names
     classList.forEach(cls => {
       fetchTeacherName(cls.professor, cls.id);
       fetchSubjectName(cls.subject, cls.id);
@@ -100,7 +98,6 @@ export default function EnrollStudents({ navigation }) {
   const fetchTeacherName = async (teacherRef, classId) => {
     if (!teacherRef) return;
     let teacherId = teacherRef;
-    // If it's a reference string like "users/abc123", extract the ID
     if (typeof teacherRef === 'string' && teacherRef.includes('/')) {
       teacherId = teacherRef.split('/').pop();
     } else if (teacherRef.id) {
@@ -125,7 +122,6 @@ export default function EnrollStudents({ navigation }) {
   const fetchSubjectName = async (subjectRef, classId) => {
     if (!subjectRef) return;
     let subjectId = subjectRef;
-    // If it's a reference string like "subjects/abc123", extract the ID
     if (typeof subjectRef === 'string' && subjectRef.includes('/')) {
       subjectId = subjectRef.split('/').pop();
     } else if (subjectRef.id) {
@@ -155,7 +151,7 @@ export default function EnrollStudents({ navigation }) {
       return;
     }
 
-    // Check if this student is already enrolled in this class
+    // check if student is already enrolled 
     const enrollmentSnap = await getDocs(collection(db, 'enrolment'));
     const alreadyEnrolled = enrollmentSnap.docs.some(docSnap => {
       const data = docSnap.data();

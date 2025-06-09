@@ -23,12 +23,10 @@ export default function useStudentClasses() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch all classes
         const classSnap = await getDocs(collection(db, 'classes'));
         const classList = classSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setClasses(classList);
 
-        // Fetch all enrollments
         const enrollmentSnap = await getDocs(collection(db, 'enrolment'));
         const counts = {};
         const enrolledIds = [];
@@ -46,9 +44,7 @@ export default function useStudentClasses() {
         setClassCounts(counts);
         setEnrolledClassIds(enrolledIds);
 
-        // Fetch subject and teacher names for each class
         for (const cls of classList) {
-          // Subject
           let subjectId = cls.subject?.id || (typeof cls.subject === 'string' ? cls.subject.split('/').pop() : null);
           if (subjectId && !classSubjects[cls.id]) {
             const subjectSnap = await getDoc(doc(db, 'subjects', subjectId));
@@ -57,7 +53,6 @@ export default function useStudentClasses() {
               [cls.id]: subjectSnap.exists() ? subjectSnap.data().name : subjectId,
             }));
           }
-          // Teacher
           let teacherId = cls.professor?.id || (typeof cls.professor === 'string' ? cls.professor.split('/').pop() : null);
           if (teacherId && !classTeachers[cls.id]) {
             const teacherSnap = await getDoc(doc(db, 'users', teacherId));
@@ -73,19 +68,15 @@ export default function useStudentClasses() {
       setLoading(false);
     };
     fetchData();
-    // eslint-disable-next-line
   }, [studentId]);
 
-  // Fetch subject and teacher options for filters
   useEffect(() => {
     const fetchOptions = async () => {
-      // Subjects
       const subjSnap = await getDocs(collection(db, 'subjects'));
       setSubjectOptions(subjSnap.docs.map(doc => ({
         id: doc.id,
         name: doc.data().name,
       })));
-      // Teachers
       const userSnap = await getDocs(collection(db, 'users'));
       const teachers = userSnap.docs
         .filter(doc => (doc.data().roles || []).includes('teacher'))

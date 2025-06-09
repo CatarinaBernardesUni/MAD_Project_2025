@@ -22,7 +22,7 @@ export default function StudentEnrollEdit({ navigation }) {
         const snapshot = await getDocs(collection(db, 'enrolment'));
         const studentEnrollments = [];
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Midnight today
+        today.setHours(0, 0, 0, 0); 
 
         for (const docSnap of snapshot.docs) {
           const data = docSnap.data();
@@ -38,7 +38,6 @@ export default function StudentEnrollEdit({ navigation }) {
               const classSnap = await getDoc(doc(db, 'classes', classId));
               if (classSnap.exists()) {
                 classData = { id: classId, ...classSnap.data() };
-                // Fetch subject name
                 let subjectId = classData.subject?.id || (typeof classData.subject === 'string' ? classData.subject.split('/').pop() : null);
                 if (subjectId) {
                   const subjectSnap = await getDoc(doc(db, 'subjects', subjectId));
@@ -46,7 +45,6 @@ export default function StudentEnrollEdit({ navigation }) {
                     subjectName = subjectSnap.data().name || subjectId;
                   }
                 }
-                // Fetch teacher name
                 let teacherId = classData.professor?.id || (typeof classData.professor === 'string' ? classData.professor.split('/').pop() : null);
                 if (teacherId) {
                   const teacherSnap = await getDoc(doc(db, 'users', teacherId));
@@ -54,7 +52,6 @@ export default function StudentEnrollEdit({ navigation }) {
                     teacherName = teacherSnap.data().name || teacherId;
                   }
                 }
-                // Check if class ended before today
                 const endDate = classData.end
                   ? new Date(classData.end.seconds ? classData.end.seconds * 1000 : classData.end)
                   : null;
@@ -64,9 +61,8 @@ export default function StudentEnrollEdit({ navigation }) {
               }
             }
             if (shouldDelete && docSnap.id) {
-              // Remove the enrollment if class ended before today
               await deleteDoc(doc(db, 'enrolment', docSnap.id));
-              continue; // Skip adding to enrollments
+              continue; 
             }
             studentEnrollments.push({
               id: docSnap.id,

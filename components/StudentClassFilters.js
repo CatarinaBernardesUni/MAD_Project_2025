@@ -13,9 +13,8 @@ export default function StudentClassFilters({
   setFilterTeacher,
   subjectOptions,
   teacherOptions,
-  styles, // main styles from parent
+  styles, 
 }) {
-  // Filter teachers by subject
   const filteredTeachers = React.useMemo(() => {
     if (!filterSubject) return teacherOptions;
     const selectedSubject = subjectOptions.find(s => s.id === filterSubject)?.name;
@@ -89,24 +88,8 @@ export default function StudentClassFilters({
 }
 
 const localStyles = StyleSheet.create({
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    marginBottom: 8,
-    backgroundColor: '#fff',
-    width: '100%',
-    justifyContent: 'center',
-  },
-  picker: {
-    width: '100%',
-    height: 54,
-    fontSize: 16,
-  },
-  teacherRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 8,
-  },
+  pickerContainer: { borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 8,
+     backgroundColor: '#fff', width: '100%', justifyContent: 'center' },
+  picker: { width: '100%', height: 54, fontSize: 16 },
+  teacherRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
 });

@@ -33,13 +33,11 @@ export default function StudentClasses({ navigation }) {
   const auth = getAuth();
   const studentId = auth.currentUser?.uid;
 
-  // Filter state
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [filterClassId, setFilterClassId] = useState('');
   const [filterSubject, setFilterSubject] = useState('');
   const [filterTeacher, setFilterTeacher] = useState('');
 
-  // Enroll handler
   const handleEnroll = async (classItem) => {
     const enrolledCount = classCounts[classItem.id] || 0;
     const limit = classItem.peopleLimit ?? classItem.limit ?? Infinity;
@@ -58,7 +56,7 @@ export default function StudentClasses({ navigation }) {
         enrolledAt: new Date()
       });
       Alert.alert('Success', `Enrolled in class ${classSubjects[classItem.id] || classItem.id}`);
-      // Refresh data
+
       setEnrolledClassIds([...enrolledClassIds, classItem.id]);
       setClassCounts({
         ...classCounts,
@@ -74,29 +72,23 @@ export default function StudentClasses({ navigation }) {
     return <ActivityIndicator style={{ marginTop: 40 }} />;
   }
 
-  // Get today's date at midnight
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Filter and sort classes
   const upcomingClasses = classes
     .filter(item => {
       const startDateObj = item.start
         ? new Date(item.start.seconds ? item.start.seconds * 1000 : item.start)
         : null;
-      // Only show classes today or later
       if (!startDateObj || startDateObj < today) return false;
 
-      // Filter by class ID
       if (filterClassId && !item.id.toLowerCase().includes(filterClassId.trim().toLowerCase())) return false;
 
-      // Filter by subject
       if (filterSubject && classSubjects[item.id]) {
         const subjName = subjectOptions.find(s => s.id === filterSubject)?.name;
         if (!subjName || classSubjects[item.id] !== subjName) return false;
       }
 
-      // Filter by teacher
       if (filterTeacher && classTeachers[item.id] && classTeachers[item.id] !== teacherOptions.find(t => t.id === filterTeacher)?.name) return false;
 
       return true;

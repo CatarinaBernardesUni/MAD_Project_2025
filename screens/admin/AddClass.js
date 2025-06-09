@@ -25,7 +25,6 @@ const AddClass = ({ navigation }) => {
   });
   const [loading, setLoading] = useState(false);
 
-  // Fetch dropdown data
   const fetchDropdownData = async () => {
     try {
       const subjSnap = await getDocs(collection(db, 'subjects'));
@@ -54,7 +53,6 @@ const AddClass = ({ navigation }) => {
     }
   };
 
-  // Fetch class types
   useEffect(() => {
     const fetchClassType = async () => {
       try {
@@ -72,7 +70,7 @@ const AddClass = ({ navigation }) => {
     fetchDropdownData();
   }, []);
 
-  // Filter professors by subject
+  // filter professors by subject
   useEffect(() => {
     if (!form.subjectId) {
       setFilteredProfessors([]);

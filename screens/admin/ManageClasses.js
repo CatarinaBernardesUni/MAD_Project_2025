@@ -6,7 +6,7 @@ import {
 import { Picker } from '@react-native-picker/picker'; 
 import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import ClassCard from '../../components/ClassCard'; // <- Make sure path is correct
+import ClassCard from '../../components/ClassCard'; 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const fetchRefName = async (refPath, field = 'name') => {
@@ -96,10 +96,8 @@ const ManageClasses = ({ navigation }) => {
     }
   };
 
-  // Fetch teachers and subjects for dropdowns
   useEffect(() => {
     const fetchDropdowns = async () => {
-      // Fetch teachers from users collection
       const usersSnap = await getDocs(collection(db, 'users'));
       const teachers = usersSnap.docs
         .filter(doc => {
@@ -112,7 +110,6 @@ const ManageClasses = ({ navigation }) => {
         }));
       setTeacherOptions(teachers);
 
-      // Fetch subjects
       const subjectsSnap = await getDocs(collection(db, 'subjects'));
       const subjects = subjectsSnap.docs.map(doc => ({
         id: doc.id,
@@ -120,7 +117,6 @@ const ManageClasses = ({ navigation }) => {
       }));
       setSubjectOptions(subjects);
 
-      // Fetch class types (assuming class types are stored in the same collection, otherwise adjust the path)
       const classTypesSnap = await getDocs(collection(db, 'classType'));
       const classTypes = classTypesSnap.docs.map(doc => ({
         id: doc.id,

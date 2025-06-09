@@ -14,11 +14,9 @@ export default function EditClass({ route, navigation }) {
   const [allProfessors, setAllProfessors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch class data and dropdown options
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch dropdowns
         const subjectsSnap = await getDocs(collection(db, 'subjects'));
         const subjectOpts = subjectsSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
         setSubjectOptions(subjectOpts);
@@ -37,7 +35,6 @@ export default function EditClass({ route, navigation }) {
         const typeOpts = typesSnap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
         setClassTypeOptions(typeOpts);
 
-        // Set form state from classData
         setForm({
           subjectId: classData.subjectId || '',
           professorId: classData.professorId || '',
@@ -70,7 +67,6 @@ export default function EditClass({ route, navigation }) {
     fetchData();
   }, [classData]);
 
-  // Update professor options when subject changes
   useEffect(() => {
     if (!form) return;
     const selectedSubjectName = subjectOptions.find(s => s.id === form.subjectId)?.name;
@@ -80,7 +76,6 @@ export default function EditClass({ route, navigation }) {
           Array.isArray(prof.subjects) && prof.subjects.includes(selectedSubjectName)
         )
       );
-      // If current professor doesn't teach this subject, clear selection
       if (!allProfessors.find(p => p.id === form.professorId && Array.isArray(p.subjects) && p.subjects.includes(selectedSubjectName))) {
         setForm(f => ({ ...f, professorId: '' }));
       }
@@ -98,7 +93,7 @@ export default function EditClass({ route, navigation }) {
       const startDateTime = new Date(`${form.date}T${form.startTime}:00`);
       const endDateTime = new Date(`${form.date}T${form.endTime}:00`);
 
-      // Validation: Required fields
+      // required fields
       if (
         !form.subjectId ||
         !form.professorId ||

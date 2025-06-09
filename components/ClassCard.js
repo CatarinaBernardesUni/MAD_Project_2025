@@ -27,7 +27,6 @@ const formatDate = (date) => {
 const ClassCard = ({ item, onEdit, onDelete, classTypeOptions = [] }) => {
   const [expanded, setExpanded] = useState(false);
 
-  // Find the class type name by ID or by name (for legacy support)
   const classTypeName =
     classTypeOptions.find(opt => opt.id === item.classType)?.name ||
     classTypeOptions.find(opt => opt.name === item.classType)?.name ||
@@ -44,7 +43,6 @@ const ClassCard = ({ item, onEdit, onDelete, classTypeOptions = [] }) => {
     );
   };
 
-  // People limit logic: show "No limit" for 0, null, undefined, or ''
   const peopleLimitDisplay =
     !item.peopleLimit || Number(item.peopleLimit) === 0
       ? 'No limit'

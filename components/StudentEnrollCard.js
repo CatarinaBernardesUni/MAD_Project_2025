@@ -38,72 +38,18 @@ export default function StudentEnrollCard({ student, onEdit, onSelect }) {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    padding: 12,
-    marginVertical: 6,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    elevation: 2,
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 12,
-    backgroundColor: '#eee',
-  },
-  info: {
-    flex: 1,
-    minWidth: '60%',
-  },
-  text: {
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  label: {
-    fontWeight: 'bold',
-  },
-  actions: {
-    flexDirection: 'row',
-    marginTop: 10,
-    width: '100%',
-    justifyContent: 'flex-end',
-  },
-  editBtn: {
-    backgroundColor: '#4A90E2',
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 6,
-  },
-  selectBtn: {
-    backgroundColor: '#00cc66',
-    marginLeft: 10,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 6,
-  },
-  actionText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  profileImage: {
-  width: 60,
-  height: 60,
-  borderRadius: 30,
-  backgroundColor: '#ccc',
-  marginRight: 12,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-placeholder: {
-  backgroundColor: '#999',
-},
-initials: {
-  color: '#fff',
-  fontSize: 24,
-  fontWeight: 'bold',
-},
+  card: { flexDirection: 'row', padding: 12, marginVertical: 6, backgroundColor: '#fff', borderRadius: 10,
+     elevation: 2, alignItems: 'center', flexWrap: 'wrap' },
+  avatar: { width: 60, height: 60, borderRadius: 30, marginRight: 12, backgroundColor: '#eee' },
+  info: { flex: 1, minWidth: '60%' },
+  text: { fontSize: 14, marginBottom: 2 },
+  label: { fontWeight: 'bold' },
+  actions: { flexDirection: 'row', marginTop: 10, width: '100%', justifyContent: 'flex-end' },
+  editBtn: { backgroundColor: '#4A90E2', paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6 },
+  selectBtn: { backgroundColor: '#00cc66', marginLeft: 10, paddingVertical: 6, paddingHorizontal: 14, borderRadius: 6 },
+  actionText: { color: '#fff', fontWeight: 'bold' },
+  profileImage: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#ccc', marginRight: 12,
+     justifyContent: 'center', alignItems: 'center' },
+  placeholder: { backgroundColor: '#999' },
+  initials: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
 });

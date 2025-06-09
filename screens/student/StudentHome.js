@@ -18,7 +18,7 @@ const StudentHome = ({ navigation }) => {
         const user = getAuth().currentUser;
         if (!user) return;
 
-        // Get all enrollments for this student
+        // get all enrollments for this student
         const enrollSnap = await getDocs(collection(db, 'enrolment'));
         const classIds = [];
         enrollSnap.forEach(docSnap => {
@@ -30,14 +30,13 @@ const StudentHome = ({ navigation }) => {
           }
         });
 
-        // Get class data for each enrolled class, including subject and teacher names
+        // class data for each enrolled class
         const classDataList = [];
         for (const classId of classIds) {
           const classSnap = await getDoc(doc(db, 'classes', classId));
           if (classSnap.exists()) {
             const classData = { id: classId, ...classSnap.data() };
 
-            // Fetch subject name
             let subjectName = '';
             const subjectId = classData.subject?.id || (typeof classData.subject === 'string' ? classData.subject.split('/').pop() : null);
             if (subjectId) {
@@ -47,7 +46,6 @@ const StudentHome = ({ navigation }) => {
               }
             }
 
-            // Fetch teacher name
             let teacherName = '';
             const teacherId = classData.professor?.id || (typeof classData.professor === 'string' ? classData.professor.split('/').pop() : null);
             if (teacherId) {
@@ -61,7 +59,6 @@ const StudentHome = ({ navigation }) => {
           }
         }
 
-        // Separate into today's and upcoming
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -87,14 +84,13 @@ const StudentHome = ({ navigation }) => {
           }
         });
 
-        // Sort by start time
+        // sort by start time
         todays.sort((a, b) => new Date(a.start) - new Date(b.start));
         upcoming.sort((a, b) => new Date(a.start) - new Date(b.start));
 
         setTodaysClasses(todays);
         setUpcomingClasses(upcoming);
       } catch (err) {
-        // Handle error if needed
       }
       setLoading(false);
     };
@@ -178,7 +174,6 @@ const StudentHome = ({ navigation }) => {
               try {
                 await signOut(auth);
               } catch (error) {
-                // Handle error
               }
             }}
           >

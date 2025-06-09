@@ -11,7 +11,7 @@ export default function EditEnrollment({ route, navigation }) {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch enrollments for this student
+  // enrollments for this student
   useEffect(() => {
     const fetchEnrollments = async () => {
       setLoading(true);
@@ -20,10 +20,10 @@ export default function EditEnrollment({ route, navigation }) {
         const studentEnrollments = [];
         for (const docSnap of snapshot.docs) {
           const data = docSnap.data();
-          // Check if this enrollment is for the current student
+          // check if this enrollment is for the current student
           let enrolledStudentId = data.student?.id || (typeof data.student === 'string' ? data.student.split('/').pop() : null);
           if (enrolledStudentId === studentId) {
-            // Fetch class info
+            // class info
             let classId = data.class?.id || (typeof data.class === 'string' ? data.class.split('/').pop() : null);
             let classData = null;
             let subjectName = '';
@@ -32,7 +32,7 @@ export default function EditEnrollment({ route, navigation }) {
               const classSnap = await getDoc(doc(db, 'classes', classId));
               if (classSnap.exists()) {
                 classData = { id: classId, ...classSnap.data() };
-                // Fetch subject name
+                // subject name
                 let subjectId = classData.subject?.id || (typeof classData.subject === 'string' ? classData.subject.split('/').pop() : null);
                 if (subjectId) {
                   const subjectSnap = await getDoc(doc(db, 'subjects', subjectId));
@@ -40,7 +40,7 @@ export default function EditEnrollment({ route, navigation }) {
                     subjectName = subjectSnap.data().name || subjectId;
                   }
                 }
-                // Fetch teacher name
+                // teacher name
                 let teacherId = classData.professor?.id || (typeof classData.professor === 'string' ? classData.professor.split('/').pop() : null);
                 if (teacherId) {
                   const teacherSnap = await getDoc(doc(db, 'users', teacherId));
@@ -68,7 +68,6 @@ export default function EditEnrollment({ route, navigation }) {
     fetchEnrollments();
   }, [studentId]);
 
-  // Delete enrollment
   const handleDelete = async (enrollmentId) => {
     Alert.alert(
       'Remove Enrollment',
