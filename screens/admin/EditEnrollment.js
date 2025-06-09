@@ -134,7 +134,7 @@ export default function EditEnrollment({ route, navigation }) {
                   </Text>
                   <View style={styles.actions}>
                     <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item.id)}>
-                      <Text style={styles.actionText}>Delete</Text>
+                      <Text style={styles.actionText}>Remove</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

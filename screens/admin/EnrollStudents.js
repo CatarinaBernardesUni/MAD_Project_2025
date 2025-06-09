@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import EnrollStudentList from '../../components/EnrollStudentList';
+import EnrollClassList from '../../components/EnrollClassList';
 import { collection, query, where, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import StudentEnrollCard from '../../components/StudentEnrollCard';
 import { useFocusEffect } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function EnrollStudents({ navigation }) {
   const [students, setStudents] = useState([]);
@@ -17,6 +18,7 @@ export default function EnrollStudents({ navigation }) {
   const [loadingClasses, setLoadingClasses] = useState(false);
   const [classTeachers, setClassTeachers] = useState({}); // { [classId]: teacherName }
   const [classSubjects, setClassSubjects] = useState({}); // { [classId]: subjectName }
+  const [classCounts, setClassCounts] = useState({}); // { [classId]: number }
 
   useFocusEffect(
     useCallback(() => {
@@ -31,9 +33,9 @@ export default function EnrollStudents({ navigation }) {
   const fetchStudents = async () => {
     const q = query(collection(db, 'users'), where('roles', 'array-contains', 'student'));
     const snapshot = await getDocs(q);
-    const studentList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setStudents(studentList);
-    setFilteredStudents(studentList);
+    const enrollstudentList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setStudents(enrollstudentList);
+    setFilteredStudents(enrollstudentList);
   };
 
   const applyFilters = () => {
@@ -53,14 +55,30 @@ export default function EnrollStudents({ navigation }) {
   const handleSelectStudent = async (student) => {
     setSelectedStudent(student);
     setLoadingClasses(true);
+
     // Fetch all classes
     const classSnap = await getDocs(collection(db, 'classes'));
     const classList = classSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     setClasses(classList);
+
+    // Fetch all enrollments and count per class
+    const enrollmentSnap = await getDocs(collection(db, 'enrolment'));
+    const counts = {};
+    enrollmentSnap.docs.forEach(docSnap => {
+      const data = docSnap.data();
+      let classId = data.class?.id || (typeof data.class === 'string' ? data.class.split('/').pop() : null);
+      if (classId) {
+        counts[classId] = (counts[classId] || 0) + 1;
+      }
+    });
+    setClassCounts(counts);
+
+    // Fetch teacher and subject names
     classList.forEach(cls => {
       fetchTeacherName(cls.professor, cls.id);
       fetchSubjectName(cls.subject, cls.id);
     });
+
     setLoadingClasses(false);
   };
 
@@ -115,6 +133,27 @@ export default function EnrollStudents({ navigation }) {
   };
 
   const handleEnroll = async (student, classItem) => {
+    const enrolledCount = classCounts[classItem.id] || 0;
+    const limit = classItem.peopleLimit ?? classItem.limit ?? Infinity;
+    if (enrolledCount >= limit) {
+      Alert.alert('Class Full', 'This class has reached its enrollment limit.');
+      return;
+    }
+
+    // Check if this student is already enrolled in this class
+    const enrollmentSnap = await getDocs(collection(db, 'enrolment'));
+    const alreadyEnrolled = enrollmentSnap.docs.some(docSnap => {
+      const data = docSnap.data();
+      const studentId = data.student?.id || (typeof data.student === 'string' ? data.student.split('/').pop() : null);
+      const classId = data.class?.id || (typeof data.class === 'string' ? data.class.split('/').pop() : null);
+      return studentId === student.id && classId === classItem.id;
+    });
+
+    if (alreadyEnrolled) {
+      Alert.alert('Already Enrolled', `${student.name} is already enrolled in this class.`);
+      return;
+    }
+
     try {
       await addDoc(collection(db, 'enrolment'), {
         student: doc(db, 'users', student.id),
@@ -122,127 +161,44 @@ export default function EnrollStudents({ navigation }) {
         enrolledAt: new Date()
       });
       Alert.alert('Success', `Enrolled ${student.name} in class ${classItem.classType}`);
-      setSelectedStudent(null); // Optionally go back to student list
+      setSelectedStudent(null);
     } catch (err) {
       Alert.alert('Error', 'Failed to enroll student.');
       console.error(err);
     }
   };
 
-  const renderItem = ({ item }) => (
-    <StudentEnrollCard
-      student={item}
-      onEdit={(student) => navigation.navigate('EditEnrollment', { studentId: student.id })}
-      onSelect={handleSelectStudent}
-    />
-  );
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
         <Text style={styles.header}>Enroll Students</Text>
-
-        {!selectedStudent && (
-          <>
-            <Text>Filters</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Student ID"
-              value={studentIdFilter}
-              onChangeText={setStudentIdFilter}
-            />
-            <View style={styles.filtersRow}>
-              <TouchableOpacity style={styles.filterButton} onPress={() => setSortAlphabetically(!sortAlphabetically)}>
-                <Text>Alphabetical Order</Text>
-                <Text>{sortAlphabetically ? '▼' : '▲'}</Text>
-              </TouchableOpacity>
-              <Button title="Search" onPress={applyFilters} />
-            </View>
-
-            <FlatList
-              data={filteredStudents}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-            />
-          </>
-        )}
-
-        {selectedStudent && (
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 8 }}>
-              Select a class to enroll {selectedStudent.name}:
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Search by Class ID"
-              value={classIdFilter}
-              onChangeText={setClassIdFilter}
-            />
-            {loadingClasses ? (
-              <Text>Loading classes...</Text>
-            ) : (
-              <FlatList
-                data={classes.filter(cls =>
-                  classIdFilter.trim() === '' ||
-                  cls.id.toLowerCase().includes(classIdFilter.trim().toLowerCase())
-                )}
-                keyExtractor={item => item.id}
-                renderItem={({ item }) => {
-                  // Convert Firestore Timestamp or JS Date to Date object
-                  const startDateObj = item.start
-                    ? new Date(item.start.seconds ? item.start.seconds * 1000 : item.start)
-                    : null;
-                  const endDateObj = item.end
-                    ? new Date(item.end.seconds ? item.end.seconds * 1000 : item.end)
-                    : null;
-
-                  // Use only the start date for "Date"
-                  const date = startDateObj
-                    ? startDateObj.toLocaleDateString()
-                    : '';
-                  const startTime = startDateObj
-                    ? startDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    : '';
-                  const endTime = endDateObj
-                    ? endDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    : '';
-
-                  return (
-                    <TouchableOpacity
-                      style={styles.classOption}
-                      onPress={() => {
-                        Alert.alert(
-                          'Confirm Enrollment',
-                          `Enroll ${selectedStudent.name} in ${classSubjects[item.id] || 'this class'}?`,
-                          [
-                            { text: 'Cancel', style: 'cancel' },
-                            { text: 'Enroll', style: 'default', onPress: () => handleEnroll(selectedStudent, item) }
-                          ]
-                        );
-                      }}
-                    >
-                      <Text style={{ fontWeight: 'bold' }}>
-                        {classSubjects[item.id] || 'Loading...'} - {item.classType}
-                      </Text>
-                      <Text>
-                        Teacher: {classTeachers[item.id] || 'Loading...'}
-                      </Text>
-                      <Text>
-                        Date: {date}
-                      </Text>
-                      <Text>
-                        Start Time: {startTime}
-                      </Text>
-                      <Text>
-                        End Time: {endTime}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-            )}
-            <Button title="Back to Students" onPress={() => setSelectedStudent(null)} />
-          </View>
+        {!selectedStudent ? (
+          <EnrollStudentList
+            students={students}
+            studentIdFilter={studentIdFilter}
+            setStudentIdFilter={setStudentIdFilter}
+            sortAlphabetically={sortAlphabetically}
+            setSortAlphabetically={setSortAlphabetically}
+            applyFilters={applyFilters}
+            filteredStudents={filteredStudents}
+            onSelectStudent={handleSelectStudent}
+            navigation={navigation}
+            styles={styles}
+          />
+        ) : (
+          <EnrollClassList
+            classes={classes}
+            classIdFilter={classIdFilter}
+            setClassIdFilter={setClassIdFilter}
+            loadingClasses={loadingClasses}
+            classSubjects={classSubjects}
+            classTeachers={classTeachers}
+            classCounts={classCounts}
+            selectedStudent={selectedStudent}
+            handleEnroll={handleEnroll}
+            setSelectedStudent={setSelectedStudent}
+            styles={styles}
+          />
         )}
       </View>
     </SafeAreaView>
