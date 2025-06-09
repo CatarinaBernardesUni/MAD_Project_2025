@@ -80,12 +80,12 @@ const TeacherCalendar = () => {
     <View style={styles.container}>
       <Calendar
         theme={{
-          selectedDayBackgroundColor: '#2563eb',
+          selectedDayBackgroundColor: '#477fd1',
           selectedDayTextColor: '#fff',
           todayTextColor: '#ef4444',
           dayTextColor: '#1e293b',
-          textDisabledColor: '#cbd5e1',
-          arrowColor: '#2563eb',
+          textDisabledColor: '#9399a3',
+          arrowColor: '#477fd1',
           textDayFontWeight: '500',
           textMonthFontWeight: '700',
           textDayHeaderFontWeight: '600',
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f0f4f8', // Soft background (light gray-blue)
+    backgroundColor: '#f0f4f8',
   },
   dateHeader: {
     fontSize: 18,
@@ -134,12 +134,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   classItem: {
-    backgroundColor: '#dbeafe', // Soft blue background
+    backgroundColor: '#dbeafe', 
     padding: 14,
     marginVertical: 8,
     borderRadius: 12,
     borderLeftWidth: 5,
-    borderLeftColor: '#2563eb', // Blue stripe
+    borderLeftColor: '#477fd1', 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   classText: {
     fontSize: 15,
-    color: '#1e3a8a', // Deep blue text
+    color: '#000000',
     marginBottom: 4,
   },
   classNote: {
@@ -158,7 +158,5 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 });
-
-
 
 export default TeacherCalendar;
