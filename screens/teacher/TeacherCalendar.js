@@ -102,7 +102,7 @@ const TeacherCalendar = () => {
             [selectedDate]: {
               ...(markedDates[selectedDate] || {}),
               selected: true,
-              selectedColor: '#2563eb',
+              selectedColor: '#477fd1',
             },
           }),
         }}
