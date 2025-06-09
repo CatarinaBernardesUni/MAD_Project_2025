@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import StatusBar from 'expo-status-bar';
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,7 +43,7 @@ export default function HomepageScreen({ navigation }) {
   }, []);
 
   return (
-    <LinearGradient colors={['#1f3a93', '#0f2027']} style={styles.container}>
+    <LinearGradient colors={['#3578e5', '#bbe1ff']} style={styles.container}>
       <Animated.View
         style={[
           styles.floatingCircle,
@@ -90,19 +89,19 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     marginHorizontal: 30,
-    backgroundColor: '#3b5998',
+    backgroundColor: '#477fd1',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
   },
-  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 20 },
   floatingCircle: {
     position: 'absolute',
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(18, 93, 192, 0.62)',
   },
 });
