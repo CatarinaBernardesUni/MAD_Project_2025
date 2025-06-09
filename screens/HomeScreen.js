@@ -7,13 +7,11 @@ const { width, height } = Dimensions.get('window');
 export default function HomepageScreen({ navigation }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(-50)).current;
-
-  // Floating animation for background shapes
+  
   const blinkAnim1 = useRef(new Animated.Value(0)).current;
   const blinkAnim2 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Main text animation
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -57,7 +55,6 @@ export default function HomepageScreen({ navigation }) {
         ]}
       />
 
-      {/* Main Content */}
       <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
         <Text style={styles.title}>TimeToTeach</Text>
         <Text style={styles.subtitle}>“Where every class finds its time.”</Text>

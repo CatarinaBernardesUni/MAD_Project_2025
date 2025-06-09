@@ -40,16 +40,16 @@ export default function LoginScreen() {
   };
 
   return (
-    <LinearGradient colors={['#1f3a93', '#0f2027']} style={styles.container}>
+    <LinearGradient colors={['#3578e5', '#bbe1ff']} style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.innerContainer}>
         <Text style={styles.title}>Log In</Text>
 
         <View style={styles.inputContainer}>
-          <Icon name="email-outline" size={20} color="#fff" style={styles.inputIcon} />
+          <Icon name="email-outline" size={20} color="#000000" style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Email"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#000000"
             autoCapitalize="none"
             keyboardType="email-address"
             onChangeText={setEmail}
@@ -58,11 +58,11 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Icon name="lock-outline" size={20} color="#fff" style={styles.inputIcon} />
+          <Icon name="lock-outline" size={20} color="#000000" style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Password"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#000000"
             secureTextEntry
             autoCapitalize="none"
             onChangeText={setPassword}
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 25,
     paddingHorizontal: 15,
     marginBottom: 20,
@@ -110,11 +110,11 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingVertical: 12,
-    color: '#fff',
+    color: '#000000',
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#3b5998',
+    backgroundColor: '#477fd1',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 25,

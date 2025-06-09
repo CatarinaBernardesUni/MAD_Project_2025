@@ -47,17 +47,17 @@ export default function SignupScreen() {
   const roles = ['student', 'teacher'];
 
   return (
-    <LinearGradient colors={['#1f3a93', '#0f2027']} style={styles.container}>
+    <LinearGradient colors={['#3578e5', '#bbe1ff']} style={styles.container}>
       <KeyboardAvoidingView keyboardVerticalOffset={60} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Sign Up</Text>
 
           <View style={styles.inputContainer}>
-            <Icon name="account-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Icon name="account-outline" size={20} color="#000000" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Name"
-              placeholderTextColor="#aaa"
+              placeholderTextColor="#000000"
               onChangeText={(name) => setForm({ ...form, name })}
               value={form.name}
               autoCapitalize="words"
@@ -65,11 +65,11 @@ export default function SignupScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Icon name="calendar" size={20} color="#fff" style={styles.inputIcon} />
+            <Icon name="calendar" size={20} color="#000000" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Age"
-              placeholderTextColor="#aaa"
+              placeholderTextColor="#000000"
               keyboardType="numeric"
               onChangeText={(age) => setForm({ ...form, age })}
               value={form.age}
@@ -90,11 +90,11 @@ export default function SignupScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Icon name="email-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Icon name="email-outline" size={20} color="#000000" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Email"
-              placeholderTextColor="#aaa"
+              placeholderTextColor="#000000"
               keyboardType="email-address"
               autoCapitalize="none"
               onChangeText={(email) => setForm({ ...form, email })}
@@ -103,11 +103,11 @@ export default function SignupScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Icon name="lock-outline" size={20} color="#fff" style={styles.inputIcon} />
+            <Icon name="lock-outline" size={20} color="#000000" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Password"
-              placeholderTextColor="#aaa"
+              placeholderTextColor="#000000"
               secureTextEntry
               autoCapitalize="none"
               onChangeText={(password) => setForm({ ...form, password })}
@@ -116,7 +116,7 @@ export default function SignupScreen() {
           </View>
 
           <TouchableOpacity
-            style={[styles.imagePicker, { backgroundColor: 'rgba(255, 255, 255, 0.1)' }]}
+            style={[styles.imagePicker, { backgroundColor: 'rgba(255, 255, 255, 0.6)' }]}
             onPress={async () => {
               const uri = await pickImage();
               if (uri) {
@@ -124,7 +124,7 @@ export default function SignupScreen() {
               }
             }}
           >
-            <Text style={{ color: '#fff' }}>
+            <Text style={{ color: '#000000' }}>
               {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}
             </Text>
           </TouchableOpacity>
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 25,
     paddingHorizontal: 15,
     marginBottom: 20,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingVertical: 12,
-    color: '#fff',
+    color: '#000000',
     fontSize: 16,
   },
   label: {
@@ -202,16 +202,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#aaa',
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(98, 118, 163, 0.61)',
   },
   radioButtonSelected: {
-    backgroundColor: '#2979FF', 
-  borderColor: '#2979FF',
-  shadowColor: '#2979FF',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.8,
-  shadowRadius: 4,
-  elevation: 6,
+    backgroundColor: '#2979FF',
+    borderColor: '#2979FF',
+    shadowColor: '#2979FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 6,
   },
   radioText: {
     color: '#fff',
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#3b5998',
+    backgroundColor: '#477fd1',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 25,
