@@ -1,34 +1,42 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 const Dashboard = () => {
   return (
-    <View style={styles.container}>
-        <Text style={styles.title}>Dashboard</Text>
-        <Text style={styles.text}>This is where you will view attendance and class records.</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>TimeToTeach</Text>
+      <Text style={styles.section}>Dashboard</Text>
 
-    </View>
+      <Text style={styles.stats}>
+        [ Teachers: 12 ] [ Students: 150 ] [ Classes Today: 5 ]{'\n'}
+        [ Avg Attendance: 88% ] [ Unmarked Sessions: 3 ]
+      </Text>
+
+      <Text style={styles.alerts}>3 classes today don’t have attendance marked</Text>
+
+      <View style={styles.chartPlaceholder}>
+        <Text>📊 70% of scheduled classes were given today</Text>
+      </View>
+
+      <View style={styles.chartPlaceholder}>
+        <Text>📈 Activity Summary</Text>
+        <Text>Bar chart: 16/05 to 20/05</Text>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F6FC',
-    justifyContent: 'center',
-    alignItems: 'center',
+  container: { padding: 16, backgroundColor: '#fff' },
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center' },
+  section: { fontSize: 20, marginTop: 20 },
+  stats: { marginVertical: 16, fontSize: 16, lineHeight: 24 },
+  alerts: { color: 'red', marginBottom: 20 },
+  chartPlaceholder: {
+    backgroundColor: '#eee',
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    color: '#4A90E2',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  text: {
-    fontSize: 16,
-    color: '#444',
-    textAlign: 'center',
+    marginBottom: 20,
+    borderRadius: 10,
   },
 });
 
