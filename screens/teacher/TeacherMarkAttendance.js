@@ -58,6 +58,12 @@ export default function TeacherAttendanceScreen({ route }) {
     );
   };
 
+  const markAllPresent = () => {
+  setStudents((prev) =>
+    prev.map((stu) => ({ ...stu, isPresent: true }))
+  );
+};
+
   const submitAttendance = async () => {
     try {
       const batch = writeBatch(db);
@@ -104,6 +110,8 @@ export default function TeacherAttendanceScreen({ route }) {
       />
 
       <View style={styles.buttonContainer}>
+        <Button title="Mark All Present" onPress={markAllPresent} />
+  <View style={{ height: 10 }} />
         <Button title="Submit Attendance" onPress={submitAttendance} />
       </View>
     </View>
