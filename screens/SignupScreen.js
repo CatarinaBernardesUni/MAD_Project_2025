@@ -47,7 +47,7 @@ export default function SignupScreen() {
   const roles = ['student', 'teacher'];
 
   return (
-    <LinearGradient colors={['#3578e5', '#bbe1ff']} style={styles.container}>
+    <LinearGradient colors={['#84bfdd','#fff7cf']} style={styles.container}>
       <KeyboardAvoidingView keyboardVerticalOffset={60} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Sign Up</Text>
@@ -205,9 +205,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(98, 118, 163, 0.61)',
   },
   radioButtonSelected: {
-    backgroundColor: '#2979FF',
-    borderColor: '#2979FF',
-    shadowColor: '#2979FF',
+    backgroundColor: '#477fd1',
+    borderColor: '#477fd1',
+    shadowColor: '#477fd1',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 4,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#477fd1',
+    backgroundColor: '#5996b5',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 25,

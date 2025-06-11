@@ -40,7 +40,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <LinearGradient colors={['#3578e5', '#bbe1ff']} style={styles.container}>
+    <LinearGradient colors={['#84bfdd','#fff7cf']} style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.innerContainer}>
         <Text style={styles.title}>Log In</Text>
 
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#477fd1',
+    backgroundColor: '#5996b5',
     paddingVertical: 15,
     paddingHorizontal: 40,
     borderRadius: 25,

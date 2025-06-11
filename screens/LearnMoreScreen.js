@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function LearnMoreScreen() {
   return (
-    <LinearGradient colors={['#3578e5', '#bbe1ff']} style={styles.container}>
+    <LinearGradient colors={['#84bfdd','#fff7cf']} style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.header}>TimeToTeach</Text>
         <Text style={styles.subtitle}>Where every class finds its time.</Text>

@@ -41,7 +41,7 @@ export default function HomepageScreen({ navigation }) {
   }, []);
 
   return (
-    <LinearGradient colors={['#3578e5', '#bbe1ff']} style={styles.container}>
+    <LinearGradient colors={['#84bfdd','#fff7cf']} style={styles.container}>
       <Animated.View
         style={[
           styles.floatingCircle,
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     marginHorizontal: 30,
-    backgroundColor: '#477fd1',
+    backgroundColor: '#5996b5',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
