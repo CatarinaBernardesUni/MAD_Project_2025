@@ -107,7 +107,7 @@ export default function TeacherHome({ navigation }) {
         {showAttendanceButton && (
         <TouchableOpacity
           style={styles.attendanceButton}
-          onPress={() => {navigation.navigate('TeacherMarkAttendance');}}
+          onPress={() => {navigation.navigate('TeacherMarkAttendance', { selectedClassId: cls.id });}}
         >
           <Text style={styles.attendanceButtonText}>Mark Attendance</Text>
         </TouchableOpacity>
