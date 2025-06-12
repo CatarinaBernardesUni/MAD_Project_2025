@@ -15,6 +15,8 @@ import EditClass from '../screens/admin/EditClass';
 import AddStudent from '../screens/admin/AddStudent';
 import EditStudent from '../screens/admin/EditStudent';
 import EditEnrollment from '../screens/admin/EditEnrollment';
+import EditProfile from '../screens/EditProfile';
+import NotificationSettings from '../screens/NotificationSettings';
 
 const Drawer = createDrawerNavigator();
 
@@ -35,6 +37,8 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="AddStudent" component={AddStudent} options={{ drawerItemStyle: { display: 'none' } }}/>  
       <Drawer.Screen name="EditStudent" component={EditStudent} options={{ drawerItemStyle: { display: 'none' } }}/>   
       <Drawer.Screen name="EditEnrollment" component={EditEnrollment} options={{ drawerItemStyle: { display: 'none' } }}/>
+      <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
+      <Drawer.Screen name="NotificationSettings" component={NotificationSettings} options={{title: "Notification Settings", drawerItemStyle: { display: 'none' }}} />
     </Drawer.Navigator>
   );
 };

@@ -8,6 +8,8 @@ import Settings from '../screens/Settings';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import TeacherAddClass from '../screens/teacher/TeacherAddClass'; 
 import TeacherMarkAttendance from '../screens/teacher/TeacherMarkAttendance';
+import EditProfile from '../screens/EditProfile';
+import NotificationSettings from '../screens/NotificationSettings';
 
 const Drawer = createDrawerNavigator();
 
@@ -21,6 +23,8 @@ export default function TeacherNavigator() {
             <Drawer.Screen name="Settings" component={Settings} />
             <Drawer.Screen name="TeacherAddClass" component={TeacherAddClass} options={{ drawerItemStyle: { display: 'none', title: "Manage Classes" } }} />
             <Drawer.Screen name="TeacherMarkAttendance" component={TeacherMarkAttendance} options={{ drawerItemStyle: { display: 'none', title: "Mark Attendance" } }} />
+            <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
+            <Drawer.Screen name="NotificationSettings" component={NotificationSettings} options={{title: "Notification Settings", drawerItemStyle: { display: 'none' }}} />
         </Drawer.Navigator>
     );
 }
