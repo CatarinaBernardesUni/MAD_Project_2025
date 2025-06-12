@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import BlockBar from '../../components/BlockBar';
 
 const TeacherDashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -113,9 +114,7 @@ const TeacherDashboard = () => {
         return profMatch && subjMatch;
       });
       const classRefs = classDocs.map(d => d.ref);
-      console.log('Found classes:', classDocs.length, classDocs.map(d => d.id));
-      console.log('professorRef:', professorRef.path);
-      console.log('subjectRef:', subjectRef.path);
+
 
       let totalPresences = 0;
       let totalAttendances = 0;
@@ -132,7 +131,6 @@ const TeacherDashboard = () => {
                 where('class', 'in', batchRefs)
               )
             );
-            console.log('Batch enrolments:', enrolSnap.size);
             enrolSnap.forEach(doc => {
               const data = doc.data();
               if (typeof data.attendance === 'boolean') {
@@ -154,26 +152,6 @@ const TeacherDashboard = () => {
     };
     fetchSummary();
   }, [selectedSubject, teacherId]);
-
-  const BlockBar = ({ percentage, blocks = 10, filledColor = "#4A90E2", emptyColor = "#eee", size = 18, gap = 4 }) => {
-    const filledBlocks = Math.round((percentage / 100) * blocks);
-    return (
-      <View style={{ flexDirection: 'row', marginVertical: 8 }}>
-        {Array.from({ length: blocks }).map((_, i) => (
-          <View
-            key={i}
-            style={{
-              width: size,
-              height: size,
-              marginRight: i < blocks - 1 ? gap : 0,
-              borderRadius: 4,
-              backgroundColor: i < filledBlocks ? filledColor : emptyColor,
-            }}
-          />
-        ))}
-      </View>
-    );
-  };
 
   if (loading) {
     return (
