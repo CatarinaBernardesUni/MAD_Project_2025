@@ -51,7 +51,6 @@ const ManageClasses = ({ navigation }) => {
         querySnapshot.docs.map(async (docSnap) => {
           const data = docSnap.data();
 
-          // Handle professor field (string or reference)
           let professorRef = data.professor || '';
           let professorId = '';
           if (typeof professorRef === 'string') {
@@ -65,7 +64,6 @@ const ManageClasses = ({ navigation }) => {
             ? await fetchRefName(professorRef, 'name')
             : 'Unknown';
 
-          // Handle subject field (string or reference)
           let subjectRef = data.subject || '';
           let subjectId = '';
           if (typeof subjectRef === 'string') {
@@ -147,7 +145,7 @@ const ManageClasses = ({ navigation }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <Text style={styles.header}>Manage Classes</Text>
 

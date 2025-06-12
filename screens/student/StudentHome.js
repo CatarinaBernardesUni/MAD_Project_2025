@@ -119,7 +119,7 @@ const StudentHome = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>Student Home</Text>

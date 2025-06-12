@@ -88,7 +88,7 @@ export default function TeacherHome({ navigation }) {
     fetchClasses();
   }, []);
 
-  const renderClass = ({ item: cls }) => {
+  const renderClass = ({ item: cls, showAttendanceButton = false }) => {
     let startDate = cls.start;
     let endDate = cls.end;
     if (startDate && startDate.seconds) startDate = new Date(startDate.seconds * 1000);
@@ -103,15 +103,24 @@ export default function TeacherHome({ navigation }) {
         <Text style={styles.classTitle}>{cls.subjectName || 'Class'} - {cls.classType || ''}</Text>
         <Text style={styles.classInfo}>Date: {date}</Text>
         <Text style={styles.classInfo}>Time: {startTime} - {endTime}</Text>
+
+        {showAttendanceButton && (
+        <TouchableOpacity
+          style={styles.attendanceButton}
+          onPress={() => {navigation.navigate('TeacherMarkAttendance', { selectedClassId: cls.id });}}
+        >
+          <Text style={styles.attendanceButtonText}>Mark Attendance</Text>
+        </TouchableOpacity>
+      )}
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Teacher Home</Text>
+          <Text style={styles.title}>Home</Text>
           <Text style={styles.welcomeText}>
             Welcome, Teacher{teacherName ? ` ${teacherName}` : ''}! {'\n'}Here's what's coming up next:
           </Text>
@@ -127,7 +136,7 @@ export default function TeacherHome({ navigation }) {
                 <FlatList
                   data={todaysClasses}
                   keyExtractor={item => item.id}
-                  renderItem={renderClass}
+                  renderItem={({ item }) => renderClass({ item, showAttendanceButton: true })}
                   scrollEnabled={false}
                 />
               )}
@@ -202,4 +211,16 @@ const styles = StyleSheet.create({
   logoutText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   addClassButton: { alignSelf: 'center', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 25, backgroundColor: '#3a9dde', marginRight: 8 },
   addClassButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  attendanceButton: {
+  marginTop: 10,
+  backgroundColor: '#4CAF50',
+  paddingVertical: 8,
+  borderRadius: 6,
+  alignItems: 'center',
+},
+attendanceButtonText: {
+  color: 'white',
+  fontWeight: 'bold',
+},
+
 });

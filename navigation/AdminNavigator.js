@@ -21,11 +21,11 @@ const Drawer = createDrawerNavigator();
 const DrawerNavigator = () => {
   return (
     <Drawer.Navigator drawerContent={(props) => <CustomDrawerContent {...props} />}>
-      <Drawer.Screen name="AdminHome" component={AdminHome} />
-      <Drawer.Screen name="ManageClasses" component={ManageClasses} />
-      <Drawer.Screen name="ManageTeachers" component={ManageTeachers} />
-      <Drawer.Screen name="ManageStudents" component={ManageStudents} />
-      <Drawer.Screen name="EnrollStudents" component={EnrollStudents} />
+      <Drawer.Screen name="AdminHome" component={AdminHome} options={{title: "Home"}}/>
+      <Drawer.Screen name="ManageClasses" component={ManageClasses} options={{title: "Manage Classes"}}/>
+      <Drawer.Screen name="ManageTeachers" component={ManageTeachers} options={{title: "Manage Teachers"}}/>
+      <Drawer.Screen name="ManageStudents" component={ManageStudents} options={{title: "Manage Students"}}/>
+      <Drawer.Screen name="EnrollStudents" component={EnrollStudents} options={{title: "Enroll Students"}}/>
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Settings" component={Settings}/>
       <Drawer.Screen name="AddTeacher" component={AddTeacherScreen} options={{ drawerItemStyle: { display: 'none' } }} />
