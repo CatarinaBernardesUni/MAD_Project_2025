@@ -15,6 +15,63 @@ const Dashboard = () => {
   const [absentCount, setAbsentCount] = useState(0);
   const [barChartData, setBarChartData] = useState(null);
   const yMax = barChartData ? Math.max(...barChartData.datasets[0].data) : 0;
+  const [teacherCount, setTeacherCount] = useState(0);
+  const [studentCount, setStudentCount] = useState(0);
+  const [todayClassCount, setTodayClassCount] = useState(0);
+  const [unmarkedSessionCount, setUnmarkedSessionCount] = useState(0);
+
+
+  useEffect(() => {
+    const fetchTopStats = async () => {
+      const usersSnapshot = await getDocs(collection(db, 'users'));
+      let teachers = 0;
+      let students = 0;
+
+      usersSnapshot.forEach(doc => {
+        const data = doc.data();
+        if (Array.isArray(data.roles) && data.roles.includes('teacher')) {
+          teachers++;
+        } else if (Array.isArray(data.roles) && data.roles.includes('student')) {
+          students++;
+        }
+      });
+
+      setTeacherCount(teachers);
+      setStudentCount(students);
+
+      const classesSnapshot = await getDocs(collection(db, 'classes'));
+      const today = new Date();
+      const todayDateString = today.toDateString();
+      let todayClasses = 0;
+
+      classesSnapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.start && typeof data.start.toDate === 'function') {
+          const startDate = data.start.toDate();
+          if (startDate.toDateString() === todayDateString) {
+            todayClasses++;
+          }
+        }
+      });
+
+      setTodayClassCount(todayClasses);
+
+      const enrolmentSnapshot = await getDocs(collection(db, 'enrolment'));
+      let unmarked = 0;
+
+      enrolmentSnapshot.forEach(doc => {
+        const data = doc.data();
+        if (!('attendance' in data)) {
+          unmarked++;
+        }
+      });
+
+      setUnmarkedSessionCount(unmarked);
+    };
+
+    fetchTopStats();
+  }, []);
+
 
   useEffect(() => {
     const fetchAttendance = async () => {
@@ -85,38 +142,39 @@ const Dashboard = () => {
   }, []);
 
 
-  // Calculate percentages for pie chart
+
   const total = presentCount + absentCount;
   const pieData = [
     {
-      name: `Present (${((presentCount / total) * 100).toFixed(0)}%)`,
+      name: `Present`,
       population: isNaN(presentCount) ? 0 : presentCount,
-      color: '#4CAF50',
+      color: '#33cc33',
       legendFontColor: '#333',
       legendFontSize: 14,
     },
     {
-      name: `Absent (${((absentCount / total) * 100).toFixed(0)}%)`,
+      name: `Absent`,
       population: isNaN(absentCount) ? 0 : absentCount,
-      color: '#F44336',
+      color: '#ff0000',
       legendFontColor: '#333',
       legendFontSize: 14,
     },
   ];
 
-  
+
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>TimeToTeach</Text>
-      <Text style={styles.section}>Dashboard</Text>
+      <Text style={styles.title}>Admin Dashboard</Text>
+      <Text style={styles.section}>Quick Overview:</Text>
 
       <Text style={styles.stats}>
-        [ Teachers: 12 ] [ Students: 150 ] [ Classes Today: 5 ]{'\n'}
-        [ Avg Attendance: 88% ] [ Unmarked Sessions: 3 ]
+        [ Teachers: {teacherCount} ] [ Students: {studentCount} ]{'\n'} 
+        [ Classes Today: {todayClassCount} ]
+        [ Unmarked Sessions: {unmarkedSessionCount} ]
       </Text>
 
-      <Text style={styles.alerts}>3 classes today don’t have attendance marked</Text>
+      <Text style={styles.alerts}>{unmarkedSessionCount} classes today don’t have attendance marked!</Text>
 
       <View style={styles.chartContainer}>
         <Text style={styles.chartTitle}>Average Attendace Summary</Text>
@@ -133,12 +191,12 @@ const Dashboard = () => {
           accessor="population"
           backgroundColor="transparent"
           paddingLeft="15"
-          absolute
+          absolute={false}
         />
       </View>
 
       <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Class Activity: 16/05 - 20/05</Text>
+        <Text style={styles.chartTitle}>Recent Class Activity</Text>
         {barChartData && (
           <BarChart
             data={barChartData}
@@ -170,7 +228,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center' },
   section: { fontSize: 20, marginTop: 20 },
   stats: { marginVertical: 16, fontSize: 16, lineHeight: 24 },
-  alerts: { color: 'red', marginBottom: 20 },
+  alerts: { color: 'red', marginBottom: 20, fontSize: 16, fontWeight: 'bold' },
   chartContainer: {
     alignItems: 'center',
     marginBottom: 30,
