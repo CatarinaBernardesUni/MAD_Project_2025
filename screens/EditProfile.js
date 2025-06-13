@@ -17,12 +17,6 @@ import { pickImage, uploadImage } from '../utils/uploadImage';
 
 export default function EditProfile({ navigation, route }) {
   const user = auth.currentUser;
-
-  if (!user) {
-    Alert.alert('Not authenticated');
-    return null;
-  }
-
   const userId = user.uid;
 
   const [form, setForm] = useState(null);
@@ -62,24 +56,6 @@ export default function EditProfile({ navigation, route }) {
       return;
     }
 
-    if (form.email !== user.email) {
-      Alert.alert(
-        'Security Check',
-        'Please reauthenticate before changing your email.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Passing new email to ReAuthScreen
-              navigation.navigate('ReAuthScreen', { newEmail: form.email });
-            },
-          },
-        ],
-        { cancelable: false },
-      );
-      return;
-    }
-
     try {
       // Update Firestore first
       const userRef = doc(db, 'users', userId);
@@ -92,7 +68,6 @@ export default function EditProfile({ navigation, route }) {
       await updateDoc(userRef, {
         name: form.name,
         age: parseInt(form.age),
-        email: form.email,
         profilePicture: finalImageUrl,
       });
 
@@ -102,7 +77,7 @@ export default function EditProfile({ navigation, route }) {
         photoURL: finalImageUrl,
       });
 
-      Alert.alert('Profile updated!', '');
+      Alert.alert('Profile updated!');
       navigation.goBack();
 
     } catch (err) {
@@ -128,14 +103,6 @@ export default function EditProfile({ navigation, route }) {
         keyboardType="numeric"
         value={form.age}
         onChangeText={(age) => setForm({ ...form, age })}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={form.email}
-        onChangeText={(email) => setForm({ ...form, email })}
-        autoCapitalize="none"
-        keyboardType="email-address"
       />
 
       <TouchableOpacity
