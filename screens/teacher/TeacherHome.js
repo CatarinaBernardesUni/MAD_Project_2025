@@ -29,7 +29,7 @@ export default function TeacherHome({ navigation }) {
         if (firestoreEmail !== user.email) {
           // Update Firestore email to match the authenticated email
           await updateDoc(userRef, { email: user.email });
-          console.log('Email synced in Firestore:', user.email);
+          // console.log('Email synced in Firestore:', user.email);
         }
       }
     } catch (error) {
