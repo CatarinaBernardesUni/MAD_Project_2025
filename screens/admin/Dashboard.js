@@ -174,7 +174,7 @@ const Dashboard = () => {
         [ Unmarked Sessions: {unmarkedSessionCount} ]
       </Text>
 
-      <Text style={styles.alerts}>{unmarkedSessionCount} classes today don’t have attendance marked!</Text>
+      <Text style={styles.alerts}>{unmarkedSessionCount} classes don’t have attendance marked!</Text>
 
       <View style={styles.chartContainer}>
         <Text style={styles.chartTitle}>Average Attendace Summary</Text>
