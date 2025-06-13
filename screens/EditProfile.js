@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  TextInput,
-  Button,
-  Alert,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Text,
+  View, TextInput, Alert, Image, TouchableOpacity,
+  ScrollView, StyleSheet, Text, KeyboardAvoidingView, Platform
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { pickImage, uploadImage } from '../utils/uploadImage';
 
-export default function EditProfile({ navigation, route }) {
+export default function EditProfile({ navigation }) {
   const user = auth.currentUser;
   const userId = user.uid;
 
@@ -30,12 +24,10 @@ export default function EditProfile({ navigation, route }) {
 
         if (snapshot.exists()) {
           const data = snapshot.data();
-
-          setForm({ 
+          setForm({
             name: data.name || '',
             age: data.age?.toString() || '',
-            email: data.email || '',
-            profilePicture: data.profilePicture || '' 
+            profilePicture: data.profilePicture || ''
           });
         }
         setLoading(false);
@@ -49,15 +41,12 @@ export default function EditProfile({ navigation, route }) {
   }, [userId]);
 
   const handleUpdate = async () => {
-    console.log('handleUpdate called');
-
     if (!form.name || !form.age) {
       Alert.alert('Please fill all required fields.');
       return;
     }
 
     try {
-      // Update Firestore first
       const userRef = doc(db, 'users', userId);
       let finalImageUrl = form.profilePicture;
 
@@ -71,7 +60,6 @@ export default function EditProfile({ navigation, route }) {
         profilePicture: finalImageUrl,
       });
 
-      // Update Auth profile
       await updateProfile(user, {
         displayName: form.name,
         photoURL: finalImageUrl,
@@ -90,53 +78,144 @@ export default function EditProfile({ navigation, route }) {
   if (!form) return null;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={form.name}
-        onChangeText={(name) => setForm({ ...form, name })}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Age"
-        keyboardType="numeric"
-        value={form.age}
-        onChangeText={(age) => setForm({ ...form, age })}
-      />
+    <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={60}
+        style={styles.container}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Edit Profile</Text>
 
-      <TouchableOpacity
-        style={styles.imagePicker}
-        onPress={async () => {
-          const uri = await pickImage();
-          if (uri) {
-            setForm((prev) => ({
-              ...prev,
-              profilePicture: uri,
-            }));
-            setPictureChanged(true);
-          }
-        }}>
-        <Text>
-          {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture'}
-        </Text>
-      </TouchableOpacity>
+          <Text style={styles.label}>Name:</Text>
+          <View style={styles.inputContainer}>
+            
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor="#000000"
+              value={form.name}
+              onChangeText={(name) => setForm({ ...form, name })}
+            />
+          </View>
 
-      {form.profilePicture ? (
-        <Image
-          source={{ uri: form.profilePicture }}
-          style={styles.previewImage}
-        />
-      ) : null}
+          <Text style={styles.label}>Age:</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Age"
+              placeholderTextColor="#000000"
+              keyboardType="numeric"
+              value={form.age}
+              onChangeText={(age) => setForm({ ...form, age })}
+            />
+          </View>
 
-      <Button title="Update Profile" onPress={handleUpdate} />
-    </ScrollView>
+          <TouchableOpacity
+            style={[styles.imagePicker, { backgroundColor: 'rgba(255, 255, 255, 0.6)' }]}
+            onPress={async () => {
+              const uri = await pickImage();
+              if (uri) {
+                setForm((prev) => ({ ...prev, profilePicture: uri }));
+                setPictureChanged(true);
+              }
+            }}
+          >
+            <Text style={{ color: '#000000' }}>
+              {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture'}
+            </Text>
+          </TouchableOpacity>
+
+          {form.profilePicture && (
+            <Image
+              source={{ uri: form.profilePicture }}
+              style={styles.previewImage}
+            />
+          )}
+
+          <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+            <Text style={styles.buttonText}>Update Profile</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({ 
-  container: { padding: 20 },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10, borderRadius: 8 },
-  imagePicker: { padding: 10, backgroundColor: '#ccc', marginBottom: 10, alignItems: 'center' },
-  previewImage: { width: 100, height: 100, borderRadius: 50, alignSelf: 'center' },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    paddingTop: 150,
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    width: '100%',
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 12,
+    color: '#000000',
+    fontSize: 16,
+  },
+  imagePicker: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    marginBottom: 10,
+    alignItems: 'center',
+    width: '100%',
+  },
+  previewImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: 'center',
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#5996b5',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    width: '100%',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  label: {
+    color: '#000000',
+    fontSize: 16,
+    marginBottom: 6,
+    fontWeight: '500',
+    alignSelf: 'flex-start',
+    marginLeft: 10,
+  },
 });

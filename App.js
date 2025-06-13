@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { ActivityIndicator, View, Alert } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 
 import useFirebaseUser from './hooks/useFirebaseUser';
