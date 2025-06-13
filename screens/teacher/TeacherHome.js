@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export default function TeacherHome({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -13,6 +13,30 @@ export default function TeacherHome({ navigation }) {
   const [teacherName, setTeacherName] = useState('');
 
   useEffect(() => {
+    const syncEmail = async () => {
+    try {
+      const user = getAuth().currentUser;
+      if (!user) return;
+
+      // Force refresh the user to get the most updated email
+      await user.reload();
+
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const firestoreEmail = userSnap.data().email;
+        if (firestoreEmail !== user.email) {
+          // Update Firestore email to match the authenticated email
+          await updateDoc(userRef, { email: user.email });
+          console.log('Email synced in Firestore:', user.email);
+        }
+      }
+    } catch (error) {
+      console.error('Error syncing email:', error);
+    }
+  };
+
     const fetchClasses = async () => {
       setLoading(true);
       try {
@@ -86,6 +110,7 @@ export default function TeacherHome({ navigation }) {
     };
 
     fetchClasses();
+    syncEmail();
   }, []);
 
   const renderClass = ({ item: cls, showAttendanceButton = false }) => {
