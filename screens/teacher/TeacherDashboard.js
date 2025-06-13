@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback  } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import BlockBar from '../../components/BlockBar';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TeacherDashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -16,7 +17,8 @@ const TeacherDashboard = () => {
 
   const teacherId = getAuth().currentUser?.uid;
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     const fetchSubjects = async () => {
       setLoading(true);
       if (!teacherId) return;
@@ -37,9 +39,10 @@ const TeacherDashboard = () => {
       setLoading(false);
     };
     fetchSubjects();
-  }, [teacherId]);
+  }, [teacherId]));
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     const fetchGeneralSummary = async () => {
       if (!teacherId) {
         setGeneralSummary(null);
@@ -91,7 +94,7 @@ const TeacherDashboard = () => {
       setLoading(false);
     };
     fetchGeneralSummary();
-  }, [teacherId]);
+  }, [teacherId]));
 
   useEffect(() => {
     const fetchSummary = async () => {
