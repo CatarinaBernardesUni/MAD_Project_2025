@@ -83,7 +83,7 @@ export default function TeacherHome({ navigation }) {
     }
     setLoading(false);
   };
-  
+
   const syncEmail = async () => {
     try {
       const user = getAuth().currentUser;
@@ -109,14 +109,12 @@ export default function TeacherHome({ navigation }) {
   };
 
   useEffect(() => {
-    fetchClasses();
     syncEmail();
   }, []);
 
   useFocusEffect(
     useCallback(() => {
       fetchClasses();
-      syncEmail();
     }, [])
   );
 

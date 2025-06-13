@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Touchable } from 'react-native';
 
 export default function Settings({ navigation }) {
   return (
@@ -7,7 +7,13 @@ export default function Settings({ navigation }) {
       <TouchableOpacity
         style={styles.option}
         onPress={() => navigation.navigate('EditProfile')}>
-        <Text style={styles.optionText}>Edit Profile</Text>
+        <Text style={styles.optionText}>Edit Profile Info</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.option}
+        onPress={() => navigation.navigate('ChangeEmail')}>
+        <Text style={styles.optionText}>Change Email</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -20,10 +26,10 @@ export default function Settings({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
+  container: { padding: 20, backgroundColor: '#f0f4f8' },
   option: {
     padding: 20,
-    backgroundColor: '#eee',
+    backgroundColor: '#ffffff',
     borderRadius: 8,
     marginBottom: 16,
   },

@@ -1,25 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback , useState } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { auth, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function CustomDrawerContent(props) {
   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-          setUserData(userDoc.data());
-        }
+  const fetchUserData = useCallback(async () => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      if (userDoc.exists()) {
+        setUserData(userDoc.data());
       }
-    };
-
-    fetchUserData();
+    }
   }, []);
+
+  useFocusEffect(() => {
+    fetchUserData();
+  });
 
   return (
     <DrawerContentScrollView {...props}>
