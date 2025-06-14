@@ -217,7 +217,7 @@ export default function EnrollStudents({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, flex: 1 },
+  container: { padding: 16, flex: 1, backgroundColor: '#f0f4f8' },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
   addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
   input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12 },

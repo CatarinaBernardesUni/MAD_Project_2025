@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { collection, getDocs, getDoc, doc, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const StudentCalendar = () => {
   const [markedDates, setMarkedDates] = useState({});
@@ -12,85 +13,74 @@ const StudentCalendar = () => {
 
   const userId = getAuth().currentUser?.uid;
 
-  useEffect(() => {
-    const fetchEnrolledClasses = async () => {
-      const enrolRef = collection(db, 'enrolment');
-      const q = query(enrolRef, where('student', '==', doc(db, 'users', userId)));
-      const snapshot = await getDocs(q);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchEnrolledClasses = async () => {
+        const enrolRef = collection(db, 'enrolment');
+        const q = query(enrolRef, where('student', '==', doc(db, 'users', userId)));
+        const snapshot = await getDocs(q);
 
-      const dateMap = {};
-      const marks = {};
+        const dateMap = {};
+        const marks = {};
 
-      for (const enrollDoc of snapshot.docs) {
-        const enrollment = enrollDoc.data();
-        const classRef = enrollment.class;
-        const classSnap = await getDoc(classRef);
+        for (const enrollDoc of snapshot.docs) {
+          const enrollment = enrollDoc.data();
+          const classRef = enrollment.class;
+          const classSnap = await getDoc(classRef);
 
-        if (!classSnap.exists()) continue;
+          if (!classSnap.exists()) continue;
 
-        const classData = classSnap.data();
+          const classData = classSnap.data();
 
-        const start = classData.start.toDate();
-        const end = classData.end.toDate();
-        const dateStr = start.toISOString().split('T')[0];
+          const start = classData.start.toDate();
+          const end = classData.end.toDate();
+          const dateStr = start.toISOString().split('T')[0];
 
-        let professorName = 'Unknown';
-        try {
-          if (typeof classData.professor === 'string') {
-            if (classData.professor.includes('/')) {
-              // professor is a full path string like 'users/abc123'
-              const pathSegments = classData.professor.split('/');
-              const profDoc = await getDoc(doc(db, ...pathSegments));
+          let professorName = 'Unknown';
+          try {
+            if (classData.professor && typeof classData.professor === 'object' && 'path' in classData.professor) {
+
+              const profDoc = await getDoc(classData.professor);
               if (profDoc.exists()) {
                 professorName = profDoc.data().name || 'Unknown';
               }
-            } else {
-              // professor is just an ID, fetch from 'users' collection
-              const profDoc = await getDoc(doc(db, 'users', classData.professor));
-              if (profDoc.exists()) {
-                professorName = profDoc.data().name || 'Unknown';
-              }
+            
+          }} catch (err) {
+            console.warn('Error fetching professor:', err);
+          }
+
+          let subjectName = 'Unknown';
+          try {
+            if (typeof classData.subject === 'object') {
+              const subjectDoc = await getDoc(classData.subject);
+              if (subjectDoc.exists()) subjectName = subjectDoc.data().name;
             }
+          } catch (err) {
+            console.warn('Error fetching subject:', err);
           }
-        } catch (err) {
-          console.warn('Error fetching professor:', err);
-        }
 
-        let subjectName = 'Unknown';
-        try {
-          if (typeof classData.subject === 'string') {
-            const subjectDoc = await getDoc(doc(db, classData.subject));
-            if (subjectDoc.exists()) subjectName = subjectDoc.data().name;
-          } else if (typeof classData.subject === 'object') {
-            const subjectDoc = await getDoc(classData.subject);
-            if (subjectDoc.exists()) subjectName = subjectDoc.data().name;
+          if (!dateMap[dateStr]) {
+            dateMap[dateStr] = [];
+            marks[dateStr] = { marked: true, dotColor: '#16a34a' };
           }
-        } catch (err) {
-          console.warn('Error fetching subject:', err);
+
+          dateMap[dateStr].push({
+            id: classSnap.id,
+            subjectName,
+            classType: classData.classType,
+            start: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            end: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            additionalNotes: classData.additionalNotes || '',
+            professorName,
+          });
         }
 
-        if (!dateMap[dateStr]) {
-          dateMap[dateStr] = [];
-          marks[dateStr] = { marked: true, dotColor: '#16a34a' };
-        }
+        setMarkedDates(marks);
+        setClassesByDate(dateMap);
+      };
 
-        dateMap[dateStr].push({
-          id: classSnap.id,
-          subjectName,
-          classType: classData.classType,
-          start: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          end: end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          additionalNotes: classData.additionalNotes || '',
-          professorName,
-        });
-      }
-
-      setMarkedDates(marks);
-      setClassesByDate(dateMap);
-    };
-
-    if (userId) fetchEnrolledClasses();
-  }, [userId]);
+      if (userId) fetchEnrolledClasses();
+    }, [userId]));
 
   const renderClassItem = ({ item }) => (
     <View style={styles.classItem}>

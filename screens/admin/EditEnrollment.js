@@ -6,6 +6,7 @@ import { doc, getDoc, collection, getDocs, deleteDoc } from 'firebase/firestore'
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
+
 export default function EditEnrollment({ route, navigation }) {
   const { studentId } = route.params;
   const [enrollments, setEnrollments] = useState([]);
