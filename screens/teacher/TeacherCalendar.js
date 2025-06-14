@@ -4,6 +4,7 @@ import { Calendar } from 'react-native-calendars';
 import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TeacherCalendar = () => {
   const [markedDates, setMarkedDates] = useState({});
@@ -12,7 +13,8 @@ const TeacherCalendar = () => {
 
   const userId = getAuth().currentUser?.uid;
 
-  useEffect(() => {
+useFocusEffect(
+  React.useCallback(() => {
     const fetchClasses = async () => {
       const snapshot = await getDocs(collection(db, 'classes'));
       const dateMap = {};
@@ -21,7 +23,7 @@ const TeacherCalendar = () => {
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data();
 
-        if (!data.professor || !data.professor.endsWith(userId)) continue;
+        if (!data.professor?.id || data.professor.id !== userId) continue;
 
         const start = data.start.toDate();
         const end = data.end.toDate();
@@ -29,13 +31,7 @@ const TeacherCalendar = () => {
 
         let subjectName = 'Unknown';
         try {
-          if (typeof data.subject === 'string') {
-            const subjectRef = doc(db, data.subject);
-            const subjDoc = await getDoc(subjectRef);
-            if (subjDoc.exists()) {
-              subjectName = subjDoc.data().name;
-            }
-          } else if (typeof data.subject === 'object' && 'path' in data.subject) {
+          if (data.subject?.id) {
             const subjDoc = await getDoc(data.subject);
             if (subjDoc.exists()) {
               subjectName = subjDoc.data().name;
@@ -65,7 +61,7 @@ const TeacherCalendar = () => {
     };
 
     fetchClasses();
-  }, [userId]);
+  }, [userId]));
 
   const renderClassItem = ({ item }) => (
     <View style={styles.classItem}>
@@ -134,12 +130,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   classItem: {
-    backgroundColor: '#dbeafe', 
+    backgroundColor: '#ffffff',
     padding: 14,
     marginVertical: 8,
     borderRadius: 12,
     borderLeftWidth: 5,
-    borderLeftColor: '#477fd1', 
+    borderLeftColor: '#477fd1',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

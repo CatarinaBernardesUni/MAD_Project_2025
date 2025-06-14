@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
-import { collection, getDocs, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, Timestamp, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -112,8 +112,8 @@ const AddClass = ({ navigation }) => {
     try {
       setLoading(true);
       await addDoc(collection(db, 'classes'), {
-        subject: `subjects/${form.subjectId}`,
-        professor: `users/${form.professorId}`,
+        subject: doc(db, 'subjects', form.subjectId),
+        professor: doc(db, 'users', form.professorId),
         classType: form.classType,
         start: Timestamp.fromDate(startDateTime),
         end: Timestamp.fromDate(endDateTime),

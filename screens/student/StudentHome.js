@@ -5,13 +5,18 @@ import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const StudentHome = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [todaysClasses, setTodaysClasses] = useState([]);
   const [upcomingClasses, setUpcomingClasses] = useState([]);
 
-  useEffect(() => {
+
+  useFocusEffect(
+  React.useCallback(() => {
+
     const fetchClasses = async () => {
       setLoading(true);
       try {
@@ -90,13 +95,14 @@ const StudentHome = ({ navigation }) => {
 
         setTodaysClasses(todays);
         setUpcomingClasses(upcoming);
+
       } catch (err) {
       }
       setLoading(false);
     };
 
     fetchClasses();
-  }, []);
+  }, []));
 
   const renderClass = (cls) => {
     let startDate = cls.start;

@@ -36,8 +36,8 @@ export default function EditClass({ route, navigation }) {
         setClassTypeOptions(typeOpts);
 
         setForm({
-          subjectId: classData.subjectId || '',
-          professorId: classData.professorId || '',
+          subjectId: classData.subject?.id || classData.subject?.split('/')[1] || '',
+professorId: classData.professor?.id || classData.professor?.split('/')[1] || '',
           classType: classData.classType || '',
           date: classData.start
             ? (classData.start instanceof Date
@@ -116,8 +116,8 @@ export default function EditClass({ route, navigation }) {
       }
 
       await updateDoc(doc(db, 'classes', classData.id), {
-        subject: `subjects/${form.subjectId}`,
-        professor: `users/${form.professorId}`,
+        subject: doc(db, 'subjects', form.subjectId), 
+        professor: doc(db, 'users', form.professorId), 
         classType: form.classType,
         start: startDateTime,
         end: endDateTime,

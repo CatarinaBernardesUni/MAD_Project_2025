@@ -15,6 +15,11 @@ import EditClass from '../screens/admin/EditClass';
 import AddStudent from '../screens/admin/AddStudent';
 import EditStudent from '../screens/admin/EditStudent';
 import EditEnrollment from '../screens/admin/EditEnrollment';
+import EditProfile from '../screens/EditProfile';
+import ChangeEmail from '../screens/ChangeEmail';
+import ResetPassword from '../screens/ChangePassword';
+import ManageSubjects from '../screens/admin/ManageSubjects';
+import ManageClassType from '../screens/admin/ManageClassType';
 
 const Drawer = createDrawerNavigator();
 
@@ -25,6 +30,8 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="ManageClasses" component={ManageClasses} options={{title: "Manage Classes"}}/>
       <Drawer.Screen name="ManageTeachers" component={ManageTeachers} options={{title: "Manage Teachers"}}/>
       <Drawer.Screen name="ManageStudents" component={ManageStudents} options={{title: "Manage Students"}}/>
+      <Drawer.Screen name="ManageSubjects" component={ManageSubjects} options={{title: "Manage Subjects"}}/>
+      <Drawer.Screen name="ManageClassType" component={ManageClassType} options={{title: "Manage Class Types"}}/>
       <Drawer.Screen name="EnrollStudents" component={EnrollStudents} options={{title: "Enroll Students"}}/>
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Settings" component={Settings}/>
@@ -35,6 +42,10 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="AddStudent" component={AddStudent} options={{ drawerItemStyle: { display: 'none' } }}/>  
       <Drawer.Screen name="EditStudent" component={EditStudent} options={{ drawerItemStyle: { display: 'none' } }}/>   
       <Drawer.Screen name="EditEnrollment" component={EditEnrollment} options={{ drawerItemStyle: { display: 'none' } }}/>
+      <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
+      <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
+      <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
+
     </Drawer.Navigator>
   );
 };

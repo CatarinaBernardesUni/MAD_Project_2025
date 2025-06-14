@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback  } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import BlockBar from '../../components/BlockBar';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TeacherDashboard = () => {
   const [subjects, setSubjects] = useState([]);
@@ -16,7 +17,8 @@ const TeacherDashboard = () => {
 
   const teacherId = getAuth().currentUser?.uid;
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     const fetchSubjects = async () => {
       setLoading(true);
       if (!teacherId) return;
@@ -37,9 +39,10 @@ const TeacherDashboard = () => {
       setLoading(false);
     };
     fetchSubjects();
-  }, [teacherId]);
+  }, [teacherId]));
 
-  useEffect(() => {
+  useFocusEffect(
+  useCallback(() => {
     const fetchGeneralSummary = async () => {
       if (!teacherId) {
         setGeneralSummary(null);
@@ -50,10 +53,9 @@ const TeacherDashboard = () => {
       const professorRef = doc(db, 'users', teacherId);
       const classesSnap = await getDocs(collection(db, 'classes'));
       const classDocs = classesSnap.docs.filter(d => {
-        const data = d.data();
-        return (data.professor?.id === teacherId) ||
-          (typeof data.professor === 'string' && data.professor.endsWith(teacherId));
-      });
+  const data = d.data();
+  return data.professor?.id === teacherId;
+});
       const classRefs = classDocs.map(d => d.ref);
 
       let totalPresences = 0;
@@ -91,7 +93,7 @@ const TeacherDashboard = () => {
       setLoading(false);
     };
     fetchGeneralSummary();
-  }, [teacherId]);
+  }, [teacherId]));
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -106,13 +108,11 @@ const TeacherDashboard = () => {
 
       const classesSnap = await getDocs(collection(db, 'classes'));
       const classDocs = classesSnap.docs.filter(d => {
-        const data = d.data();
-        const profMatch = (data.professor?.id === teacherId) ||
-          (typeof data.professor === 'string' && data.professor.endsWith(teacherId));
-        const subjMatch = (data.subject?.id === selectedSubject) ||
-          (typeof data.subject === 'string' && data.subject.endsWith(selectedSubject));
-        return profMatch && subjMatch;
-      });
+  const data = d.data();
+  const profMatch = data.professor?.id === teacherId;
+  const subjMatch = data.subject?.id === selectedSubject;
+  return profMatch && subjMatch;
+});
       const classRefs = classDocs.map(d => d.ref);
 
 

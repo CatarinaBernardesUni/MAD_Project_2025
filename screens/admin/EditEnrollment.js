@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View, Text, Button, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator
 } from 'react-native';
 import { doc, getDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function EditEnrollment({ route, navigation }) {
   const { studentId } = route.params;
@@ -12,7 +13,8 @@ export default function EditEnrollment({ route, navigation }) {
   const [loading, setLoading] = useState(true);
 
   // enrollments for this student
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     const fetchEnrollments = async () => {
       setLoading(true);
       try {
@@ -33,15 +35,16 @@ export default function EditEnrollment({ route, navigation }) {
               if (classSnap.exists()) {
                 classData = { id: classId, ...classSnap.data() };
                 // subject name
-                let subjectId = classData.subject?.id || (typeof classData.subject === 'string' ? classData.subject.split('/').pop() : null);
+                let subjectId = classData.subject?.id || null; // no string check needed
                 if (subjectId) {
                   const subjectSnap = await getDoc(doc(db, 'subjects', subjectId));
                   if (subjectSnap.exists()) {
                     subjectName = subjectSnap.data().name || subjectId;
                   }
                 }
+
                 // teacher name
-                let teacherId = classData.professor?.id || (typeof classData.professor === 'string' ? classData.professor.split('/').pop() : null);
+                let teacherId = classData.professor?.id || null; // no string check needed
                 if (teacherId) {
                   const teacherSnap = await getDoc(doc(db, 'users', teacherId));
                   if (teacherSnap.exists()) {
@@ -66,7 +69,7 @@ export default function EditEnrollment({ route, navigation }) {
       setLoading(false);
     };
     fetchEnrollments();
-  }, [studentId]);
+  }, [studentId]));
 
   const handleDelete = async (enrollmentId) => {
     Alert.alert(
@@ -94,7 +97,7 @@ export default function EditEnrollment({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
         <Text style={styles.title}>Edit Enrollments</Text>
         {enrollments.length === 0 ? (

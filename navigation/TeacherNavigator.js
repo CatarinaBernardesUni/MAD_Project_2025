@@ -8,7 +8,9 @@ import Settings from '../screens/Settings';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import TeacherAddClass from '../screens/teacher/TeacherAddClass'; 
 import TeacherMarkAttendance from '../screens/teacher/TeacherMarkAttendance';
-import TeacherEditClass from '../screens/teacher/TeacherEditClass';
+import EditProfile from '../screens/EditProfile';
+import ChangeEmail from '../screens/ChangeEmail';
+import ResetPassword from '../screens/ChangePassword';
 
 const Drawer = createDrawerNavigator();
 
@@ -22,7 +24,9 @@ export default function TeacherNavigator() {
             <Drawer.Screen name="Settings" component={Settings} />
             <Drawer.Screen name="TeacherAddClass" component={TeacherAddClass} options={{ drawerItemStyle: { display: 'none', title: "Manage Classes" } }} />
             <Drawer.Screen name="TeacherMarkAttendance" component={TeacherMarkAttendance} options={{ drawerItemStyle: { display: 'none', title: "Mark Attendance" } }} />
-            <Drawer.Screen name="TeacherEditClass" component={TeacherEditClass} options={{ drawerItemStyle: { display: 'none', title: "Edit Class" } }} />
+            <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
+            <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
+            <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
         </Drawer.Navigator>
     );
 }

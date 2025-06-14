@@ -148,14 +148,14 @@ const Dashboard = () => {
     {
       name: `Present`,
       population: isNaN(presentCount) ? 0 : presentCount,
-      color: '#33cc33',
+      color: '#6DBE45',
       legendFontColor: '#333',
       legendFontSize: 14,
     },
     {
       name: `Absent`,
       population: isNaN(absentCount) ? 0 : absentCount,
-      color: '#ff0000',
+      color: '#D64545',
       legendFontColor: '#333',
       legendFontSize: 14,
     },
@@ -189,9 +189,10 @@ const Dashboard = () => {
             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
           }}
           accessor="population"
-          backgroundColor="transparent"
+          backgroundColor="#ffffff"
           paddingLeft="15"
           absolute={false}
+          style={{ borderRadius: 16 }}
         />
       </View>
 
@@ -224,9 +225,9 @@ const Dashboard = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center' },
-  section: { fontSize: 20, marginTop: 20 },
+  container: { padding: 16, backgroundColor: '#f0f4f8' },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'flex-start' },
+  section: { fontSize: 20, marginTop: 10 },
   stats: { marginVertical: 16, fontSize: 16, lineHeight: 24 },
   alerts: { color: 'red', marginBottom: 20, fontSize: 16, fontWeight: 'bold' },
   chartContainer: {
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
   },
   chartTitle: {
     marginBottom: 10,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });

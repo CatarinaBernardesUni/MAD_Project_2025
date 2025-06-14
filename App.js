@@ -2,7 +2,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator, View } from 'react-native';
 
-import useFirebaseUser from './useFirebaseUser';
+
+import useFirebaseUser from './hooks/useFirebaseUser';
 
 import AuthStack from './navigation/AuthStack';
 import AdminNavigator from './navigation/AdminNavigator';

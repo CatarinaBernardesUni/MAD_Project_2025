@@ -3,6 +3,7 @@ import { View, Text, FlatList, Switch, Alert, ActivityIndicator, StyleSheet, Saf
 import { doc, getDoc, getDocs, query, where, collection, writeBatch, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 
+
 export default function TeacherAttendanceScreen({ route, navigation  }) {
     const { selectedClassId: classId } = route.params;
     const [students, setStudents] = useState([]);
@@ -14,7 +15,6 @@ export default function TeacherAttendanceScreen({ route, navigation  }) {
         const classRef = doc(db, 'classes', classId);
         const enrolQuery = query(collection(db, 'enrolment'), where('class', '==', classRef));
 
-        // Listen realtime updates so UI stays in sync
         const unsubscribe = onSnapshot(enrolQuery, async (enrolSnap) => {
             try {
                 const enrolmentList = [];
