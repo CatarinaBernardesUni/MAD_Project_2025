@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
-import { collection, getDocs, addDoc, Timestamp, doc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -124,7 +124,6 @@ const AddClass = ({ navigation }) => {
       alert('Class added successfully');
       navigation.goBack();
     } catch (err) {
-      console.error('Error adding class:', err);
       alert('Failed to add class');
     } finally {
       setLoading(false);
@@ -132,7 +131,7 @@ const AddClass = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <Text style={styles.title}>Add New Class</Text>
@@ -140,7 +139,7 @@ const AddClass = ({ navigation }) => {
             style={styles.addButton}
             onPress={() => navigation.goBack()}
           >
-            <Text>Back</Text>
+            <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Back</Text>
           </TouchableOpacity>
         </View>
         <ScrollView>
@@ -238,7 +237,7 @@ const AddClass = ({ navigation }) => {
             {loading ? (
               <ActivityIndicator />
             ) : (
-              <Text style={{ color: '#fff' }}>Add Class</Text>
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Add Class</Text>
             )}
           </TouchableOpacity>
         </ScrollView>
@@ -248,17 +247,16 @@ const AddClass = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  header: {fontSize: 24, fontWeight: 'bold', marginBottom: 12},
+  container: { flex: 1, padding: 16, backgroundColor: '#f0f4f8' },
+  header: {fontSize: 24, fontWeight: 'bold', flexDirection: 'row', justifyContent: 'space-between'},
   title: { fontSize: 22, fontWeight: 'bold' },
-  addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
-  label: { fontWeight: 'bold', marginTop: 12 },
-  input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6},
-  option: {padding: 10, backgroundColor: '#eee', borderRadius: 6, marginVertical: 4, borderColor: '#ccc', borderWidth: 1},
+  addButton: { backgroundColor: '#5996b5', padding: 12, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
+  label: { fontWeight: 'bold', marginTop: 12, fontSize: 16 },
+  input: {borderColor: '#5996b5', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6, backgroundColor: '#fff'},
+  option: {padding: 10, backgroundColor: '#fff', borderRadius: 6, marginVertical: 4, borderColor: '#5996b5', borderWidth: 1},
   selected: {backgroundColor: '#D0E6FF',},
-  addButton2: {backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20},
-  pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
-   height: 50, justifyContent: 'center',marginTop: 12},
+  addButton2: {backgroundColor: '#5996b5', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20},
+  pickerWrapper: {borderWidth: 1, borderColor: '#5996b5', borderRadius: 6, marginBottom: 12, height: 50, justifyContent: 'center',marginTop: 12, backgroundColor: '#fff' },
   picker: { height: 56, width: '100%' },
 });
 
