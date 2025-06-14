@@ -22,13 +22,6 @@ export default function Settings({ navigation }) {
         onPress={() => navigation.navigate('ChangePassword')}>
         <Text style={styles.optionText}>Reset Password</Text>
       </TouchableOpacity>
-
-
-      <TouchableOpacity
-        style={styles.option}
-        onPress={() => navigation.navigate('NotificationSettings')}>
-        <Text style={styles.optionText}>Notification Settings</Text>
-      </TouchableOpacity>
     </LinearGradient>
   );
 }
