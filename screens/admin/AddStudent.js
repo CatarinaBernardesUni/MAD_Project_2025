@@ -38,10 +38,27 @@ export default function AddStudent({ navigation }) {
             Alert.alert('Success', 'Student account has been successfully created.');
             navigation.goBack();
         } catch (err) {
-            Alert.alert('Error:', err.message);
+            let message = 'Something went wrong. Please try again later.';
+
+            switch (err.code) {
+                case 'auth/email-already-in-use':
+                    message = 'This email is already in use. Please use a different email.';
+                    break;
+                case 'auth/invalid-email':
+                    message = 'The email address is not valid. Please check and try again.';
+                    break;
+                case 'auth/weak-password':
+                    message = 'The password is too weak. Please use at least 6 characters.';
+                    break;
+                default:
+                    message = 'Could not create student account. Please try again.';
+            }
+
+            Alert.alert('Error', message);
         } finally {
             await secondaryAuth.signOut();
-    }};
+        }
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
