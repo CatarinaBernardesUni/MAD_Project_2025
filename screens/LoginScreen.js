@@ -7,7 +7,7 @@ import { auth, db } from '../firebase';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -16,12 +16,10 @@ export default function LoginScreen() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Now check if user exists in Firestore
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
-        // Sign out and show alert
         await signOut(auth);
         Alert.alert(
           'Account Blocked',
@@ -30,18 +28,29 @@ export default function LoginScreen() {
         return;
       }
 
-      // If Firestore user document exists
-      console.log('Login successful');
       Alert.alert('Login Successful', 'You have successfully logged in.');
 
     } catch (err) {
-      Alert.alert('Login Failed', err.message);
+      let message = 'Something went wrong. Please try again later.';
+
+      switch (err.code) {
+        case 'auth/invalid-email':
+          message = 'The email address is badly formatted.';
+          break;
+        case 'auth/too-many-requests':
+          message = 'Too many login attempts. Please try again later.';
+          break;
+        default:
+          message = 'Login failed. Please check your details and try again.';
+      }
+
+      Alert.alert('Login Failed', message);
     }
   };
 
   return (
-    <LinearGradient colors={['#84bfdd','#fff7cf']} style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.innerContainer}>
+    <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
+      <KeyboardAvoidingView behavior='height' style={styles.innerContainer}>
         <Text style={styles.title}>Log In</Text>
 
         <View style={styles.inputContainer}>
@@ -69,6 +78,10 @@ export default function LoginScreen() {
             value={password}
           />
         </View>
+
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Log In</Text>
@@ -131,4 +144,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
+
+  forgotPasswordText: {
+    color: '#000000',
+    fontSize: 16,
+    textDecorationLine: 'underline',
+    textAlign: 'right',
+    marginTop: 10,
+    marginBottom: 20,
+  }
 });
