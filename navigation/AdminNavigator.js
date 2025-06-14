@@ -30,6 +30,8 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="ManageClasses" component={ManageClasses} options={{title: "Manage Classes"}}/>
       <Drawer.Screen name="ManageTeachers" component={ManageTeachers} options={{title: "Manage Teachers"}}/>
       <Drawer.Screen name="ManageStudents" component={ManageStudents} options={{title: "Manage Students"}}/>
+      <Drawer.Screen name="ManageSubjects" component={ManageSubjects} options={{title: "Manage Subjects"}}/>
+      <Drawer.Screen name="ManageClassType" component={ManageClassType} options={{title: "Manage Class Types"}}/>
       <Drawer.Screen name="EnrollStudents" component={EnrollStudents} options={{title: "Enroll Students"}}/>
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Settings" component={Settings}/>
@@ -43,8 +45,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
-      <Drawer.Screen name="ManageSubjects" component={ManageSubjects} options={{title: "Manage Subjects"}}/>
-      <Drawer.Screen name="ManageClassType" component={ManageClassType} options={{title: "Manage Class Types"}}/>
+
     </Drawer.Navigator>
   );
 };
