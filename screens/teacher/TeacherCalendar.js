@@ -21,7 +21,7 @@ const TeacherCalendar = () => {
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data();
 
-        if (!data.professor || !data.professor.endsWith(userId)) continue;
+        if (!data.professor?.id || data.professor.id !== userId) continue;
 
         const start = data.start.toDate();
         const end = data.end.toDate();
@@ -29,13 +29,7 @@ const TeacherCalendar = () => {
 
         let subjectName = 'Unknown';
         try {
-          if (typeof data.subject === 'string') {
-            const subjectRef = doc(db, data.subject);
-            const subjDoc = await getDoc(subjectRef);
-            if (subjDoc.exists()) {
-              subjectName = subjDoc.data().name;
-            }
-          } else if (typeof data.subject === 'object' && 'path' in data.subject) {
+          if (data.subject?.id) {
             const subjDoc = await getDoc(data.subject);
             if (subjDoc.exists()) {
               subjectName = subjDoc.data().name;
@@ -134,12 +128,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   classItem: {
-    backgroundColor: '#dbeafe', 
+    backgroundColor: '#dbeafe',
     padding: 14,
     marginVertical: 8,
     borderRadius: 12,
     borderLeftWidth: 5,
-    borderLeftColor: '#477fd1', 
+    borderLeftColor: '#477fd1',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

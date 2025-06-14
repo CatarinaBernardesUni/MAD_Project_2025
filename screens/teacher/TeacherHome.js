@@ -26,20 +26,20 @@ export default function TeacherHome({ navigation }) {
       const classSnap = await getDocs(collection(db, 'classes'));
       const classDataList = [];
       for (const docSnap of classSnap.docs) {
-        const classData = { id: docSnap.id, ...docSnap.data() };
-        const teacherId = classData.professor?.id || (typeof classData.professor === 'string' ? classData.professor.split('/').pop() : null);
-        if (teacherId === user.uid) {
-          let subjectName = '';
-          const subjectId = classData.subject?.id || (typeof classData.subject === 'string' ? classData.subject.split('/').pop() : null);
-          if (subjectId) {
-            const subjectSnap = await getDoc(doc(db, 'subjects', subjectId));
-            if (subjectSnap.exists()) {
-              subjectName = subjectSnap.data().name || '';
-            }
-          }
-          classDataList.push({ ...classData, subjectName });
+      const classData = { id: docSnap.id, ...docSnap.data() };
+
+      if (classData.professor?.id !== user.uid) continue;
+
+      let subjectName = '';
+      if (classData.subject?.id) {
+        const subjectSnap = await getDoc(classData.subject);
+        if (subjectSnap.exists()) {
+          subjectName = subjectSnap.data().name || '';
         }
       }
+
+      classDataList.push({ ...classData, subjectName });
+    }
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);

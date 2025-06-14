@@ -93,7 +93,7 @@ const AddClass = ({ navigation }) => {
       setLoading(true);
       await addDoc(collection(db, 'classes'), {
         subject: doc(db, 'subjects', form.subjectId), 
-        professor: `users/${teacherId}`,
+        professor: doc(db, 'users', teacherId),
         classType: form.classType,
         start: Timestamp.fromDate(startDateTime),
         end: Timestamp.fromDate(endDateTime),
