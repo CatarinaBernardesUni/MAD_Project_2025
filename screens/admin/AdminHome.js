@@ -26,7 +26,7 @@ const confirmLogout = async () => {
 };
 
   return (
-        <LinearGradient colors={['#f0f4f8', '#f0f4f8']} style={styles.container}>
+        <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.title}>TimeToTeach</Text>
                 <Text style={styles.welcome}>Welcome, Admin!{'\n'}What would you like to manage today?</Text>
@@ -70,13 +70,14 @@ const confirmLogout = async () => {
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
-        </LinearGradient>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#f0f4f8',
     },
     scrollContent: {
         padding: 20,

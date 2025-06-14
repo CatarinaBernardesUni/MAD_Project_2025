@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import StudentCard from '../../components/StudentCard';
@@ -79,8 +79,7 @@ export default function AdminManageStudents({ navigation }) {
           <Text style={styles.header}>Manage Students</Text>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => navigation.navigate('AddStudent')}
-          >
+            onPress={() => navigation.navigate('AddStudent')}>
             <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 16}}>Add Student</Text>
           </TouchableOpacity>
         </View>
