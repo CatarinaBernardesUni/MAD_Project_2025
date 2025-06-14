@@ -16,7 +16,7 @@ export default function AddStudent({ navigation }) {
 
     const handleAddStudent = async () => {
         if (!form.email || !form.password || !form.name || !form.age) {
-            Alert.alert('All fields are required.');
+            Alert.alert('Missing Information', 'Please complete all fields before submitting.');
             return;
         }
 
@@ -35,7 +35,7 @@ export default function AddStudent({ navigation }) {
                 roles: ['student'],
                 profilePicture: downloadURL || null,
             });
-            Alert.alert('Student added!');
+            Alert.alert('Success', 'Student account has been successfully created.');
             navigation.goBack();
         } catch (err) {
             Alert.alert('Error:', err.message);
