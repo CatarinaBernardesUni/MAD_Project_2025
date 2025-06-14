@@ -16,12 +16,10 @@ export default function LoginScreen({ navigation }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Now check if user exists in Firestore
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (!userDoc.exists()) {
-        // Sign out and show alert
         await signOut(auth);
         Alert.alert(
           'Account Blocked',
@@ -30,18 +28,29 @@ export default function LoginScreen({ navigation }) {
         return;
       }
 
-      // If Firestore user document exists
-      console.log('Login successful');
       Alert.alert('Login Successful', 'You have successfully logged in.');
 
     } catch (err) {
-      Alert.alert('Login Failed', err.message);
+      let message = 'Something went wrong. Please try again later.';
+
+      switch (err.code) {
+        case 'auth/invalid-email':
+          message = 'The email address is badly formatted.';
+          break;
+        case 'auth/too-many-requests':
+          message = 'Too many login attempts. Please try again later.';
+          break;
+        default:
+          message = 'Login failed. Please check your details and try again.';
+      }
+
+      Alert.alert('Login Failed', message);
     }
   };
 
   return (
     <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.innerContainer}>
+      <KeyboardAvoidingView behavior='height' style={styles.innerContainer}>
         <Text style={styles.title}>Log In</Text>
 
         <View style={styles.inputContainer}>
