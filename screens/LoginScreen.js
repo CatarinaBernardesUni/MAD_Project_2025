@@ -7,7 +7,7 @@ import { auth, db } from '../firebase';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -40,7 +40,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <LinearGradient colors={['#84bfdd','#fff7cf']} style={styles.container}>
+    <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.innerContainer}>
         <Text style={styles.title}>Log In</Text>
 
@@ -69,6 +69,10 @@ export default function LoginScreen() {
             value={password}
           />
         </View>
+
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Log In</Text>
@@ -131,4 +135,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
+
+  forgotPasswordText: {
+    color: '#000000',
+    fontSize: 16,
+    textDecorationLine: 'underline',
+    textAlign: 'right',
+    marginTop: 10,
+    marginBottom: 20,
+  }
 });
