@@ -19,6 +19,7 @@ import EditProfile from '../screens/EditProfile';
 import NotificationSettings from '../screens/NotificationSettings';
 import ChangeEmail from '../screens/ChangeEmail';
 import ResetPassword from '../screens/ChangePassword';
+import ManageSubjects from '../screens/admin/ManageSubjects';
 
 const Drawer = createDrawerNavigator();
 
@@ -43,6 +44,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="NotificationSettings" component={NotificationSettings} options={{title: "Notification Settings", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
+      <Drawer.Screen name="ManageSubjects" component={ManageSubjects} options={{title: "Manage Subjects"}}/>
     </Drawer.Navigator>
   );
 };
