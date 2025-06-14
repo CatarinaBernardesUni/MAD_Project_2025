@@ -145,14 +145,15 @@ const ManageClasses = ({ navigation }) => {
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+        <View style={styles.headerRow}>
         <Text style={styles.header}>Manage Classes</Text>
 
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('AddClass')}
-        >
-          <Text>Add Class</Text>
+          onPress={() => navigation.navigate('AddClass')}>
+          <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Add Class</Text>
         </TouchableOpacity>
+        </View>
 
         {filtersVisible && (
           <>
@@ -214,7 +215,7 @@ const ManageClasses = ({ navigation }) => {
               style={[styles.addButton, { alignSelf: 'flex-end', marginBottom: 16 }]}
               onPress={() => setFiltersVisible(false)}
             >
-              <Text>Hide Filters</Text>
+              <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Hide Filters</Text>
             </TouchableOpacity>
           </>
         )}
@@ -224,7 +225,7 @@ const ManageClasses = ({ navigation }) => {
             style={[styles.addButton, { alignSelf: 'flex-end', marginBottom: 16 }]}
             onPress={() => setFiltersVisible(true)}
           >
-            <Text>Show Filters</Text>
+            <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Show Filters</Text>
           </TouchableOpacity>
         )}
 
@@ -261,9 +262,15 @@ const styles = StyleSheet.create({
   container: {padding: 16, flex: 1 },
   header: {fontSize: 24, fontWeight: 'bold', marginBottom: 12},
   title: { fontSize: 24, fontWeight: 'bold', marginTop: 16, marginBottom: 12 },
-  addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
+  addButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
   input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
   pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12, overflow: 'hidden', height: 40, justifyContent: 'center',},
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16
+  },
 });
 
 export default ManageClasses;
