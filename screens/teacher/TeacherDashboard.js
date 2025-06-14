@@ -53,10 +53,9 @@ const TeacherDashboard = () => {
       const professorRef = doc(db, 'users', teacherId);
       const classesSnap = await getDocs(collection(db, 'classes'));
       const classDocs = classesSnap.docs.filter(d => {
-        const data = d.data();
-        return (data.professor?.id === teacherId) ||
-          (typeof data.professor === 'string' && data.professor.endsWith(teacherId));
-      });
+  const data = d.data();
+  return data.professor?.id === teacherId;
+});
       const classRefs = classDocs.map(d => d.ref);
 
       let totalPresences = 0;
@@ -109,13 +108,11 @@ const TeacherDashboard = () => {
 
       const classesSnap = await getDocs(collection(db, 'classes'));
       const classDocs = classesSnap.docs.filter(d => {
-        const data = d.data();
-        const profMatch = (data.professor?.id === teacherId) ||
-          (typeof data.professor === 'string' && data.professor.endsWith(teacherId));
-        const subjMatch = (data.subject?.id === selectedSubject) ||
-          (typeof data.subject === 'string' && data.subject.endsWith(selectedSubject));
-        return profMatch && subjMatch;
-      });
+  const data = d.data();
+  const profMatch = data.professor?.id === teacherId;
+  const subjMatch = data.subject?.id === selectedSubject;
+  return profMatch && subjMatch;
+});
       const classRefs = classDocs.map(d => d.ref);
 
 

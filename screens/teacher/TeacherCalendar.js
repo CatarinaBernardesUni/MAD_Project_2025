@@ -4,6 +4,7 @@ import { Calendar } from 'react-native-calendars';
 import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TeacherCalendar = () => {
   const [markedDates, setMarkedDates] = useState({});
@@ -12,7 +13,8 @@ const TeacherCalendar = () => {
 
   const userId = getAuth().currentUser?.uid;
 
-  useEffect(() => {
+useFocusEffect(
+  React.useCallback(() => {
     const fetchClasses = async () => {
       const snapshot = await getDocs(collection(db, 'classes'));
       const dateMap = {};
@@ -59,7 +61,7 @@ const TeacherCalendar = () => {
     };
 
     fetchClasses();
-  }, [userId]);
+  }, [userId]));
 
   const renderClassItem = ({ item }) => (
     <View style={styles.classItem}>
