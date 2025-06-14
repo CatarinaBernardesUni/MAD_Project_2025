@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
@@ -19,7 +19,6 @@ const TeacherEditClass = ({ route, navigation }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Get class data
       const classRef = doc(db, 'classes', classId);
       const classSnap = await getDoc(classRef);
       if (!classSnap.exists()) {
@@ -30,14 +29,12 @@ const TeacherEditClass = ({ route, navigation }) => {
       const data = classSnap.data();
       setClassData(data);
 
-      // Get teacher's name and subjects
       const userRef = doc(db, 'users', teacherId);
       const userSnap = await getDoc(userRef);
       const userData = userSnap.data();
-      setTeacherName(userData.name || teacherId); // fallback to ID if no name
+      setTeacherName(userData.name || teacherId); 
       const teacherSubjects = userData.subjects || [];
 
-      // Get all subject docs for dropdown
       const subjectsSnap = await getDocs(collection(db, 'subjects'));
       const allSubjects = subjectsSnap.docs.map(d => ({
         id: d.id,
@@ -46,7 +43,6 @@ const TeacherEditClass = ({ route, navigation }) => {
       const filtered = allSubjects.filter(s => teacherSubjects.includes(s.name));
       setSubjects(filtered);
 
-      // Set initial subject, date, and time
       if (data.subject?.id) setSubject(data.subject.id);
       else if (typeof data.subject === 'string') setSubject(data.subject.split('/').pop());
       if (data.start?.toDate && data.end?.toDate) {
@@ -61,7 +57,6 @@ const TeacherEditClass = ({ route, navigation }) => {
   }, [classId, teacherId]);
 
   const onSave = async () => {
-    // Validate date and time
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       Alert.alert('Invalid date', 'Date must be in YYYY-MM-DD format.');
       return;
@@ -98,10 +93,18 @@ const TeacherEditClass = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Class ID</Text>
-      <TextInput style={styles.input} value={classId} editable={false} />
+      <TextInput
+        style={[styles.input, styles.transparentInput]}
+        value={classId}
+        editable={false}
+      />
 
       <Text style={styles.label}>Teacher</Text>
-      <TextInput style={styles.input} value={teacherName} editable={false} />
+      <TextInput
+        style={[styles.input, styles.transparentInput]}
+        value={teacherName}
+        editable={false}
+      />
 
       <Text style={styles.label}>Subject</Text>
       <View style={styles.pickerWrapper}>
@@ -143,9 +146,13 @@ const TeacherEditClass = ({ route, navigation }) => {
       />
 
       <View style={styles.buttonRow}>
-        <Button title="Save" onPress={onSave} color="#22C55E" />
+        <TouchableOpacity style={styles.saveButton} onPress={onSave}>
+          <Text style={styles.buttonText}>Save</Text>
+        </TouchableOpacity>
         <View style={{ width: 16 }} />
-        <Button title="Cancel" onPress={() => navigation.goBack()} color="#FF6B6B" />
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -155,8 +162,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F2F6FC', padding: 20 },
   label: { fontWeight: 'bold', marginTop: 12, marginBottom: 4 },
   input: { backgroundColor: '#fff', borderRadius: 8, padding: 10, borderWidth: 1, borderColor: '#ccc', marginBottom: 8 },
+  transparentInput: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#ccc' },
   pickerWrapper: { backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ccc', marginBottom: 8 },
-  buttonRow: { flexDirection: 'row', marginTop: 20, justifyContent: 'center' },
+  buttonRow: {flexDirection: 'row', marginTop: 20, justifyContent: 'center', gap: 16,},
+  saveButton: { backgroundColor: '#22C55E', padding: 12, borderRadius: 6, alignItems: 'center', flex: 1 },
+  cancelButton: { backgroundColor: '#FF6B6B', padding: 12, borderRadius: 6, alignItems: 'center', flex: 1 },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });
 
 export default TeacherEditClass;
