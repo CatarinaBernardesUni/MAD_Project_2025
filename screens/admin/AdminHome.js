@@ -6,14 +6,6 @@ import { auth } from '../../firebase';
 
 const AdminHome = ({ navigation }) => {
 
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerStyle: { backgroundColor: '#4A90E2' },
-      headerTintColor: '#fff',
-      headerTitleStyle: { fontWeight: 'bold' },
-    });
-  }, [navigation]);
-
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
