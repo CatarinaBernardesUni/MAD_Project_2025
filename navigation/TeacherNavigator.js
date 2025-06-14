@@ -11,6 +11,7 @@ import TeacherMarkAttendance from '../screens/teacher/TeacherMarkAttendance';
 import EditProfile from '../screens/EditProfile';
 import ChangeEmail from '../screens/ChangeEmail';
 import ResetPassword from '../screens/ChangePassword';
+import TeacherEditClass from '../screens/teacher/TeacherEditClass'; // Assuming this is the correct import path
 
 const Drawer = createDrawerNavigator();
 
@@ -27,6 +28,7 @@ export default function TeacherNavigator() {
             <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
             <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
             <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
+            <Drawer.Screen name="TeacherEditClass" component={TeacherEditClass} options={{title: "Edit Class", drawerItemStyle: { display: 'none' }}} />
         </Drawer.Navigator>
     );
 }
