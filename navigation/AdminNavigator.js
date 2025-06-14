@@ -17,6 +17,8 @@ import EditStudent from '../screens/admin/EditStudent';
 import EditEnrollment from '../screens/admin/EditEnrollment';
 import EditProfile from '../screens/EditProfile';
 import NotificationSettings from '../screens/NotificationSettings';
+import ChangeEmail from '../screens/ChangeEmail';
+import ResetPassword from '../screens/ChangePassword';
 
 const Drawer = createDrawerNavigator();
 
@@ -39,6 +41,8 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="EditEnrollment" component={EditEnrollment} options={{ drawerItemStyle: { display: 'none' } }}/>
       <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="NotificationSettings" component={NotificationSettings} options={{title: "Notification Settings", drawerItemStyle: { display: 'none' }}} />
+      <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
+      <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
     </Drawer.Navigator>
   );
 };

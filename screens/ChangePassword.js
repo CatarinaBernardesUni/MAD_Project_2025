@@ -11,7 +11,7 @@ export default function ResetPassword({ navigation }) {
     try {
       await sendPasswordResetEmail(auth, user.email);
       Alert.alert('Success!', 'Password reset email sent to your email address.');
-      navigation.goBack(); // Optionally navigate back
+      navigation.goBack();
     } catch (error) {
       console.error(error);
       Alert.alert('Error!', error.message);

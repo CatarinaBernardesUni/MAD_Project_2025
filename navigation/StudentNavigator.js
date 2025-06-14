@@ -9,6 +9,8 @@ import CustomDrawerContent from '../components/CustomDrawerContent';
 import StudentEnrollEdit from '../screens/student/StudentEnrollEdit';
 import EditProfile from '../screens/EditProfile';
 import NotificationSettings from '../screens/NotificationSettings';
+import ChangeEmail from '../screens/ChangeEmail';
+import ResetPassword from '../screens/ChangePassword';
 
 
 const Drawer = createDrawerNavigator();
@@ -24,6 +26,8 @@ export default function StudentNavigator() {
             <Drawer.Screen name="StudentEnrollEdit" component={StudentEnrollEdit} options={{ drawerItemStyle: { display: 'none' } }} /> 
             <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
             <Drawer.Screen name="NotificationSettings" component={NotificationSettings} options={{title: "Notification Settings", drawerItemStyle: { display: 'none' }}} />
+            <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
+            <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
         </Drawer.Navigator>
     );
 }
