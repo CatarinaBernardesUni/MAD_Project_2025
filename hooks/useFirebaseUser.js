@@ -31,7 +31,6 @@ export default function useFirebaseUser() {
           delay *= 2;
         }
 
-        // Failed after retries
         setRole(null);
         setLoading(false);
       } else {
