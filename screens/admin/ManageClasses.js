@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import {
-  View, Text, TouchableOpacity, FlatList, StyleSheet,
-  ActivityIndicator, TextInput,
-} from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, TextInput} from 'react-native';
 import { Picker } from '@react-native-picker/picker'; 
 import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import ClassCard from '../../components/ClassCard'; 
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const fetchRefName = async (refPath, field = 'name') => {
   try {

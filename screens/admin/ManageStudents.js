@@ -15,10 +15,10 @@ export default function AdminManageStudents({ navigation }) {
   const [sortAlphabetically, setSortAlphabetically] = useState(true);
 
   useFocusEffect(
-  useCallback(() => {
-    fetchStudents();
-  }, [])
-);
+    useCallback(() => {
+      fetchStudents();
+    }, [])
+  );
 
   useEffect(() => {
     applyFilters();
@@ -38,7 +38,7 @@ export default function AdminManageStudents({ navigation }) {
       filtered = filtered.filter(t => t.id.includes(studentIdFilter.trim()));
     }
     filtered.sort((a, b) => {
-      if (!a.name || !b.name) return 0; 
+      if (!a.name || !b.name) return 0;
       return sortAlphabetically
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name);
@@ -49,7 +49,6 @@ export default function AdminManageStudents({ navigation }) {
   const deleteStudent = async (studentId) => {
     try {
       await deleteDoc(doc(db, 'users', studentId));
-      /*it is deleting from the users but not from the authentication*/
       fetchStudents();
     } catch (err) {
       console.error('Failed to delete:', err);
@@ -76,12 +75,15 @@ export default function AdminManageStudents({ navigation }) {
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
-        <Text style={styles.header}>Manage Students</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('AddStudent')}>
-          <Text>Add Student</Text>
-        </TouchableOpacity>
+        <View style={styles.headerRow}>
+          <Text style={styles.header}>Manage Students</Text>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('AddStudent')}
+          >
+            <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 16}}>Add Student</Text>
+          </TouchableOpacity>
+        </View>
 
         <Text>Filters</Text>
         <TextInput
@@ -95,7 +97,9 @@ export default function AdminManageStudents({ navigation }) {
             <Text>Alphabetical Order</Text>
             <Text>{sortAlphabetically ? '▼' : '▲'}</Text>
           </TouchableOpacity>
-          <Button title="Search" onPress={applyFilters} />
+          <TouchableOpacity style={styles.searchButton} onPress={applyFilters}>
+            <Text style={styles.searchButtonText}>Search</Text>
+          </TouchableOpacity>
         </View>
 
         <FlatList
@@ -108,12 +112,28 @@ export default function AdminManageStudents({ navigation }) {
   );
 }
 const styles = StyleSheet.create({
-  container: { padding: 16, flex: 1 },
+  container: { padding: 16, flex: 1, backgroundColor: '#f0f4f8' },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
-  addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
-  input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12 },
+  addButton: { backgroundColor: '#5996b5', padding: 12, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
+  input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, backgroundColor: '#fff', borderRadius: 6 },
   filtersRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, justifyContent: 'space-between' },
   studentCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },
   buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
   filterButton: { flexDirection: 'row', marginLeft: 8, alignItems: 'center', gap: 4 },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16
+  },
+  searchButton: {
+    backgroundColor: '#5996b5',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6
+  },
+  searchButtonText: {
+    color: '#fff',
+    fontWeight: 'bold'
+  },
 });

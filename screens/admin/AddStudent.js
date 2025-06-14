@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, Image, ScrollView, StyleSheet, KeyboardAvoidingView} from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 import { db, secondaryAuth } from '../../firebase';
 import { uploadImage, pickImage } from '../../utils/uploadImage';
+
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 export default function AddStudent({ navigation }) {
     const [form, setForm] = useState({
@@ -61,37 +65,141 @@ export default function AddStudent({ navigation }) {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Add New Student</Text>
+        <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
+      <KeyboardAvoidingView keyboardVerticalOffset={60} style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Add New Student</Text>
 
-            <TextInput style={styles.input} placeholder="Name" value={form.name} onChangeText={name => setForm({ ...form, name })} />
-            <TextInput style={styles.input} placeholder="Age" keyboardType="numeric" value={form.age} onChangeText={age => setForm({ ...form, age })} />
-            <TextInput style={styles.input} placeholder="Email" value={form.email} onChangeText={email => setForm({ ...form, email })} autoCapitalize="none" />
-            <TextInput style={styles.input} placeholder="Password" secureTextEntry value={form.password} onChangeText={password => setForm({ ...form, password })} autoCapitalize="none" />
+          <View style={styles.inputContainer}>
+            <Icon name="account-outline" size={20} color="#000000" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor="#000000"
+              value={form.name}
+              onChangeText={(name) => setForm({ ...form, name })}
+              autoCapitalize="words"
+            />
+          </View>
 
-            <TouchableOpacity style={styles.imagePicker} onPress={async () => {
-                const uri = await pickImage();
-                if (uri) {
-                    setForm(prev => ({ ...prev, profilePicture: uri }));
-                }
-            }}>
-                <Text>{form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}</Text>
-            </TouchableOpacity>
+          <View style={styles.inputContainer}>
+            <Icon name="calendar" size={20} color="#000000" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Age"
+              placeholderTextColor="#000000"
+              keyboardType="numeric"
+              value={form.age}
+              onChangeText={(age) => setForm({ ...form, age })}
+            />
+          </View>
 
-            {form.profilePicture && (
-                <Image source={{ uri: form.profilePicture }} style={styles.previewImage} />
-            )}
+          <View style={styles.inputContainer}>
+            <Icon name="email-outline" size={20} color="#000000" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="#000000"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={form.email}
+              onChangeText={(email) => setForm({ ...form, email })}
+            />
+          </View>
 
-            <Button title="Add Student" onPress={handleAddStudent} />
+          <View style={styles.inputContainer}>
+            <Icon name="lock-outline" size={20} color="#000000" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="#000000"
+              secureTextEntry
+              autoCapitalize="none"
+              value={form.password}
+              onChangeText={(password) => setForm({ ...form, password })}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.imagePicker, { backgroundColor: 'rgba(255, 255, 255, 0.6)' }]}
+            onPress={async () => {
+              const uri = await pickImage();
+              if (uri) {
+                setForm((prev) => ({ ...prev, profilePicture: uri }));
+              }
+            }}
+          >
+            <Text style={{ color: '#000000' }}>
+              {form.profilePicture ? 'Change Profile Picture' : 'Add Profile Picture (Optional)'}
+            </Text>
+          </TouchableOpacity>
+
+          {form.profilePicture && <Image source={{ uri: form.profilePicture }} style={styles.previewImage} />}
+
+          <TouchableOpacity style={styles.button} onPress={handleAddStudent}>
+            <Text style={styles.buttonText}>Add Student</Text>
+          </TouchableOpacity>
         </ScrollView>
-    );
+      </KeyboardAvoidingView>
+    </LinearGradient>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 20, backgroundColor: '#fff' },
-    title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
-    input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginBottom: 12 },
-    label: { marginBottom: 6, fontWeight: '600' },
-    imagePicker: { padding: 10, backgroundColor: '#ccc', borderRadius: 6, marginBottom: 10, alignItems: 'center' },
-    previewImage: { width: 100, height: 100, borderRadius: 50, alignSelf: 'center', marginBottom: 10 },
+  container: { flex: 1 },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 20,
+    paddingTop: 150,
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    width: '100%',
+  },
+  inputIcon: { marginRight: 10 },
+  input: { flex: 1, paddingVertical: 12, color: '#000000', fontSize: 16 },
+  imagePicker: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    marginBottom: 10,
+    alignItems: 'center',
+    width: '100%',
+  },
+  previewImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: 'center',
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#5996b5',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 25,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    width: '100%',
+  },
+  buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 18, textAlign: 'center' },
 });

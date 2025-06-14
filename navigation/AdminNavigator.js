@@ -35,13 +35,13 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="EnrollStudents" component={EnrollStudents} options={{title: "Enroll Students"}}/>
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Settings" component={Settings}/>
-      <Drawer.Screen name="AddTeacher" component={AddTeacherScreen} options={{ drawerItemStyle: { display: 'none' } }} />
-      <Drawer.Screen name="AddClass" component={AddClass} options={{ drawerItemStyle: { display: 'none' } }} />
-      <Drawer.Screen name="EditTeacher" component={EditTeacher} options={{ drawerItemStyle: { display: 'none' } }}/>
-      <Drawer.Screen name="EditClass" component={EditClass} options={{ drawerItemStyle: { display: 'none' } }}/> 
-      <Drawer.Screen name="AddStudent" component={AddStudent} options={{ drawerItemStyle: { display: 'none' } }}/>  
-      <Drawer.Screen name="EditStudent" component={EditStudent} options={{ drawerItemStyle: { display: 'none' } }}/>   
-      <Drawer.Screen name="EditEnrollment" component={EditEnrollment} options={{ drawerItemStyle: { display: 'none' } }}/>
+      <Drawer.Screen name="AddTeacher" component={AddTeacherScreen} options={{ title: "Add Teacher", drawerItemStyle: { display: 'none' } }} />
+      <Drawer.Screen name="AddClass" component={AddClass} options={{ title: "Add Class", drawerItemStyle: { display: 'none' } }} />
+      <Drawer.Screen name="EditTeacher" component={EditTeacher} options={{ title: "Edit Teacher", drawerItemStyle: { display: 'none' } }}/>
+      <Drawer.Screen name="EditClass" component={EditClass} options={{ title: "Edit Class", drawerItemStyle: { display: 'none' } }}/> 
+      <Drawer.Screen name="AddStudent" component={AddStudent} options={{ title: "Add Student", drawerItemStyle: { display: 'none' } }}/>  
+      <Drawer.Screen name="EditStudent" component={EditStudent} options={{ title: "Edit Student", drawerItemStyle: { display: 'none' } }}/>   
+      <Drawer.Screen name="EditEnrollment" component={EditEnrollment} options={{ title: "Edit Enrollment", drawerItemStyle: { display: 'none' } }}/>
       <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />
