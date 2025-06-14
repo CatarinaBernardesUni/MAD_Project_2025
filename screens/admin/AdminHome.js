@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView  } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert  } from 'react-native';
 
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
@@ -19,17 +19,14 @@ const AdminHome = ({ navigation }) => {
 
 const confirmLogout = async () => {
     try {
-        console.log('Logged in UID:', auth.currentUser?.uid);
         await signOut(auth);
-        console.log('Signed out successfully');
     } catch (error) {
-        console.error('Error signing out:', error);
         Alert.alert('Error', 'Could not log out. Please try again.');
     }
 };
 
   return (
-        <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
+        <LinearGradient colors={['#f0f4f8', '#f0f4f8']} style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Text style={styles.title}>TimeToTeach</Text>
                 <Text style={styles.welcome}>Welcome, Admin!{'\n'}What would you like to manage today?</Text>
@@ -88,7 +85,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#ffffff',
+        color: '#000000',
         textAlign: 'flex-start',
         marginBottom: 10,
         marginLeft: 8,
@@ -105,6 +102,8 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 15,
         marginVertical: 8,
+        borderWidth: 1,
+        borderColor: '#5996b5',
     },
     buttonText: {
         fontWeight: 'bold',
