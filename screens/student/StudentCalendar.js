@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   classItem: {
-    backgroundColor: '#dbeafe',
+    backgroundColor: '#ffffff',
     padding: 14,
     marginVertical: 8,
     borderRadius: 12,

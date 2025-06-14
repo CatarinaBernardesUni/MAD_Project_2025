@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { signOut } from 'firebase/auth';
+import { signOut, getAuth } from 'firebase/auth';
 import { auth, db } from '../../firebase';
-import { getAuth } from 'firebase/auth';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function TeacherHome({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -12,81 +12,111 @@ export default function TeacherHome({ navigation }) {
   const [upcomingClasses, setUpcomingClasses] = useState([]);
   const [teacherName, setTeacherName] = useState('');
 
-  useEffect(() => {
-    const fetchClasses = async () => {
-      setLoading(true);
-      try {
-        const user = getAuth().currentUser;
-        if (!user) return;
+  const fetchClasses = async () => {
+    setLoading(true);
+    try {
+      const user = getAuth().currentUser;
+      if (!user) return;
 
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          setTeacherName(userDoc.data().name || '');
-        }
-
-        const classSnap = await getDocs(collection(db, 'classes'));
-        const classDataList = [];
-        for (const docSnap of classSnap.docs) {
-          const classData = { id: docSnap.id, ...docSnap.data() };
-          const teacherId = classData.professor?.id || (typeof classData.professor === 'string' ? classData.professor.split('/').pop() : null);
-          if (teacherId === user.uid) {
-            let subjectName = '';
-            const subjectId = classData.subject?.id || (typeof classData.subject === 'string' ? classData.subject.split('/').pop() : null);
-            if (subjectId) {
-              const subjectSnap = await getDoc(doc(db, 'subjects', subjectId));
-              if (subjectSnap.exists()) {
-                subjectName = subjectSnap.data().name || '';
-              }
-            }
-            classDataList.push({ ...classData, subjectName });
-          }
-        }
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const todays = [];
-        const upcoming = [];
-
-        classDataList.forEach(cls => {
-          let startDate = cls.start;
-          if (startDate && startDate.seconds) {
-            startDate = new Date(startDate.seconds * 1000);
-          } else if (typeof startDate === 'string' || typeof startDate === 'number') {
-            startDate = new Date(startDate);
-          }
-          if (!startDate || isNaN(startDate.getTime())) return;
-
-          const classDay = new Date(startDate);
-          classDay.setHours(0, 0, 0, 0);
-
-          if (classDay.getTime() === today.getTime()) {
-            todays.push(cls);
-          } else if (classDay > today) {
-            upcoming.push(cls);
-          }
-        });
-
-        todays.sort((a, b) => {
-          const aDate = a.start?.seconds ? new Date(a.start.seconds * 1000) : new Date(a.start);
-          const bDate = b.start?.seconds ? new Date(b.start.seconds * 1000) : new Date(b.start);
-          return aDate - bDate;
-        });
-        upcoming.sort((a, b) => {
-          const aDate = a.start?.seconds ? new Date(a.start.seconds * 1000) : new Date(a.start);
-          const bDate = b.start?.seconds ? new Date(b.start.seconds * 1000) : new Date(b.start);
-          return aDate - bDate;
-        });
-
-        setTodaysClasses(todays);
-        setUpcomingClasses(upcoming);
-      } catch (err) {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        setTeacherName(userDoc.data().name || '');
       }
-      setLoading(false);
-    };
 
-    fetchClasses();
+      const classSnap = await getDocs(collection(db, 'classes'));
+      const classDataList = [];
+      for (const docSnap of classSnap.docs) {
+        const classData = { id: docSnap.id, ...docSnap.data() };
+        const teacherId = classData.professor?.id || (typeof classData.professor === 'string' ? classData.professor.split('/').pop() : null);
+        if (teacherId === user.uid) {
+          let subjectName = '';
+          const subjectId = classData.subject?.id || (typeof classData.subject === 'string' ? classData.subject.split('/').pop() : null);
+          if (subjectId) {
+            const subjectSnap = await getDoc(doc(db, 'subjects', subjectId));
+            if (subjectSnap.exists()) {
+              subjectName = subjectSnap.data().name || '';
+            }
+          }
+          classDataList.push({ ...classData, subjectName });
+        }
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const todays = [];
+      const upcoming = [];
+
+      classDataList.forEach(cls => {
+        let startDate = cls.start;
+        if (startDate && startDate.seconds) {
+          startDate = new Date(startDate.seconds * 1000);
+        } else if (typeof startDate === 'string' || typeof startDate === 'number') {
+          startDate = new Date(startDate);
+        }
+        if (!startDate || isNaN(startDate.getTime())) return;
+
+        const classDay = new Date(startDate);
+        classDay.setHours(0, 0, 0, 0);
+
+        if (classDay.getTime() === today.getTime()) {
+          todays.push(cls);
+        } else if (classDay > today) {
+          upcoming.push(cls);
+        }
+      });
+
+      todays.sort((a, b) => {
+        const aDate = a.start?.seconds ? new Date(a.start.seconds * 1000) : new Date(a.start);
+        const bDate = b.start?.seconds ? new Date(b.start.seconds * 1000) : new Date(b.start);
+        return aDate - bDate;
+      });
+      upcoming.sort((a, b) => {
+        const aDate = a.start?.seconds ? new Date(a.start.seconds * 1000) : new Date(a.start);
+        const bDate = b.start?.seconds ? new Date(b.start.seconds * 1000) : new Date(b.start);
+        return aDate - bDate;
+      });
+
+      setTodaysClasses(todays);
+      setUpcomingClasses(upcoming);
+    } catch (err) {
+    }
+    setLoading(false);
+  };
+
+  const syncEmail = async () => {
+    try {
+      const user = getAuth().currentUser;
+      if (!user) return;
+
+      // Force refresh the user to get the most updated email
+      await user.reload();
+
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (userSnap.exists()) {
+        const firestoreEmail = userSnap.data().email;
+        if (firestoreEmail !== user.email) {
+          // Update Firestore email to match the authenticated email
+          await updateDoc(userRef, { email: user.email });
+          // console.log('Email synced in Firestore:', user.email);
+        }
+      }
+    } catch (error) {
+      console.error('Error syncing email:', error);
+    }
+  };
+
+  useEffect(() => {
+    syncEmail();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchClasses();
+    }, [])
+  );
 
   const renderClass = ({ item: cls, showAttendanceButton = false }) => {
     let startDate = cls.start;
@@ -105,13 +135,13 @@ export default function TeacherHome({ navigation }) {
         <Text style={styles.classInfo}>Time: {startTime} - {endTime}</Text>
 
         {showAttendanceButton && (
-        <TouchableOpacity
-          style={styles.attendanceButton}
-          onPress={() => {navigation.navigate('TeacherMarkAttendance', { selectedClassId: cls.id });}}
-        >
-          <Text style={styles.attendanceButtonText}>Mark Attendance</Text>
-        </TouchableOpacity>
-      )}
+          <TouchableOpacity
+            style={styles.attendanceButton}
+            onPress={() => { navigation.navigate('TeacherMarkAttendance', { selectedClassId: cls.id }); }}
+          >
+            <Text style={styles.attendanceButtonText}>Mark Attendance</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   };
@@ -183,7 +213,7 @@ export default function TeacherHome({ navigation }) {
             onPress={async () => {
               try {
                 await signOut(auth);
-              } catch (error) {}
+              } catch (error) { }
             }}
           >
             <Text style={styles.logoutText}>Logout</Text>
@@ -212,15 +242,15 @@ const styles = StyleSheet.create({
   addClassButton: { alignSelf: 'center', borderRadius: 20, paddingVertical: 10, paddingHorizontal: 25, backgroundColor: '#3a9dde', marginRight: 8 },
   addClassButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   attendanceButton: {
-  marginTop: 10,
-  backgroundColor: '#4CAF50',
-  paddingVertical: 8,
-  borderRadius: 6,
-  alignItems: 'center',
-},
-attendanceButtonText: {
-  color: 'white',
-  fontWeight: 'bold',
-},
+    marginTop: 10,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  attendanceButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 
 });
