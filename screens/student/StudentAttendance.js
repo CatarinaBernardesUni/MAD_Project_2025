@@ -9,15 +9,6 @@ import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
 
 
-const chartConfig = {
-  backgroundGradientFrom: '#F2F6FC',
-  backgroundGradientTo: '#F2F6FC',
-  color: (opacity = 1, index) => index === 0 ? '#76c8d6' : '#E5E5E5',
-  strokeWidth: 18,
-  barPercentage: 1,
-  useShadowColorFromDataset: false,
-};
-
 const StudentAttendance = () => {
   const [presentCount, setPresentCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -36,9 +27,7 @@ const StudentAttendance = () => {
     if (!userId) return;
 
     const userRef = doc(db, 'users', userId);
-    const enrolmentRef = collection(db, 'enrolment');
-    const enrolmentQuery = query(enrolmentRef, where('student', '==', userRef));
-
+    const enrolmentQuery = query(collection(db, 'enrolment'), where('student', '==', userRef));
     const snapshot = await getDocs(enrolmentQuery);
 
     let present = 0;
@@ -69,20 +58,34 @@ const StudentAttendance = () => {
       if (!userId) return;
 
       const userRef = doc(db, 'users', userId);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const studentSubjects = userSnap.data().subjects || [];
-        // Search all subjects in the collection
-        const subjectsSnap = await getDocs(collection(db, 'subjects'));
-        const allSubjects = subjectsSnap.docs.map(d => ({
-          id: d.id,
-          name: d.data().name,
-        }));
-        // Filter only student subjects
-        const filtered = allSubjects.filter(s => studentSubjects.includes(s.name));
-        setSubjectRefs(filtered);
-        setSelectedSubject(filtered.length > 0 ? filtered[0].id : '');
+      const enrolmentQuery = query(collection(db, 'enrolment'), where('student', '==', userRef));
+      const enrolmentsSnap = await getDocs(enrolmentQuery);
+
+      const subjectIds = new Set();
+
+      for (const enrolDoc of enrolmentsSnap.docs) {
+        const enrolData = enrolDoc.data();
+        if (enrolData.class) {
+          const classSnap = await getDoc(enrolData.class);
+          if (classSnap.exists()) {
+            const classData = classSnap.data();
+            const subjectRef = classData.subject;
+            if (subjectRef) {
+              subjectIds.add(subjectRef.id);
+            }
+          }
+        }
       }
+
+      const subjectsSnap = await getDocs(collection(db, 'subjects'));
+      const allSubjects = subjectsSnap.docs.map(d => ({
+        id: d.id,
+        name: d.data().name,
+      }));
+
+      const filtered = allSubjects.filter(s => subjectIds.has(s.id));
+      setSubjectRefs(filtered);
+      setSelectedSubject(filtered.length > 0 ? filtered[0].id : '');
     };
     fetchSubjects();
   }, []);
@@ -94,17 +97,23 @@ const StudentAttendance = () => {
       if (!userId) return;
 
       const userRef = doc(db, 'users', userId);
-      const enrolmentRef = collection(db, 'enrolment');
-      const enrolmentQuery = query(enrolmentRef, where('student', '==', userRef));
+      const enrolmentQuery = query(collection(db, 'enrolment'), where('student', '==', userRef));
       const snapshot = await getDocs(enrolmentQuery);
 
       const types = [];
-      snapshot.forEach(doc => {
+      for (const docSnap of snapshot.docs) {
         const data = doc.data();
-        if (data.classType && !types.includes(data.classType)) {
-          types.push(data.classType);
+        if (data.class) {
+          const classSnap = await getDoc(data.class);
+          if (classSnap.exists()) {
+            const classData = classSnap.data();
+            const type = classData.classType;
+            if (type && !types.includes(type)) {
+              types.push(type);
+            }
+          }
         }
-      });
+      }
       setClassTypes(types);
       setSelectedClassType(types.length > 0 ? types[0] : '');
     };
@@ -122,39 +131,33 @@ const StudentAttendance = () => {
       }
 
       const userRef = doc(db, 'users', userId);
-      const enrolmentRef = collection(db, 'enrolment');
-      let enrolmentQuery;
-
-      if (selectedClassType) {
-        enrolmentQuery = query(
-          enrolmentRef,
-          where('student', '==', userRef),
-          where('subject', '==', doc(db, 'subjects', selectedSubject)),
-          where('classType', '==', selectedClassType)
-        );
-      } else {
-        enrolmentQuery = query(
-          enrolmentRef,
-          where('student', '==', userRef),
-          where('subject', '==', doc(db, 'subjects', selectedSubject))
-        );
-      }
-
+      const enrolmentQuery = query(collection(db, 'enrolment'), where('student', '==', userRef));
       const snapshot = await getDocs(enrolmentQuery);
 
       let present = 0;
       let total = 0;
 
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (typeof data.attendance === 'boolean') {
-          total += 1;
-          if (data.attendance === true) {
-            present += 1;
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data();
+        if (data.class) {
+          const classSnap = await getDoc(data.class);
+          if (classSnap.exists()) {
+            const classData = classSnap.data();
+            const subjectRef = classData.subject;
+            const classType = classData.classType;
+
+            const matchSubject = subjectRef?.id === selectedSubject;
+            const matchType = selectedClassType ? classType === selectedClassType : true;
+
+            if (matchSubject && matchType && typeof data.attendance === 'boolean') {
+              total += 1;
+              if (data.attendance === true) {
+                present += 1;
+              }
+            }
           }
         }
-      });
-
+      }
       setFilteredTotal(total);
       setFilteredPresent(present);
     };
