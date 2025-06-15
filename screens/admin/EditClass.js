@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import { doc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function EditClass({ route, navigation }) {
   const { classData } = route.params;
@@ -13,6 +14,10 @@ export default function EditClass({ route, navigation }) {
   const [classTypeOptions, setClassTypeOptions] = useState([]);
   const [allProfessors, setAllProfessors] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +41,8 @@ export default function EditClass({ route, navigation }) {
         setClassTypeOptions(typeOpts);
 
         setForm({
-          subjectId: classData.subject?.id || classData.subject?.split('/')[1] || '',
-          professorId: classData.professor?.id || classData.professor?.split('/')[1] || '',
+          subjectId: classData.subjectId || '',
+          professorId: classData.professorId || '',
           classType: classData.classType || '',
           date: classData.start
             ? (classData.start instanceof Date
@@ -60,14 +65,8 @@ export default function EditClass({ route, navigation }) {
 
         setLoading(false);
       } catch (err) {
-        Alert.alert(
-          'Failed to Load Class Details',
-          'There was a problem loading the class information. Please check your connection and try again.',
-          [
-            { text: 'Retry', onPress: fetchData },
-            { text: 'Cancel', style: 'cancel' }
-          ]
-        );
+        Alert.alert('Failed to Load Class Details',
+          'There was a problem loading the class information. Please check your connection and try again.');
         setLoading(false);
       }
     };
@@ -112,41 +111,32 @@ export default function EditClass({ route, navigation }) {
         isNaN(endDateTime.getTime())
       ) {
         setLoading(false);
-        Alert.alert(
-        'Incomplete Information',
-        'Please make sure all required fields are filled out correctly.'
-      );
+        Alert.alert('Missing Fields', 'Please fill in all required fields with valid data.');
         return;
       }
 
       if (endDateTime <= startDateTime) {
         setLoading(false);
-        Alert.alert(
-        'Invalid Time Selection',
-        'The end time must be later than the start time. Please adjust your selection.'
-      );
+        Alert.alert('Invalid Time', 'End time must be after start time.');
         return;
       }
 
       await updateDoc(doc(db, 'classes', classData.id), {
-        subject: doc(db, 'subjects', form.subjectId),
-        professor: doc(db, 'users', form.professorId),
+        subject: `subjects/${form.subjectId}`,
+        professor: `users/${form.professorId}`,
         classType: form.classType,
         start: startDateTime,
         end: endDateTime,
         peopleLimit: form.peopleLimit === '' ? null : Number(form.peopleLimit),
         additionalNotes: form.additionalNotes || '',
       });
-      Alert.alert(
-      'Class Updated',
-      'The class details have been successfully saved.',
-      [{ text: 'OK', onPress: () => navigation.goBack() }]
-    );
+      Alert.alert('Success', 'Class updated!');
+      navigation.goBack();
     } catch (err) {
       Alert.alert(
-      'Update Failed',
-      'Something went wrong while updating the class. Please try again later.'
-    );
+        'Update Failed',
+        'Something went wrong while updating the class. Please try again later.'
+      );
     } finally {
       setLoading(false);
     }
@@ -161,7 +151,7 @@ export default function EditClass({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Edit Class</Text>
 
@@ -211,28 +201,64 @@ export default function EditClass({ route, navigation }) {
         </View>
 
         <Text style={styles.label}>Date</Text>
-        <TextInput
-          style={styles.input}
-          value={form.date}
-          onChangeText={v => handleChange('date', v)}
-          placeholder="YYYY-MM-DD"
-        />
+        <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
+          <Text>{form.date || 'Select Date'}</Text>
+        </TouchableOpacity>
+        {showDatePicker && (
+          <DateTimePicker
+            value={form.date ? new Date(form.date) : new Date()}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                const formattedDate = selectedDate.toISOString().slice(0, 10);
+                handleChange('date', formattedDate);
+              }
+            }}
+          />
+        )}
+
 
         <Text style={styles.label}>Start Time</Text>
-        <TextInput
-          style={styles.input}
-          value={form.startTime}
-          onChangeText={v => handleChange('startTime', v)}
-          placeholder="HH:MM"
-        />
+        <TouchableOpacity style={styles.input} onPress={() => setShowStartTimePicker(true)}>
+          <Text>{form.startTime || 'Select Start Time'}</Text>
+        </TouchableOpacity>
+        {showStartTimePicker && (
+          <DateTimePicker
+            value={form.startTime ? new Date(`${form.date}T${form.startTime}:00`) : new Date()}
+            mode="time"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowStartTimePicker(false);
+              if (selectedDate) {
+                const hours = selectedDate.getHours().toString().padStart(2, '0');
+                const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+                handleChange('startTime', `${hours}:${minutes}`);
+              }
+            }}
+          />
+        )}
 
         <Text style={styles.label}>End Time</Text>
-        <TextInput
-          style={styles.input}
-          value={form.endTime}
-          onChangeText={v => handleChange('endTime', v)}
-          placeholder="HH:MM"
-        />
+        <TouchableOpacity style={styles.input} onPress={() => setShowEndTimePicker(true)}>
+          <Text>{form.endTime || 'Select End Time'}</Text>
+        </TouchableOpacity>
+        {showEndTimePicker && (
+          <DateTimePicker
+            value={form.endTime ? new Date(`${form.date}T${form.endTime}:00`) : new Date()}
+            mode="time"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setShowEndTimePicker(false);
+              if (selectedDate) {
+                const hours = selectedDate.getHours().toString().padStart(2, '0');
+                const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+                handleChange('endTime', `${hours}:${minutes}`);
+              }
+            }}
+          />
+        )}
 
         <Text style={styles.label}>People Limit</Text>
         <TextInput
