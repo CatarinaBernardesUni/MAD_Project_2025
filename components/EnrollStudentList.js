@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import StudentEnrollCard from './StudentEnrollCard';
 
 export default function StudentList({
@@ -24,7 +24,7 @@ export default function StudentList({
 
   return (
     <>
-      <Text>Filters</Text>
+      <Text style={{ fontWeight: 'bold', fontSize: 14 }}>Filters</Text>
       <TextInput
         style={styles.input}
         placeholder="Student ID"
@@ -32,11 +32,20 @@ export default function StudentList({
         onChangeText={setStudentIdFilter}
       />
       <View style={styles.filtersRow}>
-        <TouchableOpacity style={styles.filterButton} onPress={() => setSortAlphabetically(!sortAlphabetically)}>
+        <TouchableOpacity style={styles.filterButton} onPress={() => {
+          const newSortOrder = !sortAlphabetically;
+          setSortAlphabetically(newSortOrder);
+          applyFilters(newSortOrder);
+        }}>
           <Text>Alphabetical Order</Text>
           <Text>{sortAlphabetically ? '▼' : '▲'}</Text>
         </TouchableOpacity>
-        <Button title="Search" onPress={applyFilters} />
+        <TouchableOpacity
+          style={styles.searchButton}
+          onPress={applyFilters}
+        >
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Search</Text>
+        </TouchableOpacity>
       </View>
       <FlatList
         data={filteredStudents}

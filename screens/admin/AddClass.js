@@ -1,111 +1,174 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; 
+import { Picker } from '@react-native-picker/picker';
 import { collection, getDocs, addDoc, Timestamp, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddClass = ({ navigation }) => {
-  const insets = useSafeAreaInsets();
-  const [subjects, setSubjects] = useState([]);
-  const [professors, setProfessors] = useState([]);
-  const [filteredProfessors, setFilteredProfessors] = useState([]);
-  const [classType, setClassType] = useState([]);
+  // form state
   const [form, setForm] = useState({
     subjectId: '',
     professorId: '',
     classType: '',
-    date: '',
-    startTime: '',
-    endTime: '',
+    date: new Date().toISOString().split('T')[0],
+    startTime: new Date().toTimeString().substring(0, 5),
+    endTime: new Date().toTimeString().substring(0, 5),
     additionalNotes: '',
     peopleLimit: '',
   });
-  const [loading, setLoading] = useState(false);
 
+  // picker controls
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  // datetime
+  const [selectedDate, setSelectedDate] = useState(new Date()); // for calendar picker
+  const [selectedStartTime, setSelectedStartTime] = useState(new Date()); // for clock picker
+  const [selectedEndTime, setSelectedEndTime] = useState(new Date()); // for clock picker
+
+  // data from db
+  const [loading, setLoading] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+  const [professors, setProfessors] = useState([]);
+  const [filteredProfessors, setFilteredProfessors] = useState([]);
+  const [classTypes, setClassTypes] = useState([]);
+
+  // Safe area
+  const insets = useSafeAreaInsets();
+
+  // handlers for picker
+  const handleDateChange = (event, date) => {
+    setShowDatePicker(false);
+    if (date) {
+      setSelectedDate(date);
+      handleChange('date', date.toISOString().split('T')[0]);
+    }
+  };
+
+  const handleStartTimeChange = (event, date) => {
+    setShowStartTimePicker(false);
+    if (date) {
+      setSelectedStartTime(date);
+      handleChange('startTime', date.toTimeString().substring(0, 5)); // hh:mm
+    }
+  };
+
+  const handleEndTimeChange = (event, date) => {
+    setShowEndTimePicker(false);
+    if (date) {
+      setSelectedEndTime(date);
+      handleChange('endTime', date.toTimeString().substring(0, 5)); // hh:mm
+    }
+  };
+
+  // form handle
+  const handleChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // fetching data from db
   const fetchDropdownData = async () => {
     try {
+      // subjects
       const subjSnap = await getDocs(collection(db, 'subjects'));
+      setSubjects(
+        subjSnap.docs.map((item) => ({
+          id: item.id,
+          name: item.data().name,
+        }))
+      );
+
+      // professors
       const profSnap = await getDocs(collection(db, 'users'));
-
-      const fetchedSubjects = subjSnap.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name,
-      }));
-
-      const teacherUsers = profSnap.docs
-        .filter(doc => {
-          const roles = doc.data().roles || [];
-          return Array.isArray(roles) && roles.includes('teacher');
-        })
-        .map(doc => ({
-          id: doc.id,
-          name: doc.data().name || doc.data().fullName || 'Unnamed',
-          subjects: doc.data().subjects || [],
-        }));
-
-      setSubjects(fetchedSubjects);
-      setProfessors(teacherUsers);
+      setProfessors(
+        profSnap.docs
+          .filter((item) => item.data().roles?.includes('teacher'))
+          .map((item) => ({
+            id: item.id,
+            name: item.data().name,
+            subjects: item.data().subjects ?? [],
+          }))
+      );
     } catch (err) {
-      console.error('Error fetching dropdown data:', err);
+      console.error('Error fetching data!', err);
+    }
+  };
+
+  const fetchClassTypes = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, 'classType'));
+      setClassTypes(
+        snapshot.docs.map((item) => ({
+          id: item.id,
+          name: item.data().name,
+        }))
+      );
+    } catch (error) {
+      console.error('Error fetching class types!', error);
     }
   };
 
   useEffect(() => {
-    const fetchClassType = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, 'classType'));
-        const types = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setClassType(types);
-      } catch (error) {
-        console.error('Error fetching class types:', error);
-      }
-    };
-    fetchClassType();
-  }, []);
-
-  useEffect(() => {
     fetchDropdownData();
+    fetchClassTypes();
   }, []);
 
   // filter professors by subject
   useEffect(() => {
-    if (!form.subjectId) {
+    if (form.subjectId) {
+      const selected = subjects.find((s) => s.id === form.subjectId);
+      if (selected) {
+        setFilteredProfessors(
+          professors.filter((p) => p.subjects?.includes(selected.name))
+        );
+      } else {
+        setFilteredProfessors([]);
+      }
+    } else {
       setFilteredProfessors([]);
-      return;
     }
-    const selectedSubj = subjects.find(s => s.id === form.subjectId)?.name;
-    const filtered = professors.filter(p =>
-      p.subjects.includes(selectedSubj)
-    );
-    setFilteredProfessors(filtered);
-    setForm(f => ({ ...f, professorId: '' }));
-  }, [form.subjectId, subjects, professors]);
+  }, [form.subjectId, professors, subjects]);
 
-  const handleChange = (field, value) => setForm(f => ({ ...f, [field]: value }));
-
+  // adding class to db
   const handleAddClass = async () => {
-    const startDateTime = new Date(`${form.date}T${form.startTime}:00`);
-    const endDateTime = new Date(`${form.date}T${form.endTime}:00`);
-
     if (
       !form.subjectId ||
       !form.professorId ||
       !form.classType ||
       !form.date ||
       !form.startTime ||
-      !form.endTime ||
-      isNaN(startDateTime.getTime()) ||
-      isNaN(endDateTime.getTime())
+      !form.endTime
     ) {
-      alert('Please fill in all required fields with valid data');
+      Alert.alert('Error!', 'Please fill in all required fields.');
       return;
     }
 
-    if (endDateTime <= startDateTime) {
-      alert('End time must be after start time.');
+    const start = new Date(
+      `${form.date}T${form.startTime}`
+    );
+    const end = new Date(
+      `${form.date}T${form.endTime}`
+    );
+
+    if (isNaN(start) ||
+      isNaN(end) ||
+      end <= start) {
+      Alert.alert('Error!', 'Please select a valid start and end time.');
       return;
     }
 
@@ -115,151 +178,207 @@ const AddClass = ({ navigation }) => {
         subject: doc(db, 'subjects', form.subjectId),
         professor: doc(db, 'users', form.professorId),
         classType: form.classType,
-        start: Timestamp.fromDate(startDateTime),
-        end: Timestamp.fromDate(endDateTime),
-        additionalNotes: form.additionalNotes || '',
-        peopleLimit: form.peopleLimit === '' ? null : Number(form.peopleLimit),
+        start: Timestamp.fromDate(start),
+        end: Timestamp.fromDate(end),
+        additionalNotes: form.additionalNotes ?? '',
+        peopleLimit: form.peopleLimit ? Number(form.peopleLimit) : null,
         description: '',
       });
-      alert('Class added successfully');
+      Alert.alert('Success!', 'Class added successfully.');
       navigation.goBack();
     } catch (err) {
-      console.error('Error adding class:', err);
-      alert('Failed to add class');
+      console.error(err);
+      Alert.alert('Error!', 'Failed to add class.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
-          <Text style={styles.title}>Add New Class</Text>
+          <Text style={styles.title}>
+            Add New Class
+          </Text>
           <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text>Back</Text>
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}>
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Back</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView>
-          <Text style={styles.label}>Subject:</Text>
-          {subjects.map(subj => (
+
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <Text style={styles.label}>
+            Subject:
+          </Text>
+          {subjects.map((item) => (
             <TouchableOpacity
-              key={subj.id}
-              onPress={() => handleChange('subjectId', subj.id)}
+              key={item.id}
+              onPress={() => handleChange('subjectId', item.id)}
               style={[
                 styles.option,
-                form.subjectId === subj.id && styles.selected,
+                form.subjectId === item.id && styles.selected,
               ]}
             >
-              <Text>{subj.name}</Text>
+              <Text>{item.name}</Text>
             </TouchableOpacity>
           ))}
 
-          <Text style={styles.label}>Teacher:</Text>
+          <Text style={styles.label}>
+            Professor:
+          </Text>
           {filteredProfessors.length > 0 ? (
-            filteredProfessors.map(prof => (
+            filteredProfessors.map((item) => (
               <TouchableOpacity
-                key={prof.id}
-                onPress={() => handleChange('professorId', prof.id)}
+                key={item.id}
+                onPress={() => handleChange('professorId', item.id)}
                 style={[
                   styles.option,
-                  form.professorId === prof.id && styles.selected,
+                  form.professorId === item.id && styles.selected,
                 ]}
               >
-                <Text>{prof.name}</Text>
+                <Text>{item.name}</Text>
               </TouchableOpacity>
             ))
           ) : form.subjectId ? (
-            <Text style={{ fontStyle: 'italic' }}>No teachers for this subject</Text>
-          ) : null}
+            <Text style={{ fontStyle: 'italic' }}>No professors for this subject</Text>
+          ) : (
+            <Text style={{ fontStyle: 'italic', marginBottom: 20 }}>Select subject first</Text>
+          )}
 
-          <Text style={styles.label}>Class Type:</Text>
+          <Text style={styles.label}>
+            Class Type:
+          </Text>
           <View style={styles.pickerWrapper}>
             <Picker
               selectedValue={form.classType}
-              onValueChange={v => handleChange('classType', v)}
+              onValueChange={(itemValue) =>
+                handleChange('classType', itemValue)
+              }
               style={styles.picker}
             >
               <Picker.Item label="Select Class Type" value="" />
-              {classType.map(type => (
-                <Picker.Item key={type.id} label={type.name} value={type.name} />
+              {classTypes.map((item) => (
+                <Picker.Item
+                  key={item.id}
+                  label={item.name}
+                  value={item.name}
+                />
               ))}
             </Picker>
           </View>
 
-          <Text style={styles.label}>Date:</Text>
-          <TextInput
-            value={form.date}
-            onChangeText={v => handleChange('date', v)}
-            style={styles.input}
-            placeholder="e.g. 2025-06-12"
-          />
-          <Text style={styles.label}>Start Time:</Text>
-          <TextInput
-            value={form.startTime}
-            onChangeText={v => handleChange('startTime', v)}
-            style={styles.input}
-            placeholder="e.g. 14:30"
-          />
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={styles.input}>
+            <Text>
+              <Text style={{ fontWeight: "bold", fontSize: 16 }}>Date: </Text>
+              {selectedDate.toLocaleDateString()}
+            </Text>
+          </TouchableOpacity>
 
-          <Text style={styles.label}>End Time:</Text>
-          <TextInput
-            value={form.endTime}
-            onChangeText={v => handleChange('endTime', v)}
-            style={styles.input}
-            placeholder="e.g. 16:00"
-          />
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode='date'
+              display='default'
+              onChange={handleDateChange}
+            />
+          )}
 
-          <Text style={styles.label}>Additional Notes:</Text>
+          <TouchableOpacity
+            onPress={() => setShowStartTimePicker(true)}
+            style={styles.input}>
+            <Text>
+              <Text style={{ fontWeight: "bold", fontSize: 16 }}>Start Time: </Text>
+              {selectedStartTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}
+            </Text>
+          </TouchableOpacity>
+
+          {showStartTimePicker && (
+            <DateTimePicker
+              value={selectedStartTime}
+              mode='time'
+              is24Hour
+              display='default'
+              onChange={handleStartTimeChange}
+            />
+          )}
+
+          <TouchableOpacity
+            onPress={() => setShowEndTimePicker(true)}
+            style={styles.input}>
+            <Text>
+              <Text style={{ fontWeight: "bold", fontSize: 16 }}>End Time: </Text>
+              {selectedEndTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}
+            </Text>
+          </TouchableOpacity>
+
+          {showEndTimePicker && (
+            <DateTimePicker
+              value={selectedEndTime}
+              mode='time'
+              is24Hour
+              display='default'
+              onChange={handleEndTimeChange}
+            />
+          )}
+
+          <Text style={styles.label}>
+            Additional Notes:
+          </Text>
           <TextInput
+            style={styles.textInput}
             value={form.additionalNotes}
-            onChangeText={v => handleChange('additionalNotes', v)}
-            style={styles.input}
-            placeholder="Optional notes..."
+            onChangeText={(text) => handleChange('additionalNotes', text)}
+            placeholder='Optional notes...'
           />
 
-          <Text style={styles.label}>People Limit (optional):</Text>
+          <Text style={styles.label}>
+            People Limit (optional):
+          </Text>
           <TextInput
+            style={styles.textInput}
             value={form.peopleLimit}
-            onChangeText={v => handleChange('peopleLimit', v)}
-            keyboardType="numeric"
-            style={styles.input}
-            placeholder="e.g. 20"
+            onChangeText={(text) => handleChange('peopleLimit', text)}
+            keyboardType='numeric'
+            placeholder='e.g. 20'
           />
 
           <TouchableOpacity
-            style={styles.addButton2}
-            onPress={handleAddClass}
             disabled={loading}
-          >
+            onPress={handleAddClass}
+            style={styles.addBtn}>
             {loading ? (
-              <ActivityIndicator />
+              <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={{ color: '#fff' }}>Add Class</Text>
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+                Add Class
+              </Text>
             )}
+
           </TouchableOpacity>
         </ScrollView>
+
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  header: {fontSize: 24, fontWeight: 'bold', marginBottom: 12},
-  title: { fontSize: 22, fontWeight: 'bold' },
-  addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
-  label: { fontWeight: 'bold', marginTop: 12 },
-  input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6},
-  option: {padding: 10, backgroundColor: '#eee', borderRadius: 6, marginVertical: 4, borderColor: '#ccc', borderWidth: 1},
-  selected: {backgroundColor: '#D0E6FF',},
-  addButton2: {backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20},
-  pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
-   height: 50, justifyContent: 'center',marginTop: 12},
-  picker: { height: 56, width: '100%' },
+  container: { flex: 1, padding: 16, backgroundColor: '#f0f4f8' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  title: { fontSize: 24, fontWeight: 'bold' },
+  backBtn: { backgroundColor: '#5996b5', padding: 12, borderRadius: 6 },
+  label: { fontWeight: 'bold', marginBottom: 12, fontSize: 16 },
+  input: { borderWidth: 1, borderColor: '#5996b5', padding: 12, borderRadius: 6, backgroundColor: '#fff', marginBottom: 12 },
+  textInput: { borderWidth: 1, borderColor: '#5996b5', padding: 12, borderRadius: 6, backgroundColor: '#fff', marginBottom: 12 },
+  pickerWrapper: { borderWidth: 1, borderColor: '#5996b5', borderRadius: 6, backgroundColor: '#fff', marginBottom: 12 },
+  picker: { height: 50 },
+  option: { padding: 12, backgroundColor: '#fff', borderRadius: 6, marginBottom: 12, borderWidth: 1, borderColor: '#5996b5' },
+  selected: { backgroundColor: '#D0E6FF' },
+  addBtn: { backgroundColor: '#5996b5', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20 },
 });
 
 export default AddClass;

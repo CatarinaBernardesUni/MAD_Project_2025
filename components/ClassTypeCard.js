@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-export default function SubjectCard({ subject, onEdit, onDelete }) {
+export default function ClassTypeCard({ classType, onEdit, onDelete }) {
   const [expanded, setExpanded] = useState(false);
 
   const handleToggle = () => setExpanded(prev => !prev);
@@ -9,15 +9,15 @@ export default function SubjectCard({ subject, onEdit, onDelete }) {
   return (
     <TouchableOpacity style={styles.card} onPress={handleToggle}>
       <View style={styles.info}>
-        <Text style={styles.text}><Text style={styles.label}>Name:</Text> {subject.name}</Text>
+        <Text style={styles.text}><Text style={styles.label}>Name:</Text> {classType.name}</Text>
       </View>
 
       {expanded && (
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.editButton} onPress={() => onEdit(subject)}>
+          <TouchableOpacity style={styles.editButton} onPress={() => onEdit(classType)}>
             <Text style={styles.actionText}>Edit</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(subject)}>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => onDelete(classType)}>
             <Text style={styles.actionText}>Delete</Text>
           </TouchableOpacity>
         </View>
