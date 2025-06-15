@@ -51,7 +51,7 @@ export default function AdminManageStudents({ navigation }) {
       await deleteDoc(doc(db, 'users', studentId));
       fetchStudents();
     } catch (err) {
-      console.error('Failed to delete:', err);
+       Alert.alert('Error', 'Failed to delete the student. Please try again later.');
     }
   };
 

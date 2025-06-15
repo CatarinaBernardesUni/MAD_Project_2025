@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, Image, ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { uploadImage, pickImage } from '../../utils/uploadImage';

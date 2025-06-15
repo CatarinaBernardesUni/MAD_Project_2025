@@ -13,8 +13,9 @@ export default function ResetPassword({ navigation }) {
       Alert.alert('Success!', 'Password reset email sent to your email address.');
       navigation.goBack();
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error!', error.message);
+      Alert.alert(
+      'Password Reset Failed', 'Something went wrong while trying to send the password reset email. Please try again later.'
+    );
     }
   };
 
@@ -35,7 +36,7 @@ export default function ResetPassword({ navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={{ marginTop: 20 }}>
-          <Text style={{ color: '#000000' }}>Back to Settings</Text>
+          <Text style={{ color: '#000000', textDecorationLine: 'underline' }}>Back to Settings</Text>
         </TouchableOpacity>
         </View>
       </View>

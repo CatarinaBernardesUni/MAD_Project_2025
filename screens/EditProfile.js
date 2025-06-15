@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View, TextInput, Alert, Image, TouchableOpacity,
-  ScrollView, StyleSheet, Text, KeyboardAvoidingView, Platform
-} from 'react-native';
+import { View, TextInput, Alert, Image, TouchableOpacity, ScrollView, StyleSheet, Text, KeyboardAvoidingView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { auth, db } from '../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -32,8 +29,10 @@ export default function EditProfile({ navigation }) {
         }
         setLoading(false);
       } catch (err) {
-        console.error(err);
-        Alert.alert('Error!', 'Unable to load user profile.');
+        Alert.alert(
+          'Error Loading Profile',
+          'Something went wrong while loading the user profile. Please check your internet connection or try again later.'
+        );
         setLoading(false);
       }
     };
@@ -42,7 +41,10 @@ export default function EditProfile({ navigation }) {
 
   const handleUpdate = async () => {
     if (!form.name || !form.age) {
-      Alert.alert('Please fill all required fields.');
+      Alert.alert(
+        'Incomplete Form',
+        'Please fill in both your name and age to update your profile.'
+      );
       return;
     }
 
@@ -65,12 +67,17 @@ export default function EditProfile({ navigation }) {
         photoURL: finalImageUrl,
       });
 
-      Alert.alert('Profile updated!');
-      navigation.goBack();
+      Alert.alert(
+        'Profile Updated',
+        'Your profile has been successfully updated.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
 
     } catch (err) {
-      console.error(err);
-      Alert.alert('Update failed!', err.message);
+      Alert.alert(
+        'Update Failed',
+        'We were unable to update your profile. Please try again later.'
+      );
     }
   };
 
@@ -80,7 +87,7 @@ export default function EditProfile({ navigation }) {
   return (
     <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior='height'
         keyboardVerticalOffset={60}
         style={styles.container}
       >
@@ -89,7 +96,7 @@ export default function EditProfile({ navigation }) {
 
           <Text style={styles.label}>Name:</Text>
           <View style={styles.inputContainer}>
-            
+
             <TextInput
               style={styles.input}
               placeholder="Name"
@@ -136,6 +143,9 @@ export default function EditProfile({ navigation }) {
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={{ marginTop: 40 }}>
+            <Text style={{ color: '#000000', fontSize: 16, textDecorationLine: 'underline' }}>Back to Settings</Text>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>
@@ -152,7 +162,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingBottom: 20,
-    paddingTop: 150,
+    paddingTop: 100,
   },
   title: {
     fontSize: 34,

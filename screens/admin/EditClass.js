@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -37,22 +37,22 @@ export default function EditClass({ route, navigation }) {
 
         setForm({
           subjectId: classData.subject?.id || classData.subject?.split('/')[1] || '',
-professorId: classData.professor?.id || classData.professor?.split('/')[1] || '',
+          professorId: classData.professor?.id || classData.professor?.split('/')[1] || '',
           classType: classData.classType || '',
           date: classData.start
             ? (classData.start instanceof Date
-                ? classData.start.toISOString().slice(0, 10)
-                : new Date(classData.start).toISOString().slice(0, 10))
+              ? classData.start.toISOString().slice(0, 10)
+              : new Date(classData.start).toISOString().slice(0, 10))
             : '',
           startTime: classData.start
             ? (classData.start instanceof Date
-                ? classData.start.toISOString().slice(11, 16)
-                : new Date(classData.start).toISOString().slice(11, 16))
+              ? classData.start.toISOString().slice(11, 16)
+              : new Date(classData.start).toISOString().slice(11, 16))
             : '',
           endTime: classData.end
             ? (classData.end instanceof Date
-                ? classData.end.toISOString().slice(11, 16)
-                : new Date(classData.end).toISOString().slice(11, 16))
+              ? classData.end.toISOString().slice(11, 16)
+              : new Date(classData.end).toISOString().slice(11, 16))
             : '',
           peopleLimit: classData.peopleLimit !== undefined && classData.peopleLimit !== null ? String(classData.peopleLimit) : '',
           additionalNotes: classData.additionalNotes || '',
@@ -60,7 +60,14 @@ professorId: classData.professor?.id || classData.professor?.split('/')[1] || ''
 
         setLoading(false);
       } catch (err) {
-        Alert.alert('Error loading class');
+        Alert.alert(
+          'Failed to Load Class Details',
+          'There was a problem loading the class information. Please check your connection and try again.',
+          [
+            { text: 'Retry', onPress: fetchData },
+            { text: 'Cancel', style: 'cancel' }
+          ]
+        );
         setLoading(false);
       }
     };
@@ -105,29 +112,41 @@ professorId: classData.professor?.id || classData.professor?.split('/')[1] || ''
         isNaN(endDateTime.getTime())
       ) {
         setLoading(false);
-        Alert.alert('Missing Fields', 'Please fill in all required fields with valid data.');
+        Alert.alert(
+        'Incomplete Information',
+        'Please make sure all required fields are filled out correctly.'
+      );
         return;
       }
 
       if (endDateTime <= startDateTime) {
         setLoading(false);
-        Alert.alert('Invalid Time', 'End time must be after start time.');
+        Alert.alert(
+        'Invalid Time Selection',
+        'The end time must be later than the start time. Please adjust your selection.'
+      );
         return;
       }
 
       await updateDoc(doc(db, 'classes', classData.id), {
-        subject: doc(db, 'subjects', form.subjectId), 
-        professor: doc(db, 'users', form.professorId), 
+        subject: doc(db, 'subjects', form.subjectId),
+        professor: doc(db, 'users', form.professorId),
         classType: form.classType,
         start: startDateTime,
         end: endDateTime,
         peopleLimit: form.peopleLimit === '' ? null : Number(form.peopleLimit),
         additionalNotes: form.additionalNotes || '',
       });
-      Alert.alert('Success', 'Class updated!');
-      navigation.goBack();
+      Alert.alert(
+      'Class Updated',
+      'The class details have been successfully saved.',
+      [{ text: 'OK', onPress: () => navigation.goBack() }]
+    );
     } catch (err) {
-      Alert.alert('Error', err.message);
+      Alert.alert(
+      'Update Failed',
+      'Something went wrong while updating the class. Please try again later.'
+    );
     } finally {
       setLoading(false);
     }

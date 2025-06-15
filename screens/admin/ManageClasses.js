@@ -19,8 +19,11 @@ const fetchRefName = async (refPath, field = 'name') => {
       return 'Not Found';
     }
   } catch (err) {
-    console.error('Error resolving reference path:', refPath, err);
-    return 'Error';
+    Alert.alert(
+      'Failed to Load Classes',
+      'We encountered a problem while loading the classes. Please try again later.',
+      [{ text: 'OK' }]
+    );
   }
 };
 
@@ -101,14 +104,32 @@ const ManageClasses = ({ navigation }) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'classes', id));
-      fetchClasses();
-    } catch (err) {
-      console.error('Error deleting class:', err);
-    }
-  };
+  const handleDelete = (id) => {
+  Alert.alert(
+    'Delete Class',
+    'Are you sure you want to delete this class? This action cannot be undone.',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteDoc(doc(db, 'classes', id));
+            Alert.alert('Class Deleted', 'The class has been successfully removed.');
+            fetchClasses();
+          } catch (err) {
+            console.error('Error deleting class:', err);
+            Alert.alert(
+              'Deletion Failed',
+              'Unable to delete the class at this time. Please try again later.'
+            );
+          }
+        },
+      },
+    ]
+  );
+};
 
   const handleDateChange = (event, date) => {
     setShowDatePicker(false);

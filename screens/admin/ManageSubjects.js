@@ -25,7 +25,7 @@ export default function ManageSubjects() {
       const subjectList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setSubjects(subjectList);
     } catch (error) {
-      console.error('Error fetching subjects:', error);
+      Alert.alert('Error', 'Unable to load subjects. Please try again later.');
     }
   };
 
@@ -36,7 +36,7 @@ export default function ManageSubjects() {
       setNewSubjectName('');
       fetchSubjects();
     } catch (error) {
-      console.error('Error adding subject:', error);
+      Alert.alert('Error', 'Failed to add subject. Please try again.');
     }
   };
 
@@ -45,7 +45,7 @@ export default function ManageSubjects() {
       await deleteDoc(doc(db, 'subjects', subjectId));
       fetchSubjects();
     } catch (error) {
-      console.error('Error deleting subject:', error);
+      Alert.alert('Error', 'Failed to delete subject. Please try again.');
     }
   };
 
@@ -70,7 +70,7 @@ export default function ManageSubjects() {
       cancelEdit();
       fetchSubjects();
     } catch (error) {
-      console.error('Error updating subject:', error);
+      Alert.alert('Error', 'Failed to update subject. Please try again.');
     }
   };
 

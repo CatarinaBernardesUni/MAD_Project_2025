@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { collection, getDocs, addDoc, Timestamp, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -154,7 +145,10 @@ const AddClass = ({ navigation }) => {
       !form.startTime ||
       !form.endTime
     ) {
-      Alert.alert('Error!', 'Please fill in all required fields.');
+      Alert.alert(
+        'Incomplete Form',
+        'Please make sure you have selected a subject, professor, class type, date, start time, and end time before submitting.'
+      );
       return;
     }
 
@@ -168,7 +162,10 @@ const AddClass = ({ navigation }) => {
     if (isNaN(start) ||
       isNaN(end) ||
       end <= start) {
-      Alert.alert('Error!', 'Please select a valid start and end time.');
+      Alert.alert(
+        'Invalid Time Selection',
+        'The end time must be later than the start time. Please review your time inputs.'
+      );
       return;
     }
 
@@ -184,11 +181,16 @@ const AddClass = ({ navigation }) => {
         peopleLimit: form.peopleLimit ? Number(form.peopleLimit) : null,
         description: '',
       });
-      Alert.alert('Success!', 'Class added successfully.');
-      navigation.goBack();
+      Alert.alert(
+        'Class Added',
+        `The class for ${form.classType} starting at ${start.toLocaleString()} has been successfully added.`,
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
     } catch (err) {
-      console.error(err);
-      Alert.alert('Error!', 'Failed to add class.');
+      Alert.alert(
+        'Error Adding Class',
+        'Something went wrong while adding the class. Please check your internet connection or try again later.'
+      );
     } finally {
       setLoading(false);
     }

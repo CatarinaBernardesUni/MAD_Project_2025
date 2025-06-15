@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet, KeyboardAvoidingView, Pressable } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, Image, ScrollView, StyleSheet, KeyboardAvoidingView, Pressable } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
 import { db, secondaryAuth } from '../../firebase';
@@ -9,88 +9,90 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function AddTeacherScreen({ navigation }) {
-    const [form, setForm] = useState({
-        name: '',
-        age: '',
-        email: '',
-        password: '',
-        profilePicture: null,
-        subjects: [],
-    });
+  const [form, setForm] = useState({
+    name: '',
+    age: '',
+    email: '',
+    password: '',
+    profilePicture: null,
+    subjects: [],
+  });
 
-    const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
 
-    useEffect(() => {
-        const fetchSubjects = async () => {
-            try {
-                const snapshot = await getDocs(collection(db, 'subjects'));
-                const subjectNames = snapshot.docs.map(doc => doc.data().name);
-                setAvailableSubjects(subjectNames);
-            } catch (error) {
-                console.error('Error fetching subjects:', error);
-                Alert.alert('Error fetching subjects');
-            }
-        };
-
-        fetchSubjects();
-    }, []);
-
-    const toggleSubject = (subject) => {
-        const newSubjects = form.subjects.includes(subject)
-            ? form.subjects.filter(s => s !== subject)
-            : [...form.subjects, subject];
-        setForm({ ...form, subjects: newSubjects });
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'subjects'));
+        const subjectNames = snapshot.docs.map(doc => doc.data().name);
+        setAvailableSubjects(subjectNames);
+      } catch (error) {
+        Alert.alert(
+          'Unable to Load Subjects',
+          'There was a problem fetching the list of subjects. Please check your internet connection and try again later.'
+        );
+      }
     };
 
-    const handleAddTeacher = async () => {
-        if (!form.email || !form.password || !form.name || !form.age) {
-            Alert.alert('Missing Information', 'Please complete all fields before submitting.');
-            return;
-        }
+    fetchSubjects();
+  }, []);
 
-        try {
-            const { user } = await createUserWithEmailAndPassword(secondaryAuth, form.email, form.password);
+  const toggleSubject = (subject) => {
+    const newSubjects = form.subjects.includes(subject)
+      ? form.subjects.filter(s => s !== subject)
+      : [...form.subjects, subject];
+    setForm({ ...form, subjects: newSubjects });
+  };
 
-            let downloadURL = null;
-            if (form.profilePicture) {
-                downloadURL = await uploadImage(form.profilePicture, user.uid);
-            }
+  const handleAddTeacher = async () => {
+    if (!form.email || !form.password || !form.name || !form.age) {
+      Alert.alert('Missing Information', 'Please complete all fields before submitting.');
+      return;
+    }
 
-            await setDoc(doc(db, 'users', user.uid), {
-                name: form.name,
-                age: parseInt(form.age),
-                email: form.email,
-                roles: ['teacher'],
-                subjects: form.subjects,
-                profilePicture: downloadURL || null,
-            });
-            Alert.alert('Success', 'Teacher account has been successfully created.');
-            navigation.goBack();
-        } catch (err) {
-            let message = 'Something went wrong. Please try again later.';
+    try {
+      const { user } = await createUserWithEmailAndPassword(secondaryAuth, form.email, form.password);
 
-            switch (err.code) {
-                case 'auth/email-already-in-use':
-                    message = 'This email is already in use. Please use a different email.';
-                    break;
-                case 'auth/invalid-email':
-                    message = 'The email address is not valid. Please check and try again.';
-                    break;
-                case 'auth/weak-password':
-                    message = 'The password is too weak. Please use at least 6 characters.';
-                    break;
-                default:
-                    message = 'Could not create teacher account. Please try again.';
-            }
+      let downloadURL = null;
+      if (form.profilePicture) {
+        downloadURL = await uploadImage(form.profilePicture, user.uid);
+      }
 
-            Alert.alert('Error', message);
-        } finally {
-            await secondaryAuth.signOut();
-        }
-    };
+      await setDoc(doc(db, 'users', user.uid), {
+        name: form.name,
+        age: parseInt(form.age),
+        email: form.email,
+        roles: ['teacher'],
+        subjects: form.subjects,
+        profilePicture: downloadURL || null,
+      });
+      Alert.alert('Success', 'Teacher account has been successfully created.');
+      navigation.goBack();
+    } catch (err) {
+      let message = 'Something went wrong. Please try again later.';
 
-    return (
-        <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
+      switch (err.code) {
+        case 'auth/email-already-in-use':
+          message = 'This email is already in use. Please use a different email.';
+          break;
+        case 'auth/invalid-email':
+          message = 'The email address is not valid. Please check and try again.';
+          break;
+        case 'auth/weak-password':
+          message = 'The password is too weak. Please use at least 6 characters.';
+          break;
+        default:
+          message = 'Could not create teacher account. Please try again.';
+      }
+
+      Alert.alert('Error', message);
+    } finally {
+      await secondaryAuth.signOut();
+    }
+  };
+
+  return (
+    <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
       <KeyboardAvoidingView keyboardVerticalOffset={60} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <Text style={styles.title}>Add New Teacher</Text>

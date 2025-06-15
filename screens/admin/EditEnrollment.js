@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, Button, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator
+  View, Text, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator
 } from 'react-native';
 import { doc, getDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -64,7 +64,11 @@ export default function EditEnrollment({ route, navigation }) {
           }
           setEnrollments(studentEnrollments);
         } catch (err) {
-          Alert.alert('Error loading enrollments');
+          Alert.alert(
+            'Failed to Load Enrollments',
+            'There was an issue retrieving your enrollment information. Please check your connection and try again.',
+            [{ text: 'Retry', onPress: fetchEnrollments }, { text: 'Cancel', style: 'cancel' }]
+          );
         }
         setLoading(false);
       };
@@ -73,8 +77,8 @@ export default function EditEnrollment({ route, navigation }) {
 
   const handleDelete = async (enrollmentId) => {
     Alert.alert(
-      'Remove Enrollment',
-      'Are you sure you want to remove this enrollment?',
+      'Confirm Removal',
+      'Are you sure you want to remove this enrollment? This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -82,9 +86,12 @@ export default function EditEnrollment({ route, navigation }) {
             try {
               await deleteDoc(doc(db, 'enrolment', enrollmentId));
               setEnrollments(enrollments.filter(e => e.id !== enrollmentId));
-              Alert.alert('Enrollment removed');
+              Alert.alert('Enrollment Removed', 'The enrollment has been successfully deleted.');
             } catch (err) {
-              Alert.alert('Error removing enrollment');
+              Alert.alert(
+                'Deletion Failed',
+                'There was a problem removing the enrollment. Please try again later.'
+              );
             }
           }
         }
@@ -145,7 +152,7 @@ export default function EditEnrollment({ route, navigation }) {
           />
         )}
         <TouchableOpacity onPress={() => navigation.navigate('EnrollStudents')} style={styles.backButton}>
-          <Text style={{color:'#ffffff', fontSize: 16, fontWeight: 'bold'}}>Back</Text>
+          <Text style={{ color: '#ffffff', fontSize: 16, fontWeight: 'bold' }}>Back</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -161,5 +168,5 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 },
   deleteBtn: { backgroundColor: '#FF5252', padding: 8, borderRadius: 6 },
   actionText: { color: '#fff', fontWeight: 'bold' },
-  backButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6,  marginBottom: 8, alignContent: 'center', alignItems: 'center' },
+  backButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6, marginBottom: 8, alignContent: 'center', alignItems: 'center' },
 });

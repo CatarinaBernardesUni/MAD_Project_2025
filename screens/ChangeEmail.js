@@ -1,26 +1,13 @@
 import React, { useState } from 'react';
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    Alert,
-    StyleSheet,
-    KeyboardAvoidingView,
-    Platform,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, KeyboardAvoidingView} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '../firebase';
-import {
-    EmailAuthProvider,
-    reauthenticateWithCredential,
-    verifyBeforeUpdateEmail,
-} from 'firebase/auth';
+import { EmailAuthProvider, reauthenticateWithCredential, verifyBeforeUpdateEmail } from 'firebase/auth';
 
 export default function ChangeEmail({ navigation }) {
     const [newEmail, setNewEmail] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
-    const [step, setStep] = useState('enterEmail'); // 'enterEmail' or 'reauthenticate'
+    const [step, setStep] = useState('enterEmail');
     const [loading, setLoading] = useState(false);
 
     const validateEmail = (email) => {
@@ -30,7 +17,7 @@ export default function ChangeEmail({ navigation }) {
 
     const handleNext = () => {
         if (!newEmail.trim() || !validateEmail(newEmail)) {
-            Alert.alert('Please enter a valid new email address.');
+             Alert.alert('Validation Error', 'Please enter a valid email address.');
             return;
         }
         setStep('reauthenticate');
@@ -57,13 +44,13 @@ export default function ChangeEmail({ navigation }) {
                         try {
                             await auth.signOut();
                         } catch (signOutError) {
-                            console.error('Error signing out:', signOutError);
+                            Alert.alert('Sign Out Error', 'An error occurred while signing out. Please try again.');
                         }
                     },
                 }]
             );
         } catch (error) {
-            Alert.alert('Error', error.message);
+            Alert.alert('Email Update Failed', 'An unexpected error occurred while updating your email. Please try again later.');
         } finally {
             setLoading(false);
         }
@@ -71,10 +58,7 @@ export default function ChangeEmail({ navigation }) {
 
     return (
         <LinearGradient colors={['#84bfdd', '#fff7cf']} style={styles.container}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.innerContainer}
-            >
+            <KeyboardAvoidingView behavior='height' style={styles.innerContainer}>
                 {step === 'enterEmail' ? (
                     <>
                         <Text style={styles.title}>Enter New Email Address</Text>
@@ -96,6 +80,9 @@ export default function ChangeEmail({ navigation }) {
                             disabled={loading}
                         >
                             <Text style={styles.buttonText}>Next</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={{ marginTop: 40 }}>
+                            <Text style={{ color: '#000000', fontSize: 16, textDecorationLine: 'underline' }}>Back to Settings</Text>
                         </TouchableOpacity>
                     </>
                 ) : (

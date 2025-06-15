@@ -154,8 +154,6 @@ const Dashboard = () => {
     },
   ];
 
-
-
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Admin Dashboard</Text>

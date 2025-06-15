@@ -175,7 +175,6 @@ export default function EnrollStudents({ navigation }) {
       setSelectedStudent(null);
     } catch (err) {
       Alert.alert('Error', 'Failed to enroll student.');
-      console.error(err);
     }
   };
 

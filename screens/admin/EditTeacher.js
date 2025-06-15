@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, TouchableOpacity, Image, ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, Alert, TouchableOpacity, Image, ScrollView, StyleSheet, KeyboardAvoidingView } from 'react-native';
 import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { uploadImage, pickImage } from '../../utils/uploadImage';
@@ -97,7 +97,7 @@ export default function EditTeacherScreen({ route, navigation }) {
     } catch (err) {
       Alert.alert(
         'Update Failed',
-        'Something went wrong while updating the student. Please try again.',
+        'Something went wrong while updating the teacher. Please try again.',
       );
     }
   };

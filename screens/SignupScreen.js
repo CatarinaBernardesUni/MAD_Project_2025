@@ -38,9 +38,11 @@ export default function SignupScreen() {
         roles: [form.role],
         profilePicture: downloadURL || null,
       });
-      Alert.alert('Account created!');
+      Alert.alert('Success', 'Your account has been successfully created!');
     } catch (err) {
-      Alert.alert('Error:', err.message);
+      Alert.alert(
+      'Sign Up Failed', 'An unexpected error occurred while creating your account. Please try again.'
+    );
     }
   };
 

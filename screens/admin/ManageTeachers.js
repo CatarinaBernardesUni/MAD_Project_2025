@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import TeacherCard from '../../components/TeacherCard';
-import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AdminManageTeachers({ navigation }) {
@@ -49,10 +47,9 @@ export default function AdminManageTeachers({ navigation }) {
   const deleteTeacher = async (teacherId) => {
     try {
       await deleteDoc(doc(db, 'users', teacherId));
-      /*it is deleting from the users but not from the authentication*/
       fetchTeachers();
     } catch (err) {
-      console.error('Failed to delete:', err);
+      Alert.alert('Error', 'Failed to delete the teacher. Please try again.');
     }
   };
 

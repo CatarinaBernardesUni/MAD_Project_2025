@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert  } from 're
 
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const AdminHome = ({ navigation }) => {
   const handleLogout = () => {

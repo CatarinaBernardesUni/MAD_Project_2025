@@ -5,7 +5,6 @@ import { db } from '../../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
 import ClassTypeCard from '../../components/ClassTypeCard';
 
 export default function ManageClassType() {
@@ -26,7 +25,10 @@ export default function ManageClassType() {
       const classTypeList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setClassType(classTypeList);
     } catch (error) {
-      console.error('Error fetching classType:', error);
+      Alert.alert(
+        'Error',
+        'We could not load the class types. Please try again later.'
+      );
     }
   };
 
@@ -37,7 +39,7 @@ export default function ManageClassType() {
       setnewClassTypeName('');
       fetchClassType();
     } catch (error) {
-      console.error('Error adding class Type:', error);
+      Alert.alert('Error', 'Failed to add class type. Please try again.');
     }
   };
 
@@ -71,7 +73,7 @@ export default function ManageClassType() {
       cancelEdit();
       fetchClassType();
     } catch (error) {
-      console.error('Error updating class type:', error);
+      Alert.alert('Error', 'Failed to update class type. Please try again.');
     }
   };
 
