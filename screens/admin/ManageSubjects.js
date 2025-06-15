@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     backgroundColor: '#fff',
+    borderRadius: 10,
   },
   editContainer: {
     backgroundColor: '#fff',

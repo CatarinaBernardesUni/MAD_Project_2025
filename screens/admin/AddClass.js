@@ -49,7 +49,7 @@ const AddClass = ({ navigation }) => {
   const insets = useSafeAreaInsets();
 
   // handlers for picker
-  const handleDateChange = (date) => {
+  const handleDateChange = (event, date) => {
     setShowDatePicker(false);
     if (date) {
       setSelectedDate(date);
@@ -57,7 +57,7 @@ const AddClass = ({ navigation }) => {
     }
   };
 
-  const handleStartTimeChange = (date) => {
+  const handleStartTimeChange = (event, date) => {
     setShowStartTimePicker(false);
     if (date) {
       setSelectedStartTime(date);
@@ -65,7 +65,7 @@ const AddClass = ({ navigation }) => {
     }
   };
 
-  const handleEndTimeChange = (date) => {
+  const handleEndTimeChange = (event, date) => {
     setShowEndTimePicker(false);
     if (date) {
       setSelectedEndTime(date);
@@ -73,6 +73,7 @@ const AddClass = ({ navigation }) => {
     }
   };
 
+  // form handle
   const handleChange = (field, value) => {
     setForm((prev) => ({
       ...prev,
