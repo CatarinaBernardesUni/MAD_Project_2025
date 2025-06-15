@@ -51,7 +51,6 @@ const StudentAttendance = () => {
 }, []);
 
   useEffect(() => {
-    // Search for student's subjects
     const fetchSubjects = async () => {
       const auth = getAuth();
       const userId = auth.currentUser?.uid;
@@ -102,7 +101,7 @@ const StudentAttendance = () => {
 
       const types = [];
       for (const docSnap of snapshot.docs) {
-        const data = doc.data();
+        const data = docSnap.data();
         if (data.class) {
           const classSnap = await getDoc(data.class);
           if (classSnap.exists()) {
