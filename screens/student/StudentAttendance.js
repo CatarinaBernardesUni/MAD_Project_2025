@@ -1,15 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Dimensions } from 'react-native';
 import * as Progress from 'react-native-progress';
 import BlockBar from '../../components/BlockBar';
-import { collection, query, where, getDocs, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc} from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { db } from '../../firebase';
 import { getAuth } from 'firebase/auth';
 
-const screenWidth = Dimensions.get('window').width;
 
 const chartConfig = {
   backgroundGradientFrom: '#F2F6FC',
@@ -64,7 +62,7 @@ const StudentAttendance = () => {
 }, []);
 
   useEffect(() => {
-    // Buscar as disciplinas do estudante
+    // Search for student's subjects
     const fetchSubjects = async () => {
       const auth = getAuth();
       const userId = auth.currentUser?.uid;
@@ -74,13 +72,13 @@ const StudentAttendance = () => {
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const studentSubjects = userSnap.data().subjects || [];
-        // Buscar todos os subjects da coleção
+        // Search all subjects in the collection
         const subjectsSnap = await getDocs(collection(db, 'subjects'));
         const allSubjects = subjectsSnap.docs.map(d => ({
           id: d.id,
           name: d.data().name,
         }));
-        // Filtrar apenas os subjects do estudante
+        // Filter only student subjects
         const filtered = allSubjects.filter(s => studentSubjects.includes(s.name));
         setSubjectRefs(filtered);
         setSelectedSubject(filtered.length > 0 ? filtered[0].id : '');
