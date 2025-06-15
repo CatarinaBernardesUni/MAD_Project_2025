@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, TextInput} from 'react-native';
-import { Picker } from '@react-native-picker/picker'; 
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, TextInput } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import ClassCard from '../../components/ClassCard'; 
+import ClassCard from '../../components/ClassCard';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const fetchRefName = async (refPath, field = 'name') => {
   try {
@@ -39,6 +39,9 @@ const ManageClasses = ({ navigation }) => {
   const [teacherOptions, setTeacherOptions] = useState([]);
   const [subjectOptions, setSubjectOptions] = useState([]);
   const [classTypeOptions, setClassTypeOptions] = useState([]);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const fetchClasses = async () => {
     setLoading(true);
@@ -81,7 +84,7 @@ const ManageClasses = ({ navigation }) => {
             subjectId,
             professor: professorName,
             professorId,
-            classType: data.classType || '', 
+            classType: data.classType || '',
             additionalNotes: data.additionalNotes || '',
             start: data.start?.toDate?.() || new Date(),
             end: data.end?.toDate?.() || new Date(),
@@ -104,6 +107,17 @@ const ManageClasses = ({ navigation }) => {
       fetchClasses();
     } catch (err) {
       console.error('Error deleting class:', err);
+    }
+  };
+
+  const handleDateChange = (event, date) => {
+    setShowDatePicker(false);
+    if (date) {
+      setSelectedDate(date);
+      setFilterForm((prev) => ({
+        ...prev,
+        date: date.toISOString().split('T')[0], // Store as YYYY-MM-DD
+      }));
     }
   };
 
@@ -146,13 +160,13 @@ const ManageClasses = ({ navigation }) => {
     <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.headerRow}>
-        <Text style={styles.header}>Manage Classes</Text>
+          <Text style={styles.header}>Manage Classes</Text>
 
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('AddClass')}>
-          <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Add Class</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('AddClass')}>
+            <Text style={{ color: '#ffffff', fontWeight: 'bold' }}>Add Class</Text>
+          </TouchableOpacity>
         </View>
 
         {filtersVisible && (
@@ -204,18 +218,58 @@ const ManageClasses = ({ navigation }) => {
               </Picker>
             </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Filter by Date (YYYY-MM-DD)"
-              value={filterForm.date}
-              onChangeText={v => setFilterForm(f => ({ ...f, date: v }))}
-            />
+            <View style={{ marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(true)}
+                  style={[styles.input, { flex: 1 }]} // Makes the input take available space
+                >
+                  <Text>
+                    <Text style={{ fontWeight: "bold", fontSize: 16 }}>Date: </Text>
+                    {filterForm.date ? new Date(filterForm.date).toLocaleDateString() : 'Select Date'}
+                  </Text>
+                </TouchableOpacity>
+
+                {filterForm.date !== '' && (
+                  <TouchableOpacity
+                    onPress={() => setFilterForm((prev) => ({ ...prev, date: '' }))}
+                    style={{
+                      marginLeft: 8,
+                      backgroundColor: '#E57373',
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      borderRadius: 6,
+                      marginBottom: 12
+                    }}
+                  >
+                    <Text style={{ color: '#fff' }}>Clear</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={filterForm.date ? new Date(filterForm.date) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, date) => {
+                    setShowDatePicker(false);
+                    if (date) {
+                      setFilterForm((prev) => ({
+                        ...prev,
+                        date: date.toISOString().split('T')[0],
+                      }));
+                    }
+                  }}
+                />
+              )}
+            </View>
 
             <TouchableOpacity
               style={[styles.addButton, { alignSelf: 'flex-end', marginBottom: 16 }]}
               onPress={() => setFiltersVisible(false)}
             >
-              <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Hide Filters</Text>
+              <Text style={{ color: '#ffffff', fontWeight: 'bold' }}>Hide Filters</Text>
             </TouchableOpacity>
           </>
         )}
@@ -225,7 +279,7 @@ const ManageClasses = ({ navigation }) => {
             style={[styles.addButton, { alignSelf: 'flex-end', marginBottom: 16 }]}
             onPress={() => setFiltersVisible(true)}
           >
-            <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Show Filters</Text>
+            <Text style={{ color: '#ffffff', fontWeight: 'bold' }}>Show Filters</Text>
           </TouchableOpacity>
         )}
 
@@ -259,12 +313,12 @@ const ManageClasses = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {padding: 16, flex: 1 },
-  header: {fontSize: 24, fontWeight: 'bold', marginBottom: 12},
+  container: { padding: 16, flex: 1 },
+  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
   title: { fontSize: 24, fontWeight: 'bold', marginTop: 16, marginBottom: 12 },
-  addButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
-  input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
-  pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12, overflow: 'hidden', height: 40, justifyContent: 'center',},
+  addButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 6 },
+  input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
+  pickerWrapper: { borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12, overflow: 'hidden', height: 40, justifyContent: 'center', },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

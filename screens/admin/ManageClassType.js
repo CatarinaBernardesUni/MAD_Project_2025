@@ -5,6 +5,7 @@ import { db } from '../../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+
 import ClassTypeCard from '../../components/ClassTypeCard';
 
 export default function ManageClassType() {
