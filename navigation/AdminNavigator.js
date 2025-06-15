@@ -41,7 +41,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="EditClass" component={EditClass} options={{ title: "Edit Class", drawerItemStyle: { display: 'none' } }}/> 
       <Drawer.Screen name="AddStudent" component={AddStudent} options={{ title: "Add Student", drawerItemStyle: { display: 'none' } }}/>  
       <Drawer.Screen name="EditStudent" component={EditStudent} options={{ title: "Edit Student", drawerItemStyle: { display: 'none' } }}/>   
-      <Drawer.Screen name="EditEnrollment" component={EditEnrollment} options={{ title: "Edit Enrollment", drawerItemStyle: { display: 'none' } }}/>
+      <Drawer.Screen name="EditEnrollment" component={EditEnrollment} options={{ title: "Edit Enrollments", drawerItemStyle: { display: 'none' } }}/>
       <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
       <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />

@@ -88,7 +88,9 @@ export default function ClassList({
           }}
         />
       )}
-      <Button title="Back to Students" onPress={() => setSelectedStudent(null)} />
+      <TouchableOpacity onPress={() => setSelectedStudent(null)} style={styles.backButton}>
+        <Text style={{color: '#ffffff', fontWeight: 'bold', fontSize: 16}}>Back to Students</Text>
+      </TouchableOpacity>
     </View>
   );
 }

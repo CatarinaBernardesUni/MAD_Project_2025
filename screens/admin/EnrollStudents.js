@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   container: { padding: 16, flex: 1, backgroundColor: '#f0f4f8' },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
   addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
-  input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12 },
+  input: { borderColor: '#5996b5', borderWidth: 1, padding: 8, marginBottom: 12, backgroundColor: '#fff', borderRadius: 6},
   filtersRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, justifyContent: 'space-between' },
   studentEnrollCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },
   buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
@@ -229,5 +229,7 @@ const styles = StyleSheet.create({
   editBtn: { backgroundColor: '#4caf50', padding: 10, borderRadius: 6, marginRight: 8 },
   selectBtn: { backgroundColor: '#2196f3', padding: 10, borderRadius: 6 },
   actionText: { color: '#fff', fontWeight: 'bold' },
-  classOption: { padding: 14, backgroundColor: '#f2f6fc', borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#cce' },
+  classOption: { padding: 14, backgroundColor: '#ffffff', borderRadius: 8, marginBottom: 10, borderWidth: 1, borderColor: '#5996b5' },
+  searchButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 8 },
+  backButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6,  marginBottom: 8, alignContent: 'center', alignItems: 'center' },
 });

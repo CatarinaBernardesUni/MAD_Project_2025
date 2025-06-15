@@ -84,7 +84,7 @@ export default function AdminManageStudents({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <Text>Filters</Text>
+        <Text style= {{fontWeight: 'bold', fontSize: 14}}>Filters</Text>
         <TextInput
           style={styles.input}
           placeholder="Student ID"
@@ -113,8 +113,8 @@ export default function AdminManageStudents({ navigation }) {
 const styles = StyleSheet.create({
   container: { padding: 16, flex: 1, backgroundColor: '#f0f4f8' },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12 },
-  addButton: { backgroundColor: '#5996b5', padding: 12, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
-  input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, backgroundColor: '#fff', borderRadius: 6 },
+  addButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
+  input: { borderColor: '#5996b5', borderWidth: 1, padding: 8, marginBottom: 12, backgroundColor: '#fff', borderRadius: 6},
   filtersRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16, justifyContent: 'space-between' },
   studentCard: { padding: 12, borderWidth: 1, borderColor: '#ccc', marginBottom: 8, borderRadius: 6 },
   buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
