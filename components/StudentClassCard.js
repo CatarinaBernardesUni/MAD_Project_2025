@@ -60,11 +60,3 @@ export default function StudentClassCard({
     </TouchableOpacity>
   );
 }
-
-const styles = {
-  enrollmentCard: { backgroundColor: '#f9fbfd', borderRadius: 12, padding: 18, marginBottom: 16, shadowColor: '#000',
-     shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 3, borderWidth: 1,
-      borderColor: '#e0e6ed', width: '100%' },
-  classTitle: { fontWeight: 'bold', fontSize: 18, marginBottom: 6, color: '#1976d2' },
-  classInfo: { fontSize: 15, color: '#444', marginBottom: 2 },
-};

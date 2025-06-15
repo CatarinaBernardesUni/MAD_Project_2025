@@ -96,7 +96,7 @@ const AddClass = ({ navigation }) => {
           }))
       );
     } catch (err) {
-      console.error('Error fetching data!', err);
+      Alert.alert('Error', 'Failed to fetch professors. Please try again later.');
     }
   };
 
@@ -110,7 +110,7 @@ const AddClass = ({ navigation }) => {
         }))
       );
     } catch (error) {
-      console.error('Error fetching class types!', error);
+      Alert.alert('Error', 'Failed to fetch class types. Please try again later.');
     }
   };
 
