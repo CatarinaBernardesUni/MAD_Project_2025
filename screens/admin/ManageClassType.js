@@ -126,7 +126,9 @@ export default function ManageClassType() {
             value={newClassTypeName}
             onChangeText={setnewClassTypeName}
           />
-          <Button title="Add Class Type" onPress={addClassType} />
+                    <TouchableOpacity style={styles.addButton} onPress={addClassType}>
+                      <Text style={styles.buttonText}>Add Class Type</Text>
+                    </TouchableOpacity>
         </View>
 
         <FlatList
@@ -156,6 +158,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     backgroundColor: '#fff',
+    borderRadius: 10,
+    borderColor: '#5996b5'
   },
   editContainer: {
     backgroundColor: '#fff',
@@ -187,5 +191,12 @@ buttonText: {
   color: '#fff',
   fontWeight: 'bold',
   textAlign: 'center',
+},
+addButton: {
+  backgroundColor: '#5996b5',
+  paddingVertical: 10,
+  paddingHorizontal: 16,
+  borderRadius: 8,
+  alignItems: 'center',
 },
 });

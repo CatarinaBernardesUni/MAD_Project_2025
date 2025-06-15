@@ -34,6 +34,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: '#5996b5',
   },
   info: {
     marginBottom: 4,

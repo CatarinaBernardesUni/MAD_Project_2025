@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, TextInput, Button, Alert, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore'; // <-- added updateDoc
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -87,11 +87,11 @@ export default function ManageSubjects() {
           />
           <View style={styles.editButtons}>
             <TouchableOpacity style={styles.saveButton} onPress={saveEdit}>
-            <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={cancelEdit}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
+              <Text style={styles.buttonText}>Save</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={cancelEdit}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       );
@@ -127,7 +127,9 @@ export default function ManageSubjects() {
             value={newSubjectName}
             onChangeText={setNewSubjectName}
           />
-          <Button title="Add Subject" onPress={addSubject} />
+          <TouchableOpacity style={styles.addButton} onPress={addSubject}>
+            <Text style={styles.buttonText}>Add Subject</Text>
+          </TouchableOpacity>
         </View>
 
         <FlatList
@@ -158,6 +160,7 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: '#fff',
     borderRadius: 10,
+    borderColor: '#5996b5'
   },
   editContainer: {
     backgroundColor: '#fff',
@@ -172,22 +175,29 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   saveButton: {
-  backgroundColor: '#4A90E2',
-  paddingVertical: 8,
-  paddingHorizontal: 20,
-  borderRadius: 6,
-  marginLeft: 8,
-},
-cancelButton: {
-  backgroundColor: '#808080',
-  paddingVertical: 8,
-  paddingHorizontal: 20,
-  borderRadius: 6,
-  marginLeft: 8,
-},
-buttonText: {
-  color: '#fff',
-  fontWeight: 'bold',
-  textAlign: 'center',
+    backgroundColor: '#4A90E2',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  cancelButton: {
+    backgroundColor: '#808080',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  addButton: {
+  backgroundColor: '#5996b5',
+  paddingVertical: 10,
+  paddingHorizontal: 16,
+  borderRadius: 8,
+  alignItems: 'center',
 },
 });
