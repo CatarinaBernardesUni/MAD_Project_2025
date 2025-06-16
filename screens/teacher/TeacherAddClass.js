@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,
-} from 'react-native';
-import { Picker } from '@react-native-picker/picker'; 
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { collection, getDocs, addDoc, Timestamp, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getAuth } from 'firebase/auth';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddClass = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -24,6 +23,34 @@ const AddClass = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const teacherId = getAuth().currentUser?.uid;
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      handleChange('date', formattedDate);
+    }
+  };
+
+  const handleStartTimeChange = (event, selectedTime) => {
+    setShowStartTimePicker(false);
+    if (selectedTime) {
+      const formattedTime = selectedTime.toTimeString().split(' ')[0].slice(0, 5);
+      handleChange('startTime', formattedTime);
+    }
+  };
+
+  const handleEndTimeChange = (event, selectedTime) => {
+    setShowEndTimePicker(false);
+    if (selectedTime) {
+      const formattedTime = selectedTime.toTimeString().split(' ')[0].slice(0, 5);
+      handleChange('endTime', formattedTime);
+    }
+  };
 
   const fetchDropdownData = async () => {
     try {
@@ -44,7 +71,10 @@ const AddClass = ({ navigation }) => {
         }));
       setSubjects(fetchedSubjects);
     } catch (err) {
-      console.error('Error fetching dropdown data:', err);
+      Alert.alert(
+        'Loading Error',
+        'We encountered a problem while loading the dropdown data. Please try again later.',
+      );
     }
   };
 
@@ -55,7 +85,10 @@ const AddClass = ({ navigation }) => {
         const types = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setClassType(types);
       } catch (error) {
-        console.error('Error fetching class types:', error);
+        Alert.alert(
+          'Loading Error',
+          'We encountered a problem while loading the class types. Please try again later.',
+        );
       }
     };
     fetchClassType();
@@ -80,19 +113,25 @@ const AddClass = ({ navigation }) => {
       isNaN(startDateTime.getTime()) ||
       isNaN(endDateTime.getTime())
     ) {
-      alert('Please fill in all required fields with valid data');
+      Alert.alert(
+        'Incomplete Information',
+        'Please fill in all required fields with valid data before continuing.',
+      );
       return;
     }
 
     if (endDateTime <= startDateTime) {
-      alert('End time must be after start time.');
+      Alert.alert(
+        'Invalid Time Range',
+        'End time must be after start time.',
+      );
       return;
     }
 
     try {
       setLoading(true);
       await addDoc(collection(db, 'classes'), {
-        subject: doc(db, 'subjects', form.subjectId), 
+        subject: doc(db, 'subjects', form.subjectId),
         professor: doc(db, 'users', teacherId),
         classType: form.classType,
         start: Timestamp.fromDate(startDateTime),
@@ -101,18 +140,23 @@ const AddClass = ({ navigation }) => {
         peopleLimit: form.peopleLimit === '' ? null : Number(form.peopleLimit),
         description: '',
       });
-      alert('Class added successfully');
-      navigation.goBack();
+      Alert.alert(
+        'Success',
+        'The class has been added successfully.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
     } catch (err) {
-      console.error('Error adding class:', err);
-      alert('Failed to add class');
+      Alert.alert(
+        'Failed to Add Class',
+        'We encountered a problem while adding the class. Please try again later.',
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={[styles.container, { paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <Text style={styles.title}>Add New Class</Text>
@@ -120,7 +164,7 @@ const AddClass = ({ navigation }) => {
             style={styles.addButton}
             onPress={() => navigation.goBack()}
           >
-            <Text>Back</Text>
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Back</Text>
           </TouchableOpacity>
         </View>
         <ScrollView>
@@ -153,27 +197,54 @@ const AddClass = ({ navigation }) => {
           </View>
 
           <Text style={styles.label}>Date:</Text>
-          <TextInput
-            value={form.date}
-            onChangeText={v => handleChange('date', v)}
+          <TouchableOpacity
             style={styles.input}
-            placeholder="e.g. 2025-06-12"
-          />
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text>{form.date ? form.date : 'Select Date'}</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={form.date ? new Date(form.date) : new Date()}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
+
           <Text style={styles.label}>Start Time:</Text>
-          <TextInput
-            value={form.startTime}
-            onChangeText={v => handleChange('startTime', v)}
+          <TouchableOpacity
             style={styles.input}
-            placeholder="e.g. 14:30"
-          />
+            onPress={() => setShowStartTimePicker(true)}
+          >
+            <Text>{form.startTime ? form.startTime : 'Select Start Time'}</Text>
+          </TouchableOpacity>
+          {showStartTimePicker && (
+            <DateTimePicker
+              value={form.startTime ? new Date(`${form.date}T${form.startTime}:00`) : new Date()}
+              mode="time"
+              is24Hour={true}
+              display="default"
+              onChange={handleStartTimeChange}
+            />
+          )}
 
           <Text style={styles.label}>End Time:</Text>
-          <TextInput
-            value={form.endTime}
-            onChangeText={v => handleChange('endTime', v)}
+          <TouchableOpacity
             style={styles.input}
-            placeholder="e.g. 16:00"
-          />
+            onPress={() => setShowEndTimePicker(true)}
+          >
+            <Text>{form.endTime ? form.endTime : 'Select End Time'}</Text>
+          </TouchableOpacity>
+          {showEndTimePicker && (
+            <DateTimePicker
+              value={form.endTime ? new Date(`${form.date}T${form.endTime}:00`) : new Date()}
+              mode="time"
+              is24Hour={true}
+              display="default"
+              onChange={handleEndTimeChange}
+            />
+          )}
 
           <Text style={styles.label}>Additional Notes:</Text>
           <TextInput
@@ -211,16 +282,18 @@ const AddClass = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  header: {fontSize: 24, fontWeight: 'bold', marginBottom: 12},
+  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   title: { fontSize: 22, fontWeight: 'bold' },
-  addButton: { backgroundColor: '#cde', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
+  addButton: { backgroundColor: '#5996b5', padding: 8, borderRadius: 6, alignSelf: 'flex-end', marginBottom: 12 },
   label: { fontWeight: 'bold', marginTop: 12 },
-  input: {borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6},
-  option: {padding: 10, backgroundColor: '#eee', borderRadius: 6, marginVertical: 4, borderColor: '#ccc', borderWidth: 1},
-  selected: {backgroundColor: '#D0E6FF',},
-  addButton2: {backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20},
-  pickerWrapper: {borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
-   height: 50, justifyContent: 'center',marginTop: 12},
+  input: { borderColor: '#ccc', borderWidth: 1, padding: 8, marginBottom: 12, borderRadius: 6 },
+  option: { padding: 10, backgroundColor: '#eee', borderRadius: 6, marginVertical: 4, borderColor: '#ccc', borderWidth: 1 },
+  selected: { backgroundColor: '#D0E6FF', },
+  addButton2: { backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, alignItems: 'center', marginTop: 20 },
+  pickerWrapper: {
+    borderWidth: 1, borderColor: '#ccc', borderRadius: 6, marginBottom: 12,
+    height: 50, justifyContent: 'center', marginTop: 12
+  },
   picker: { height: 56, width: '100%' },
 });
 
