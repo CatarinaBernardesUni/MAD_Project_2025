@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback  } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getAuth } from 'firebase/auth';
@@ -18,82 +18,82 @@ const TeacherDashboard = () => {
   const teacherId = getAuth().currentUser?.uid;
 
   useFocusEffect(
-  useCallback(() => {
-    const fetchSubjects = async () => {
-      setLoading(true);
-      if (!teacherId) return;
-      const userRef = doc(db, 'users', teacherId);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const teacherSubjects = userSnap.data().subjects || [];
-        const subjectsSnap = await getDocs(collection(db, 'subjects'));
-        const allSubjects = subjectsSnap.docs.map(d => ({
-          id: d.id,
-          name: d.data().name,
-        }));
-        const filtered = allSubjects.filter(s => teacherSubjects.includes(s.name));
-        setSubjects(filtered.map(s => s.name));
-        setSubjectRefs(filtered.map(s => ({ id: s.id, name: s.name })));
-        setSelectedSubject(filtered.length > 0 ? filtered[0].id : '');
-      }
-      setLoading(false);
-    };
-    fetchSubjects();
-  }, [teacherId]));
+    useCallback(() => {
+      const fetchSubjects = async () => {
+        setLoading(true);
+        if (!teacherId) return;
+        const userRef = doc(db, 'users', teacherId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const teacherSubjects = userSnap.data().subjects || [];
+          const subjectsSnap = await getDocs(collection(db, 'subjects'));
+          const allSubjects = subjectsSnap.docs.map(d => ({
+            id: d.id,
+            name: d.data().name,
+          }));
+          const filtered = allSubjects.filter(s => teacherSubjects.includes(s.name));
+          setSubjects(filtered.map(s => s.name));
+          setSubjectRefs(filtered.map(s => ({ id: s.id, name: s.name })));
+          setSelectedSubject(filtered.length > 0 ? filtered[0].id : '');
+        }
+        setLoading(false);
+      };
+      fetchSubjects();
+    }, [teacherId]));
 
   useFocusEffect(
-  useCallback(() => {
-    const fetchGeneralSummary = async () => {
-      if (!teacherId) {
-        setGeneralSummary(null);
-        return;
-      }
-      setLoading(true);
+    useCallback(() => {
+      const fetchGeneralSummary = async () => {
+        if (!teacherId) {
+          setGeneralSummary(null);
+          return;
+        }
+        setLoading(true);
 
-      const professorRef = doc(db, 'users', teacherId);
-      const classesSnap = await getDocs(collection(db, 'classes'));
-      const classDocs = classesSnap.docs.filter(d => {
-  const data = d.data();
-  return data.professor?.id === teacherId;
-});
-      const classRefs = classDocs.map(d => d.ref);
+        const professorRef = doc(db, 'users', teacherId);
+        const classesSnap = await getDocs(collection(db, 'classes'));
+        const classDocs = classesSnap.docs.filter(d => {
+          const data = d.data();
+          return data.professor?.id === teacherId;
+        });
+        const classRefs = classDocs.map(d => d.ref);
 
-      let totalPresences = 0;
-      let totalAttendances = 0;
-      let totalClasses = classDocs.length;
+        let totalPresences = 0;
+        let totalAttendances = 0;
+        let totalClasses = classDocs.length;
 
-      if (classRefs.length > 0) {
-        const batchSize = 10;
-        for (let i = 0; i < classRefs.length; i += batchSize) {
-          const batchRefs = classRefs.slice(i, i + batchSize);
-          if (batchRefs.length > 0) {
-            const enrolSnap = await getDocs(
-              query(
-                collection(db, 'enrolment'),
-                where('class', 'in', batchRefs)
-              )
-            );
-            enrolSnap.forEach(doc => {
-              const data = doc.data();
-              if (typeof data.attendance === 'boolean') {
-                totalAttendances++;
-                if (data.attendance) totalPresences++;
-              }
-            });
+        if (classRefs.length > 0) {
+          const batchSize = 10;
+          for (let i = 0; i < classRefs.length; i += batchSize) {
+            const batchRefs = classRefs.slice(i, i + batchSize);
+            if (batchRefs.length > 0) {
+              const enrolSnap = await getDocs(
+                query(
+                  collection(db, 'enrolment'),
+                  where('class', 'in', batchRefs)
+                )
+              );
+              enrolSnap.forEach(doc => {
+                const data = doc.data();
+                if (typeof data.attendance === 'boolean') {
+                  totalAttendances++;
+                  if (data.attendance) totalPresences++;
+                }
+              });
+            }
           }
         }
-      }
 
-      setGeneralSummary({
-        totalClasses,
-        totalPresences,
-        totalAttendances,
-        averageAttendance: totalAttendances > 0 ? ((totalPresences / totalAttendances) * 100).toFixed(1) : 'N/A',
-      });
-      setLoading(false);
-    };
-    fetchGeneralSummary();
-  }, [teacherId]));
+        setGeneralSummary({
+          totalClasses,
+          totalPresences,
+          totalAttendances,
+          averageAttendance: totalAttendances > 0 ? ((totalPresences / totalAttendances) * 100).toFixed(1) : 'N/A',
+        });
+        setLoading(false);
+      };
+      fetchGeneralSummary();
+    }, [teacherId]));
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -108,11 +108,11 @@ const TeacherDashboard = () => {
 
       const classesSnap = await getDocs(collection(db, 'classes'));
       const classDocs = classesSnap.docs.filter(d => {
-  const data = d.data();
-  const profMatch = data.professor?.id === teacherId;
-  const subjMatch = data.subject?.id === selectedSubject;
-  return profMatch && subjMatch;
-});
+        const data = d.data();
+        const profMatch = data.professor?.id === teacherId;
+        const subjMatch = data.subject?.id === selectedSubject;
+        return profMatch && subjMatch;
+      });
       const classRefs = classDocs.map(d => d.ref);
 
 

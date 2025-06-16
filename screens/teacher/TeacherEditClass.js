@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../firebase';
 import { doc, getDoc, updateDoc, getDocs, collection, Timestamp } from 'firebase/firestore';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const TeacherEditClass = ({ route, navigation }) => {
   const { classId } = route.params;
@@ -16,6 +17,36 @@ const TeacherEditClass = ({ route, navigation }) => {
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  const onChangeDate = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      setDate(formattedDate);
+    }
+  };
+
+  const onChangeStartTime = (event, selectedDate) => {
+    setShowStartTimePicker(false);
+    if (selectedDate) {
+      const hours = selectedDate.getHours().toString().padStart(2, '0');
+      const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+      setStartTime(`${hours}:${minutes}`);
+    }
+  };
+
+  const onChangeEndTime = (event, selectedDate) => {
+    setShowEndTimePicker(false);
+    if (selectedDate) {
+      const hours = selectedDate.getHours().toString().padStart(2, '0');
+      const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+      setEndTime(`${hours}:${minutes}`);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,7 +63,7 @@ const TeacherEditClass = ({ route, navigation }) => {
       const userRef = doc(db, 'users', teacherId);
       const userSnap = await getDoc(userRef);
       const userData = userSnap.data();
-      setTeacherName(userData.name || teacherId); 
+      setTeacherName(userData.name || teacherId);
       const teacherSubjects = userData.subjects || [];
 
       const subjectsSnap = await getDocs(collection(db, 'subjects'));
@@ -57,14 +88,7 @@ const TeacherEditClass = ({ route, navigation }) => {
   }, [classId, teacherId]);
 
   const onSave = async () => {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      Alert.alert('Invalid date', 'Date must be in YYYY-MM-DD format.');
-      return;
-    }
-    if (!/^\d{2}:\d{2}$/.test(startTime) || !/^\d{2}:\d{2}$/.test(endTime)) {
-      Alert.alert('Invalid time', 'Times must be in HH:MM format.');
-      return;
-    }
+
     const [year, month, day] = date.split('-').map(Number);
     const [startHour, startMinute] = startTime.split(':').map(Number);
     const [endHour, endMinute] = endTime.split(':').map(Number);
@@ -118,39 +142,62 @@ const TeacherEditClass = ({ route, navigation }) => {
         </Picker>
       </View>
 
-      <Text style={styles.label}>Date (YYYY-MM-DD)</Text>
-      <TextInput
+      <Text style={styles.label}>Date</Text>
+      <TouchableOpacity
         style={styles.input}
-        value={date}
-        onChangeText={setDate}
-        placeholder="YYYY-MM-DD"
-        keyboardType="numbers-and-punctuation"
-      />
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text>{date || 'Select Date'}</Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={date ? new Date(date) : new Date()}
+          mode="date"
+          display="default"
+          onChange={onChangeDate}
+        />
+      )}
 
-      <Text style={styles.label}>Start Time (HH:MM, 24h)</Text>
-      <TextInput
+      <Text style={styles.label}>Start Time</Text>
+      <TouchableOpacity
         style={styles.input}
-        value={startTime}
-        onChangeText={setStartTime}
-        placeholder="HH:MM"
-        keyboardType="numbers-and-punctuation"
-      />
+        onPress={() => setShowStartTimePicker(true)}
+      >
+        <Text>{startTime || 'Select Start Time'}</Text>
+      </TouchableOpacity>
+      {showStartTimePicker && (
+        <DateTimePicker
+          value={startTime ? new Date(`${date}T${startTime}:00`) : new Date()}
+          mode="time"
+          display="default"
+          is24Hour={true}
+          onChange={onChangeStartTime}
+        />
+      )}
 
-      <Text style={styles.label}>End Time (HH:MM, 24h)</Text>
-      <TextInput
+      <Text style={styles.label}>End Time</Text>
+      <TouchableOpacity
         style={styles.input}
-        value={endTime}
-        onChangeText={setEndTime}
-        placeholder="HH:MM"
-        keyboardType="numbers-and-punctuation"
-      />
+        onPress={() => setShowEndTimePicker(true)}
+      >
+        <Text>{endTime || 'Select End Time'}</Text>
+      </TouchableOpacity>
+      {showEndTimePicker && (
+        <DateTimePicker
+          value={endTime ? new Date(`${date}T${endTime}:00`) : new Date()}
+          mode="time"
+          display="default"
+          is24Hour={true}
+          onChange={onChangeEndTime}
+        />
+      )}
 
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.saveButton} onPress={onSave}>
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
         <View style={{ width: 16 }} />
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.navigate('TeacherCalendar')}>
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
       </View>
@@ -164,7 +211,7 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#fff', borderRadius: 8, padding: 10, borderWidth: 1, borderColor: '#ccc', marginBottom: 8 },
   transparentInput: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#ccc' },
   pickerWrapper: { backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ccc', marginBottom: 8 },
-  buttonRow: {flexDirection: 'row', marginTop: 20, justifyContent: 'center', gap: 16,},
+  buttonRow: { flexDirection: 'row', marginTop: 20, justifyContent: 'center', gap: 16, },
   saveButton: { backgroundColor: '#22C55E', padding: 12, borderRadius: 6, alignItems: 'center', flex: 1 },
   cancelButton: { backgroundColor: '#FF6B6B', padding: 12, borderRadius: 6, alignItems: 'center', flex: 1 },
   buttonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },

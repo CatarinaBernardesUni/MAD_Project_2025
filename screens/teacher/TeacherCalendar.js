@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { collection, getDocs, getDoc, doc as firestoreDoc, deleteDoc } from 'firebase/firestore';
@@ -41,7 +41,10 @@ const TeacherCalendar = () => {
               }
             }
           } catch (err) {
-            console.warn('Error fetching subject:', err);
+            Alert.alert(
+              'Error',
+              'There was a problem loading the subject information. Please try again later.'
+            );
           }
 
           if (!dateMap[dateStr]) {

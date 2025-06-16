@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Switch, Alert, ActivityIndicator, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
-import { doc, getDoc, getDocs, query, where, collection, writeBatch, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, query, where, collection, writeBatch, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 
-export default function TeacherAttendanceScreen({ route, navigation  }) {
+export default function TeacherAttendanceScreen({ route, navigation }) {
     const { selectedClassId: classId } = route.params;
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
-    const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
+    const today = new Date().toISOString().split('T')[0];
 
-        useEffect(() => {
+    useEffect(() => {
         setLoading(true);
         const classRef = doc(db, 'classes', classId);
         const enrolQuery = query(collection(db, 'enrolment'), where('class', '==', classRef));
@@ -40,7 +40,10 @@ export default function TeacherAttendanceScreen({ route, navigation  }) {
                 setStudents(studentsWithNames);
                 setLoading(false);
             } catch (err) {
-                Alert.alert('Error loading data', err.message);
+                Alert.alert(
+                    'Loading Error',
+                    'An error occurred while loading data. Please check your internet connection or try again later.'
+                );
                 setLoading(false);
             }
         });
@@ -81,14 +84,17 @@ export default function TeacherAttendanceScreen({ route, navigation  }) {
             });
             await batch.commit();
             Alert.alert('Attendance saved!', '', [
-            {
-                text: 'OK',
-                onPress: () => navigation.navigate('TeacherHome'),
-            },
-        ]);
+                {
+                    text: 'OK',
+                    onPress: () => navigation.navigate('TeacherHome'),
+                },
+            ]);
 
         } catch (err) {
-            Alert.alert('Error saving attendance', err.message);
+            Alert.alert(
+                'Save Error',
+                'There was a problem saving the attendance. Please try again later.'
+            );
         }
     };
 

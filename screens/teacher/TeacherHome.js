@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOut, getAuth } from 'firebase/auth';
 import { auth, db } from '../../firebase';
@@ -11,6 +11,25 @@ export default function TeacherHome({ navigation }) {
   const [todaysClasses, setTodaysClasses] = useState([]);
   const [upcomingClasses, setUpcomingClasses] = useState([]);
   const [teacherName, setTeacherName] = useState('');
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Confirm Logout',
+      'Are you sure you want to log out?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Logout', style: 'destructive', onPress: confirmLogout }
+      ]
+    );
+  };
+
+  const confirmLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      Alert.alert('Error', 'Could not log out. Please try again.');
+    }
+  };
 
   const fetchClasses = async () => {
     setLoading(true);
@@ -26,20 +45,20 @@ export default function TeacherHome({ navigation }) {
       const classSnap = await getDocs(collection(db, 'classes'));
       const classDataList = [];
       for (const docSnap of classSnap.docs) {
-      const classData = { id: docSnap.id, ...docSnap.data() };
+        const classData = { id: docSnap.id, ...docSnap.data() };
 
-      if (classData.professor?.id !== user.uid) continue;
+        if (classData.professor?.id !== user.uid) continue;
 
-      let subjectName = '';
-      if (classData.subject?.id) {
-        const subjectSnap = await getDoc(classData.subject);
-        if (subjectSnap.exists()) {
-          subjectName = subjectSnap.data().name || '';
+        let subjectName = '';
+        if (classData.subject?.id) {
+          const subjectSnap = await getDoc(classData.subject);
+          if (subjectSnap.exists()) {
+            subjectName = subjectSnap.data().name || '';
+          }
         }
-      }
 
-      classDataList.push({ ...classData, subjectName });
-    }
+        classDataList.push({ ...classData, subjectName });
+      }
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -98,13 +117,14 @@ export default function TeacherHome({ navigation }) {
       if (userSnap.exists()) {
         const firestoreEmail = userSnap.data().email;
         if (firestoreEmail !== user.email) {
-          // Update Firestore email to match the authenticated email
           await updateDoc(userRef, { email: user.email });
-          // console.log('Email synced in Firestore:', user.email);
         }
       }
     } catch (error) {
-      console.error('Error syncing email:', error);
+      Alert.alert(
+        'Sync Error',
+        'An error occurred while syncing your email. Please try again later.'
+      );
     }
   };
 
@@ -208,15 +228,8 @@ export default function TeacherHome({ navigation }) {
           >
             <Text style={styles.calendarButtonText}>View Full Calendar</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={async () => {
-              try {
-                await signOut(auth);
-              } catch (error) { }
-            }}
-          >
-            <Text style={styles.logoutText}>Logout</Text>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutText} >Logout</Text>
           </TouchableOpacity>
         </View>
       </View>
