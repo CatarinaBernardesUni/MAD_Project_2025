@@ -21,8 +21,8 @@ export default function App() {
       </View>
     );
   }
-  console.log("user:", user);
-  console.log("role:", role);
+  //console.log("user:", user);
+  //console.log("role:", role);
 
   let Navigator;
 

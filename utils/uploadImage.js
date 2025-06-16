@@ -24,7 +24,10 @@ export const pickImage = async () => {
         }
         return null
     } catch (error) {
-        Alert.alert('Image selection failed', error.message);
+        Alert.alert(
+            'Image Selection Failed',
+            'An error occurred while selecting the image. Please try again.'
+        );
         return null
     }
 };
@@ -40,6 +43,9 @@ export const uploadImage = async (uri, uid) => {
         await uploadBytes(imageRef, blob);
         return await getDownloadURL(imageRef);
     } catch (err) {
-        throw new Error(`Image upload failed: ${err.message}`);
+        Alert.alert(
+            'Upload Failed',
+            'We could not upload your image. Please check your connection and try again.'
+        );
     }
 };
