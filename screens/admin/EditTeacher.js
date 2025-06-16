@@ -93,7 +93,7 @@ export default function EditTeacherScreen({ route, navigation }) {
         'Success!',
         'The teacher’s information has been successfully updated.',
       );
-      navigation.goBack();
+      navigation.navigate('ManageTeachers');
     } catch (err) {
       Alert.alert(
         'Update Failed',

@@ -53,16 +53,34 @@ const Dashboard = () => {
     setTodayClassCount(todayClasses);
 
     const enrolmentSnapshot = await getDocs(collection(db, 'enrolment'));
-    let unmarked = 0;
+    const classAttendanceMap = new Map();
 
     enrolmentSnapshot.forEach(doc => {
       const data = doc.data();
-      if (!('attendance' in data)) {
-        unmarked++;
+      const classRef = data.class;
+
+      if (!classRef) return;
+
+      const classKey = classRef.path;
+
+      if (!classAttendanceMap.has(classKey)) {
+        classAttendanceMap.set(classKey, []);
       }
+
+      classAttendanceMap.get(classKey).push(data.attendance);
     });
 
+    let unmarked = 0;
+
+    for (const [classKey, attendances] of classAttendanceMap.entries()) {
+      const anyMarked = attendances.some(att => att !== undefined);
+      if (!anyMarked) {
+        unmarked++;
+      }
+    }
+
     setUnmarkedSessionCount(unmarked);
+
   };
 
   const fetchAttendance = async () => {
