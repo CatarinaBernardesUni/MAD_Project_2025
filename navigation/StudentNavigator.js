@@ -22,7 +22,7 @@ export default function StudentNavigator() {
             <Drawer.Screen name="StudentCalendar" component={StudentCalendar} options={{title: "Calendar"}}/>
             <Drawer.Screen name="StudentEnroll" component={StudentEnroll} options={{title: "Enroll in Classes"}}/>
             <Drawer.Screen name="Settings" component={Settings} />
-            <Drawer.Screen name="StudentEnrollEdit" component={StudentEnrollEdit} options={{ drawerItemStyle: { display: 'none' } }} /> 
+            <Drawer.Screen name="StudentEnrollEdit" component={StudentEnrollEdit} options={{ title: "Edit Enrollment", drawerItemStyle: { display: 'none' } }} /> 
             <Drawer.Screen name="EditProfile" component={EditProfile} options={{title: "Edit Profile", drawerItemStyle: { display: 'none' }}} />
             <Drawer.Screen name="ChangeEmail" component={ChangeEmail} options={{title: "Change Email", drawerItemStyle: { display: 'none' }}} />
             <Drawer.Screen name="ChangePassword" component={ResetPassword} options={{title: "Reset Password", drawerItemStyle: { display: 'none' }}} />

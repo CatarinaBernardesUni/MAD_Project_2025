@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View, Text, Button, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator
-} from 'react-native';
+import { View, Text, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { collection, getDocs, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,7 +20,7 @@ export default function StudentEnrollEdit({ navigation }) {
         const snapshot = await getDocs(collection(db, 'enrolment'));
         const studentEnrollments = [];
         const today = new Date();
-        today.setHours(0, 0, 0, 0); 
+        today.setHours(0, 0, 0, 0);
 
         for (const docSnap of snapshot.docs) {
           const data = docSnap.data();
@@ -62,7 +60,7 @@ export default function StudentEnrollEdit({ navigation }) {
             }
             if (shouldDelete && docSnap.id) {
               await deleteDoc(doc(db, 'enrolment', docSnap.id));
-              continue; 
+              continue;
             }
             studentEnrollments.push({
               id: docSnap.id,
@@ -113,9 +111,9 @@ export default function StudentEnrollEdit({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
-        <Text style={styles.title}>My Enrollments ✏️</Text>
+        <Text style={styles.title}>My Enrollments</Text>
         {enrollments.length === 0 ? (
           <Text style={{ marginTop: 20 }}>No enrollments found.</Text>
         ) : (
@@ -160,7 +158,19 @@ export default function StudentEnrollEdit({ navigation }) {
             }}
           />
         )}
-        <Button title="Back" onPress={() => navigation.goBack()} />
+        <TouchableOpacity
+          onPress={() => navigation.navigate('StudentEnroll')}
+          style={{
+            backgroundColor: '#5996b5',
+            paddingVertical: 10,
+            paddingHorizontal: 16,
+            borderRadius: 6,
+            alignItems: 'center',
+            marginBottom: 8
+          }}
+        >
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Back</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

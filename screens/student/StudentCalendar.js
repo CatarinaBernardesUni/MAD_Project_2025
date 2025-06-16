@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { collection, getDocs, getDoc, doc, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -44,9 +44,13 @@ const StudentCalendar = () => {
               if (profDoc.exists()) {
                 professorName = profDoc.data().name || 'Unknown';
               }
-            
-          }} catch (err) {
-            console.warn('Error fetching professor:', err);
+
+            }
+          } catch (err) {
+            Alert.alert(
+              'Failed to Load Professor',
+              'We encountered a problem while loading the professor’s information. Please try again later.',
+            );
           }
 
           let subjectName = 'Unknown';
@@ -56,7 +60,10 @@ const StudentCalendar = () => {
               if (subjectDoc.exists()) subjectName = subjectDoc.data().name;
             }
           } catch (err) {
-            console.warn('Error fetching subject:', err);
+            Alert.alert(
+              'Failed to Load Subject',
+              'We encountered a problem while loading the subject information. Please try again later.',
+            );
           }
 
           if (!dateMap[dateStr]) {

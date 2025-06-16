@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../../firebase';
@@ -12,6 +12,25 @@ const StudentHome = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [todaysClasses, setTodaysClasses] = useState([]);
   const [upcomingClasses, setUpcomingClasses] = useState([]);
+
+  const handleLogout = () => {
+      Alert.alert(
+          'Confirm Logout',
+          'Are you sure you want to log out?',
+          [
+              { text: 'Cancel', style: 'cancel' },
+              { text: 'Logout', style: 'destructive', onPress: confirmLogout }
+          ]
+      );
+  };
+  
+  const confirmLogout = async () => {
+      try {
+          await signOut(auth);
+      } catch (error) {
+          Alert.alert('Error', 'Could not log out. Please try again.');
+      }
+  };
 
 
   useFocusEffect(
@@ -176,12 +195,7 @@ const StudentHome = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.logoutButton}
-            onPress={async () => {
-              try {
-                await signOut(auth);
-              } catch (error) {
-              }
-            }}
+            onPress={handleLogout}
           >
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>

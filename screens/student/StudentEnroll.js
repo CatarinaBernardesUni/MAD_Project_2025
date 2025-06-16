@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View, Text, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, TextInput
-} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { collection, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { View, Text, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { collection, addDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAuth } from 'firebase/auth';
@@ -63,8 +60,10 @@ export default function StudentClasses({ navigation }) {
         [classItem.id]: (classCounts[classItem.id] || 0) + 1
       });
     } catch (err) {
-      Alert.alert('Error', 'Failed to enroll.');
-      console.error(err);
+      Alert.alert(
+        'Enrollment Failed',
+        'We encountered a problem while trying to enroll. Please try again later.',
+      );
     }
   };
 
@@ -102,14 +101,16 @@ export default function StudentClasses({ navigation }) {
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>
       <View style={styles.container}>
-        <Text style={styles.title}>Available Classes 📝</Text>
-        <View style={{ alignItems: 'flex-end', marginBottom: 12 }}>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('StudentEnrollEdit')}
-          >
-            <Text style={styles.actionText}>Edit Enrollments</Text>
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={styles.title}>Available Classes</Text>
+          <View style={{ alignItems: 'flex-end', marginBottom: 12 }}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('StudentEnrollEdit')}
+            >
+              <Text style={styles.actionText}>Edit Enrollments</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <StudentClassFilters
@@ -143,7 +144,7 @@ export default function StudentClasses({ navigation }) {
               const limit = item.peopleLimit ?? item.limit ?? Infinity;
               const isFull = enrolledCount >= limit;
               const alreadyEnrolled = enrolledClassIds.includes(item.id);
-              const isPast = startDateObj && startDateObj < new Date(new Date().setHours(0,0,0,0));
+              const isPast = startDateObj && startDateObj < new Date(new Date().setHours(0, 0, 0, 0));
 
               return (
                 <StudentClassCard
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   enrollmentCard: { backgroundColor: '#f2f6fc', borderRadius: 10, padding: 16, marginBottom: 16 },
   classTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
   classInfo: { fontSize: 14, color: '#555', marginBottom: 4 },
-  editButton: { backgroundColor: '#5bc2e5', padding: 10, borderRadius: 6 },
+  editButton: { backgroundColor: '#5996b5', padding: 10, borderRadius: 6 },
   actionText: { color: '#fff', fontWeight: 'bold', textAlign: 'center' },
   filterBox: { backgroundColor: '#eaf6fb', borderRadius: 8, padding: 12, marginBottom: 16, width: '100%' },
   filterLabel: { fontWeight: 'bold', marginBottom: 4, marginTop: 8 },
