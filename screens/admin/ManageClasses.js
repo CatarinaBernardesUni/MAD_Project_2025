@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, TextInput } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, TextInput, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import ClassCard from '../../components/ClassCard';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useFocusEffect } from '@react-navigation/native';
 
 const fetchRefName = async (refPath, field = 'name') => {
   try {
@@ -22,7 +23,6 @@ const fetchRefName = async (refPath, field = 'name') => {
     Alert.alert(
       'Failed to Load Classes',
       'We encountered a problem while loading the classes. Please try again later.',
-      [{ text: 'OK' }]
     );
   }
 };
@@ -98,48 +98,39 @@ const ManageClasses = ({ navigation }) => {
 
       setClasses(fetched);
     } catch (err) {
-      console.error('Error fetching classes:', err);
+      Alert.alert(
+        'Failed to Load Classes',
+        'We encountered a problem while loading the classes. Please try again later.',
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = (id) => {
-  Alert.alert(
-    'Delete Class',
-    'Are you sure you want to delete this class? This action cannot be undone.',
-    [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteDoc(doc(db, 'classes', id));
-            Alert.alert('Class Deleted', 'The class has been successfully removed.');
-            fetchClasses();
-          } catch (err) {
-            console.error('Error deleting class:', err);
-            Alert.alert(
-              'Deletion Failed',
-              'Unable to delete the class at this time. Please try again later.'
-            );
-          }
+    Alert.alert(
+      'Delete Class',
+      'Are you sure you want to delete this class? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, 'classes', id));
+              Alert.alert('Class Deleted', 'The class has been successfully removed.');
+              fetchClasses();
+            } catch (err) {
+              Alert.alert(
+                'Deletion Failed',
+                'Unable to delete the class at this time. Please try again later.'
+              );
+            }
+          },
         },
-      },
-    ]
-  );
-};
-
-  const handleDateChange = (event, date) => {
-    setShowDatePicker(false);
-    if (date) {
-      setSelectedDate(date);
-      setFilterForm((prev) => ({
-        ...prev,
-        date: date.toISOString().split('T')[0], // Store as YYYY-MM-DD
-      }));
-    }
+      ]
+    );
   };
 
   useEffect(() => {
@@ -173,9 +164,11 @@ const ManageClasses = ({ navigation }) => {
     fetchDropdowns();
   }, []);
 
-  useEffect(() => {
-    fetchClasses();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchClasses();
+    }, [])
+  );
 
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#fff' }}>

@@ -48,7 +48,10 @@ export default function ManageClassType() {
       await deleteDoc(doc(db, 'classType', classTypeId));
       fetchClassType();
     } catch (error) {
-      console.error('Error deleting class type:', error);
+      Alert.alert(
+        'Failed to Delete Class Type',
+        'An error occurred while trying to delete the class type. Please try again later.',
+      );
     }
   };
 
@@ -89,11 +92,11 @@ export default function ManageClassType() {
           />
           <View style={styles.editButtons}>
             <TouchableOpacity style={styles.saveButton} onPress={saveEdit}>
-            <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={cancelEdit}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
+              <Text style={styles.buttonText}>Save</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={cancelEdit}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       );
@@ -129,9 +132,9 @@ export default function ManageClassType() {
             value={newClassTypeName}
             onChangeText={setnewClassTypeName}
           />
-                    <TouchableOpacity style={styles.addButton} onPress={addClassType}>
-                      <Text style={styles.buttonText}>Add Class Type</Text>
-                    </TouchableOpacity>
+          <TouchableOpacity style={styles.addButton} onPress={addClassType}>
+            <Text style={styles.buttonText}>Add Class Type</Text>
+          </TouchableOpacity>
         </View>
 
         <FlatList
@@ -177,29 +180,29 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   saveButton: {
-  backgroundColor: '#4A90E2',
-  paddingVertical: 8,
-  paddingHorizontal: 20,
-  borderRadius: 6,
-  marginLeft: 8,
-},
-cancelButton: {
-  backgroundColor: '#808080',
-  paddingVertical: 8,
-  paddingHorizontal: 20,
-  borderRadius: 6,
-  marginLeft: 8,
-},
-buttonText: {
-  color: '#fff',
-  fontWeight: 'bold',
-  textAlign: 'center',
-},
-addButton: {
-  backgroundColor: '#5996b5',
-  paddingVertical: 10,
-  paddingHorizontal: 16,
-  borderRadius: 8,
-  alignItems: 'center',
-},
+    backgroundColor: '#4A90E2',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  cancelButton: {
+    backgroundColor: '#808080',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  addButton: {
+    backgroundColor: '#5996b5',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
 });

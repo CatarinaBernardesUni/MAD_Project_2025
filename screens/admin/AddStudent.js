@@ -40,7 +40,7 @@ export default function AddStudent({ navigation }) {
                 profilePicture: downloadURL || null,
             });
             Alert.alert('Success', 'Student account has been successfully created.');
-            navigation.goBack();
+            navigation.navigate('ManageStudents');
         } catch (err) {
             let message = 'Something went wrong. Please try again later.';
 

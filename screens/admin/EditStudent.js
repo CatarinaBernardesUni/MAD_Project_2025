@@ -66,7 +66,7 @@ export default function EditStudent({ route, navigation }) {
         'Success!',
         'The student’s information has been successfully updated.',
       );
-      navigation.goBack();
+      navigation.navigate('ManageStudents');
     } catch (err) {
       Alert.alert(
         'Update Failed',

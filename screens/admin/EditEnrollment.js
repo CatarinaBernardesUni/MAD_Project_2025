@@ -1,7 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View, Text, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator
-} from 'react-native';
+import { View, Text, Alert, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { doc, getDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -67,7 +65,6 @@ export default function EditEnrollment({ route, navigation }) {
           Alert.alert(
             'Failed to Load Enrollments',
             'There was an issue retrieving your enrollment information. Please check your connection and try again.',
-            [{ text: 'Retry', onPress: fetchEnrollments }, { text: 'Cancel', style: 'cancel' }]
           );
         }
         setLoading(false);

@@ -131,7 +131,7 @@ export default function EditClass({ route, navigation }) {
         additionalNotes: form.additionalNotes || '',
       });
       Alert.alert('Success', 'Class updated!');
-      navigation.goBack();
+      navigation.navigate('ManageClasses');
     } catch (err) {
       Alert.alert(
         'Update Failed',
@@ -153,7 +153,15 @@ export default function EditClass({ route, navigation }) {
   return (
     <SafeAreaView edges={['left', 'right', 'bottom']} style={{ flex: 1, backgroundColor: '#F2F6FC' }}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+
         <Text style={styles.title}>Edit Class</Text>
+        <TouchableOpacity
+                    style={styles.backBtn}
+                    onPress={() => navigation.navigate('ManageClasses')}>
+                    <Text style={{ color: '#fff', fontWeight: 'bold' }}>Back</Text>
+                  </TouchableOpacity>
+                  </View>
 
         <Text style={styles.label}>Subject</Text>
         <View style={styles.pickerWrapper}>
@@ -298,14 +306,15 @@ const styles = StyleSheet.create({
   container: { padding: 20 },
   title: { fontSize: 24, color: '#4A90E2', fontWeight: 'bold', marginBottom: 20 },
   label: { fontSize: 16, marginVertical: 10, fontWeight: '600' },
-  input: { borderColor: '#ccc', borderWidth: 1, borderRadius: 6, backgroundColor: '#fff', padding: 10, marginBottom: 10 },
-  pickerWrapper: { borderColor: '#ccc', borderWidth: 1, borderRadius: 6, marginBottom: 10 },
+  input: { borderColor: '#5996b5', borderWidth: 1, borderRadius: 6, backgroundColor: '#fff', padding: 10, marginBottom: 10 },
+  pickerWrapper: { borderColor: '#5996b5', borderWidth: 1, borderRadius: 6, marginBottom: 10, backgroundColor: '#ffffff' },
   picker: { height: 56, width: '100%' },
   optionList: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  optionButton: { backgroundColor: '#eee', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, marginBottom: 6 },
+  optionButton: { backgroundColor: '#fff', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, marginBottom: 6, borderColor: '#5996b5', borderWidth: 1 },
   optionButtonSelected: { backgroundColor: '#4A90E2' },
   optionText: { color: '#333' },
   optionTextSelected: { color: '#fff', fontWeight: 'bold' },
   saveButton: { backgroundColor: '#4A90E2', padding: 12, borderRadius: 6, marginTop: 20, alignItems: 'center' },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  backBtn: { backgroundColor: '#5996b5', padding: 12, borderRadius: 6 },
 });

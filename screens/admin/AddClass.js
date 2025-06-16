@@ -184,7 +184,7 @@ const AddClass = ({ navigation }) => {
       Alert.alert(
         'Class Added',
         `The class for ${form.classType} starting at ${start.toLocaleString()} has been successfully added.`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: 'OK', onPress: () => navigation.navigate('ManageClasses') }]
       );
     } catch (err) {
       Alert.alert(
@@ -205,7 +205,7 @@ const AddClass = ({ navigation }) => {
           </Text>
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={() => navigation.goBack()}>
+            onPress={() => navigation.navigate('ManageClasses')}>
             <Text style={{ color: '#fff', fontWeight: 'bold' }}>Back</Text>
           </TouchableOpacity>
         </View>

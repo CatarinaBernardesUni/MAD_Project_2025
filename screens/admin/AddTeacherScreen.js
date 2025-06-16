@@ -67,7 +67,7 @@ export default function AddTeacherScreen({ navigation }) {
         profilePicture: downloadURL || null,
       });
       Alert.alert('Success', 'Teacher account has been successfully created.');
-      navigation.goBack();
+      navigation.navigate('ManageTeachers');
     } catch (err) {
       let message = 'Something went wrong. Please try again later.';
 
