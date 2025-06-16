@@ -122,8 +122,8 @@ export default function EditClass({ route, navigation }) {
       }
 
       await updateDoc(doc(db, 'classes', classData.id), {
-        subject: `subjects/${form.subjectId}`,
-        professor: `users/${form.professorId}`,
+        subject: doc(db, 'subjects', form.subjectId),
+        professor: doc(db, 'users', form.professorId),
         classType: form.classType,
         start: startDateTime,
         end: endDateTime,
@@ -155,13 +155,13 @@ export default function EditClass({ route, navigation }) {
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 
-        <Text style={styles.title}>Edit Class</Text>
-        <TouchableOpacity
-                    style={styles.backBtn}
-                    onPress={() => navigation.navigate('ManageClasses')}>
-                    <Text style={{ color: '#fff', fontWeight: 'bold' }}>Back</Text>
-                  </TouchableOpacity>
-                  </View>
+          <Text style={styles.title}>Edit Class</Text>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.navigate('ManageClasses')}>
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Back</Text>
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.label}>Subject</Text>
         <View style={styles.pickerWrapper}>
