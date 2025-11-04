@@ -1,4 +1,3 @@
-// WORKING FILE: firebase.js
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -11,12 +10,12 @@ import { getStorage } from 'firebase/storage';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBGStG2VO6lwvo76Ta3yIawPA6CEkRmyfU",
-  authDomain: "mad-project-2025.firebaseapp.com",
-  projectId: "mad-project-2025",
-  storageBucket: "mad-project-2025.firebasestorage.app",
-  messagingSenderId: "94415246820",
-  appId: "1:94415246820:web:3dc4669735ef16a2f623f1"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
 };
 
 // Initialize Firebase
